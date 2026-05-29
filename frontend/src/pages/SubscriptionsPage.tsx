@@ -1,23 +1,22 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Plus, Pencil, Trash2, RefreshCw, CalendarClock } from 'lucide-react';
 import { useSubscriptionStore } from '../store/subscriptionStore';
 import type { Subscription, SubscriptionPayload } from '../types/subscription';
 import SubscriptionModal from '../components/subscriptions/SubscriptionModal';
-
-const formatPeso = (amount: number) =>
-  `₱${amount.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
-
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr + 'T00:00:00');
-  return date.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
-};
+import PageHeader from '../components/ui/PageHeader';
+import EmptyState from '../components/ui/EmptyState';
+import AnimatedNumber from '../components/ui/AnimatedNumber';
+import { formatPeso, formatShortDate } from '../lib/utils';
+import { staggerContainer, fadeUpItem } from '../lib/motion';
 
 function renewalBadge(days: number, active: boolean) {
-  if (!active) return { label: 'Inactive', cls: 'bg-gray-100 text-gray-400' };
-  if (days < 0) return { label: 'Overdue', cls: 'bg-red-100 text-red-600' };
-  if (days === 0) return { label: 'Due today', cls: 'bg-red-100 text-red-600' };
-  if (days <= 3) return { label: `${days}d`, cls: 'bg-orange-100 text-orange-600' };
-  if (days <= 7) return { label: `${days}d`, cls: 'bg-yellow-100 text-yellow-600' };
-  return { label: `${days}d`, cls: 'bg-green-100 text-green-600' };
+  if (!active) return { label: 'Inactive', cls: 'bg-surface-soft text-ink-faint' };
+  if (days < 0) return { label: 'Overdue', cls: 'bg-rose-100 text-rose-600 dark:bg-rose-500/15' };
+  if (days === 0) return { label: 'Due today', cls: 'bg-rose-100 text-rose-600 dark:bg-rose-500/15' };
+  if (days <= 3) return { label: `${days}d left`, cls: 'bg-orange-100 text-orange-600 dark:bg-orange-500/15' };
+  if (days <= 7) return { label: `${days}d left`, cls: 'bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/15' };
+  return { label: `${days}d left`, cls: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15' };
 }
 
 export default function SubscriptionsPage() {
@@ -25,120 +24,106 @@ export default function SubscriptionsPage() {
     useSubscriptionStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSub, setEditingSub] = useState<Subscription | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSubscriptions();
   }, []);
 
-  const totalMonthly = subscriptions
-    .filter((s) => s.active)
-    .reduce((sum, s) => sum + s.amount, 0);
+  const totalMonthly = subscriptions.filter((s) => s.active).reduce((sum, s) => sum + s.amount, 0);
 
   const handleSubmit = async (data: SubscriptionPayload) => {
-    setActionError(null);
-    try {
-      if (editingSub) {
-        await editSubscription(editingSub.id, data);
-      } else {
-        await addSubscription(data);
-      }
-    } catch {
-      setActionError('Failed to save subscription.');
-      throw new Error('submit failed');
-    }
+    if (editingSub) await editSubscription(editingSub.id, data);
+    else await addSubscription(data);
   };
-
   const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this subscription?')) return;
-    try {
-      await removeSubscription(id);
-    } catch {
-      setActionError('Failed to delete subscription.');
-    }
+    await removeSubscription(id);
   };
-
   const openEdit = (sub: Subscription) => {
     setEditingSub(sub);
     setIsModalOpen(true);
   };
-
   const openCreate = () => {
     setEditingSub(null);
     setIsModalOpen(true);
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-gray-800">Subscriptions</h1>
-          {subscriptions.length > 0 && (
-            <p className="text-xs text-gray-400 mt-0.5">
-              Monthly total: <span className="font-medium text-gray-600">{formatPeso(totalMonthly)}</span>
-            </p>
-          )}
-        </div>
-        <button
-          onClick={openCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700"
-        >
-          + Add
-        </button>
-      </div>
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <PageHeader
+        title="Subscriptions"
+        subtitle="Keep track of recurring charges."
+        action={
+          <button onClick={openCreate} className="btn-gold hidden sm:inline-flex">
+            <Plus size={18} /> Add
+          </button>
+        }
+      />
 
-      {actionError && (
-        <div className="bg-red-50 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">{actionError}</div>
+      {subscriptions.length > 0 && (
+        <div className="card mb-5 flex items-center gap-4 p-5">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-nu-gradient text-nu-gold-300">
+            <RefreshCw size={22} />
+          </span>
+          <div>
+            <p className="text-xs text-ink-faint">Active monthly total</p>
+            <p className="font-display text-2xl font-extrabold text-ink">
+              <AnimatedNumber value={totalMonthly} format={(n) => formatPeso(n)} />
+            </p>
+          </div>
+        </div>
       )}
 
       {isLoading ? (
-        <p className="text-center text-gray-400 text-sm py-12">Loading...</p>
-      ) : error ? (
-        <p className="text-center text-red-400 text-sm py-12">{error}</p>
-      ) : subscriptions.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-          <p className="text-gray-400 text-sm">No subscriptions yet.</p>
+        <div className="space-y-2">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="skeleton h-16 w-full" />
+          ))}
         </div>
+      ) : error ? (
+        <EmptyState icon={RefreshCw} title="Couldn't load subscriptions" message={error} />
+      ) : subscriptions.length === 0 ? (
+        <EmptyState
+          icon={RefreshCw}
+          title="No subscriptions yet"
+          message="Add Spotify, Canva, or any recurring charge so you never get surprised by a renewal again."
+          action={
+            <button onClick={openCreate} className="btn-gold">
+              <Plus size={18} /> Add Subscription
+            </button>
+          }
+        />
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          {subscriptions.map((sub, i) => {
+        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-2.5">
+          {subscriptions.map((sub) => {
             const badge = renewalBadge(sub.daysUntilRenewal, sub.active);
             return (
-              <div
+              <motion.div
                 key={sub.id}
-                className={`flex items-center justify-between px-5 py-4 ${
-                  i !== subscriptions.length - 1 ? 'border-b border-gray-50' : ''
-                } ${!sub.active ? 'opacity-50' : ''}`}
+                variants={fadeUpItem}
+                className={`card group flex items-center gap-3 p-4 ${!sub.active ? 'opacity-60' : ''}`}
               >
-                <div>
-                  <p className="text-sm font-medium text-gray-800">{sub.name}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    Renews {formatDate(sub.renewalDate)}
-                  </p>
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15">
+                  <CalendarClock size={20} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-ink">{sub.name}</p>
+                  <p className="text-xs text-ink-faint">Renews {formatShortDate(sub.renewalDate)}</p>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.cls}`}>
-                    {badge.label}
-                  </span>
-                  <span className="text-sm font-semibold text-gray-700">{formatPeso(sub.amount)}</span>
-                  <button
-                    onClick={() => openEdit(sub)}
-                    className="text-xs text-gray-400 hover:text-blue-500"
-                  >
-                    Edit
+                <span className={`chip ${badge.cls}`}>{badge.label}</span>
+                <span className="font-display text-sm font-bold text-ink">{formatPeso(sub.amount)}</span>
+                <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button onClick={() => openEdit(sub)} className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface-soft hover:text-nu-blue-600">
+                    <Pencil size={14} />
                   </button>
-                  <button
-                    onClick={() => handleDelete(sub.id)}
-                    className="text-xs text-gray-400 hover:text-red-500"
-                  >
-                    Delete
+                  <button onClick={() => handleDelete(sub.id)} className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface-soft hover:text-rose-500">
+                    <Trash2 size={14} />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       )}
 
       <SubscriptionModal

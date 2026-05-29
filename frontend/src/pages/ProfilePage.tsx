@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
+import { CheckCircle2, AlertCircle, Flame, Star, Trophy } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { useGamificationStore } from '../store/gamificationStore';
 import profileService from '../services/profileService';
 import type { AllowanceSchedule } from '../types/auth';
+import PageHeader from '../components/ui/PageHeader';
+import TextField from '../components/ui/TextField';
+import AchievementsGrid from '../components/gamification/AchievementsGrid';
 
 const profileSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
@@ -17,8 +23,13 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
   const { user, token, setAuth } = useAuthStore();
+  const { data: gam, fetch: fetchGam } = useGamificationStore();
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchGam();
+  }, []);
 
   const {
     register,
@@ -51,100 +62,131 @@ export default function ProfilePage() {
     }
   };
 
+  const initials = (user?.fullName ?? 'U')
+    .split(' ')
+    .map((s) => s[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+  const xpPct = gam ? Math.min(100, (gam.xpIntoLevel / Math.max(1, gam.xpForNextLevel)) * 100) : 0;
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <h1 className="text-xl font-bold text-gray-800 mb-6">Profile</h1>
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <PageHeader title="Profile" subtitle="Your account and achievements." />
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 max-w-sm">
-        <p className="text-sm font-semibold text-gray-700 mb-5">Account Settings</p>
+      {/* Hero profile card */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative mb-6 overflow-hidden rounded-4xl bg-nu-gradient p-6 text-white shadow-float"
+      >
+        <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-nu-gold-400/20 blur-3xl" />
+        <div className="relative flex flex-wrap items-center gap-5">
+          <span className="grid h-20 w-20 place-items-center rounded-3xl bg-white/10 font-display text-2xl font-extrabold text-nu-gold-300 backdrop-blur">
+            {initials}
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-display text-2xl font-extrabold">{user?.fullName ?? 'Student'}</h2>
+            <p className="text-sm text-white/70">{user?.schoolName || 'NU Laguna'}</p>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <span className="chip bg-white/10 text-nu-gold-300">
+                <Star size={13} fill="currentColor" /> Level {gam?.level ?? 1}
+              </span>
+              {(gam?.currentStreak ?? 0) > 0 && (
+                <span className="chip bg-white/10 text-nu-gold-300">
+                  <Flame size={13} /> {gam?.currentStreak} day streak
+                </span>
+              )}
+              <span className="chip bg-white/10 text-white/80">{gam?.totalXp ?? 0} XP total</span>
+            </div>
+          </div>
+        </div>
 
-        {success && (
-          <div className="bg-green-50 text-green-600 text-sm rounded-xl px-4 py-3 mb-4">
-            Profile updated successfully.
+        {gam && (
+          <div className="relative mt-5">
+            <div className="mb-1 flex justify-between text-xs text-white/70">
+              <span>Level {gam.level}</span>
+              <span>
+                {gam.xpIntoLevel}/{gam.xpForNextLevel} XP to Lv {gam.level + 1}
+              </span>
+            </div>
+            <div className="h-2.5 overflow-hidden rounded-full bg-white/15">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${xpPct}%` }}
+                transition={{ duration: 1 }}
+                className="h-full rounded-full bg-nu-gradient-gold"
+              />
+            </div>
           </div>
         )}
-        {serverError && (
-          <div className="bg-red-50 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
-            {serverError}
+      </motion.div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Account form */}
+        <div className="card p-6">
+          <p className="mb-5 text-sm font-semibold text-ink">Account Settings</p>
+
+          {success && (
+            <div className="mb-4 flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-600 dark:bg-emerald-500/10">
+              <CheckCircle2 size={16} /> Profile updated successfully.
+            </div>
+          )}
+          {serverError && (
+            <div className="mb-4 flex items-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600 dark:bg-rose-500/10">
+              <AlertCircle size={16} /> {serverError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <TextField label="Full Name" error={errors.fullName?.message} {...register('fullName')} />
+            <TextField label="School" placeholder="Optional" {...register('schoolName')} />
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-ink">
+                Email <span className="font-normal text-ink-faint">(cannot change)</span>
+              </label>
+              <p className="rounded-2xl bg-surface-soft px-4 py-2.5 text-sm text-ink-soft">{user?.email}</p>
+            </div>
+
+            <div className="border-t border-surface-border/60 pt-4">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-faint">Allowance</p>
+              <div className="space-y-4">
+                <TextField
+                  label="Monthly Allowance (₱)"
+                  type="number"
+                  step="0.01"
+                  inputMode="decimal"
+                  placeholder="e.g. 3000"
+                  error={errors.monthlyAllowance?.message}
+                  {...register('monthlyAllowance')}
+                />
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-ink">Allowance Schedule</label>
+                  <select {...register('allowanceSchedule')} className="input-field">
+                    <option value="">Select schedule</option>
+                    <option value="WEEKLY">Weekly</option>
+                    <option value="BIWEEKLY">Bi-weekly (every 2 weeks)</option>
+                    <option value="MONTHLY">Monthly</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" disabled={isSubmitting} className="btn-primary mt-2 w-full">
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </button>
+          </form>
+        </div>
+
+        {/* Achievements */}
+        <div className="card p-6">
+          <div className="mb-5 flex items-center gap-2">
+            <Trophy size={16} className="text-accent" />
+            <p className="text-sm font-semibold text-ink">Achievements</p>
           </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
-            <input
-              type="text"
-              {...register('fullName')}
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-            {errors.fullName && (
-              <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">School</label>
-            <input
-              type="text"
-              {...register('schoolName')}
-              placeholder="Optional"
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-              <span className="text-gray-400 font-normal ml-1">(cannot change)</span>
-            </label>
-            <p className="text-sm text-gray-500 bg-gray-50 rounded-xl px-3.5 py-2.5">
-              {user?.email}
-            </p>
-          </div>
-
-          <hr className="border-gray-100" />
-
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Allowance Settings</p>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Monthly Allowance (₱)
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              {...register('monthlyAllowance')}
-              placeholder="e.g. 3000"
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-            {errors.monthlyAllowance && (
-              <p className="text-red-500 text-xs mt-1">{errors.monthlyAllowance.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Allowance Schedule
-            </label>
-            <select
-              {...register('allowanceSchedule')}
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            >
-              <option value="">Select schedule</option>
-              <option value="WEEKLY">Weekly</option>
-              <option value="BIWEEKLY">Bi-weekly (every 2 weeks)</option>
-              <option value="MONTHLY">Monthly</option>
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-60 mt-2"
-          >
-            {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </button>
-        </form>
+          <AchievementsGrid achievements={gam?.achievements ?? []} />
+        </div>
       </div>
     </div>
   );

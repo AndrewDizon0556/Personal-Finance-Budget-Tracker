@@ -1,3 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light theme surface tokens */
+    --surface: 255 255 255;
+    --surface-soft: 244 246 252;
+    --surface-border: 226 230 242;
+    --ink: 25 31 56;
+    --ink-soft: 90 98 128;
+    --ink-faint: 148 156 184;
+    /* Accent (customizable in Settings) — defaults to NU gold */
+    --accent: 245 179 0;
+    --accent-soft: 255 244 198;
+    --page-bg: 247 248 252;
+  }
+
+  .dark {
+    --surface: 30 35 64;
+    --surface-soft: 38 44 78;
+    --surface-border: 54 62 104;
+    --ink: 233 236 247;
+    --ink-soft: 168 176 206;
+    --ink-faint: 120 128 160;
+    --accent: 255 201 26;
+    --accent-soft: 53 64 142;
+    --page-bg: 18 21 42;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[rgb(var(--page-bg))] text-ink font-sans transition-colors duration-300;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-nu-blue-200 dark:bg-nu-blue-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-nu-blue-300 dark:bg-nu-blue-600;
+  }
+}
+
+@layer components {
+  /* Glassmorphism surfaces */
+  .glass {
+    @apply bg-surface/70 backdrop-blur-xl border border-surface-border/60 shadow-card;
+  }
+  .glass-strong {
+    @apply bg-surface/90 backdrop-blur-2xl border border-surface-border/70 shadow-card;
+  }
+  .glass-nav {
+    @apply bg-surface/70 backdrop-blur-xl border-b border-surface-border/50;
+  }
+
+  /* Standard rounded card */
+  .card {
+    @apply bg-surface rounded-3xl border border-surface-border/70 shadow-soft;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-nu-blue-700 px-5 py-2.5
+           text-sm font-semibold text-white shadow-glow-blue transition-all duration-200
+           hover:bg-nu-blue-800 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-nu-gradient-gold px-5 py-2.5
+           text-sm font-semibold text-nu-blue-900 shadow-glow transition-all duration-200
+           hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-surface-border
+           bg-surface px-5 py-2.5 text-sm font-semibold text-ink-soft transition-all duration-200
+           hover:border-nu-blue-300 hover:text-nu-blue-700 active:scale-[0.98];
+  }
+
+  /* Input */
+  .input-field {
+    @apply w-full rounded-2xl border border-surface-border bg-surface-soft px-4 py-2.5 text-sm text-ink
+           placeholder:text-ink-faint transition-all duration-200
+           focus:border-nu-blue-400 focus:bg-surface focus:outline-none focus:ring-4 focus:ring-nu-blue-100 dark:focus:ring-nu-blue-900;
+  }
+
+  /* Chip / badge */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+  }
+
+  /* Dropdown menu item */
+  .menu-item {
+    @apply flex items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm font-medium text-ink-soft
+           transition-colors hover:bg-surface-soft hover:text-ink;
+  }
+
+  /* Shimmer loading skeleton */
+  .skeleton {
+    @apply relative overflow-hidden rounded-2xl bg-surface-soft;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer
+           bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/5;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    @apply bg-nu-gradient-gold bg-clip-text text-transparent;
+  }
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #4d5db4 0%, #35408e 60%, #232a57 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}

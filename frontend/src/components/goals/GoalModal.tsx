@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { SavingsGoal } from '../../types/goal';
+import Modal from '../ui/Modal';
+import TextField from '../ui/TextField';
 
 const goalSchema = z.object({
   goalName: z.string().min(1, 'Goal name is required'),
@@ -41,94 +43,55 @@ export default function GoalModal({ isOpen, onClose, onSubmit, editingGoal }: Go
     }
   }, [editingGoal, reset, isOpen]);
 
-  if (!isOpen) return null;
-
   const handleFormSubmit = async (data: GoalFormData) => {
     await onSubmit(data);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm z-10">
-        <h3 className="text-base font-semibold text-gray-800 mb-5">
-          {editingGoal ? 'Edit Goal' : 'New Savings Goal'}
-        </h3>
+    <Modal isOpen={isOpen} onClose={onClose} title={editingGoal ? 'Edit Goal' : 'New Savings Goal'}>
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <TextField
+          label="Goal Name"
+          placeholder="e.g. Gaming Laptop"
+          error={errors.goalName?.message}
+          {...register('goalName')}
+        />
+        <TextField
+          label="Target Amount (₱)"
+          type="number"
+          step="0.01"
+          inputMode="decimal"
+          placeholder="0.00"
+          error={errors.targetAmount?.message}
+          {...register('targetAmount')}
+        />
+        <TextField
+          label="Amount Saved So Far (₱)"
+          type="number"
+          step="0.01"
+          inputMode="decimal"
+          placeholder="0.00"
+          error={errors.currentAmount?.message}
+          {...register('currentAmount')}
+        />
+        <TextField
+          label="Target Date"
+          hint="(optional)"
+          type="date"
+          error={errors.targetDate?.message}
+          {...register('targetDate')}
+        />
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Goal Name</label>
-            <input
-              type="text"
-              {...register('goalName')}
-              placeholder="e.g. Gaming Laptop"
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-            {errors.goalName && (
-              <p className="text-red-500 text-xs mt-1">{errors.goalName.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Target Amount (₱)</label>
-            <input
-              type="number"
-              step="0.01"
-              {...register('targetAmount')}
-              placeholder="0.00"
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-            {errors.targetAmount && (
-              <p className="text-red-500 text-xs mt-1">{errors.targetAmount.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Amount Saved So Far (₱)
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              {...register('currentAmount')}
-              placeholder="0.00"
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-            {errors.currentAmount && (
-              <p className="text-red-500 text-xs mt-1">{errors.currentAmount.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Target Date <span className="text-gray-400 font-normal">(optional)</span>
-            </label>
-            <input
-              type="date"
-              {...register('targetDate')}
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-          </div>
-
-          <div className="flex gap-2 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
-            >
-              {isSubmitting ? 'Saving...' : editingGoal ? 'Save Changes' : 'Create Goal'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex gap-2 pt-1">
+          <button type="button" onClick={onClose} className="btn-ghost flex-1">
+            Cancel
+          </button>
+          <button type="submit" disabled={isSubmitting} className="btn-primary flex-1">
+            {isSubmitting ? 'Saving...' : editingGoal ? 'Save Changes' : 'Create Goal'}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }

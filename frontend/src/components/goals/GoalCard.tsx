@@ -1,4 +1,10 @@
+import { motion } from 'framer-motion';
+import { Pencil, Trash2, Trophy, CalendarClock } from 'lucide-react';
 import type { SavingsGoal } from '../../types/goal';
+import ProgressRing from '../ui/ProgressRing';
+import Confetti from '../ui/Confetti';
+import { formatPeso, clamp } from '../../lib/utils';
+import { fadeUpItem } from '../../lib/motion';
 
 interface GoalCardProps {
   goal: SavingsGoal;
@@ -6,62 +12,84 @@ interface GoalCardProps {
   onDelete: (id: string) => void;
 }
 
-const formatPeso = (amount: number) =>
-  `₱${amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const QUOTES = [
+  'Every peso counts. Keep going!',
+  'Discipline today, freedom tomorrow.',
+  'Small savings, big dreams.',
+  "You're closer than you think.",
+];
 
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr + 'T00:00:00');
-  return date.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
-};
+function estimateDate(targetDate: string | null): string | null {
+  if (!targetDate) return null;
+  return new Date(targetDate + 'T00:00:00').toLocaleDateString('en-PH', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
 
 export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
-  const pct = Math.min(goal.progressPercentage, 100);
-  const barColor = goal.completed ? 'bg-green-400' : pct >= 60 ? 'bg-blue-400' : 'bg-blue-300';
+  const pct = clamp(goal.progressPercentage, 0, 100);
+  const quote = QUOTES[goal.goalName.length % QUOTES.length];
+  const remaining = Math.max(0, goal.targetAmount - goal.currentAmount);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <p className="text-sm font-semibold text-gray-800">{goal.goalName}</p>
+    <motion.div variants={fadeUpItem} whileHover={{ y: -4 }} className="card relative overflow-hidden p-5">
+      {goal.completed && <Confetti />}
+
+      <div className="flex items-center gap-4">
+        <ProgressRing
+          progress={pct}
+          size={84}
+          stroke={9}
+          colorClass={goal.completed ? 'text-emerald-500' : 'text-accent'}
+        >
+          <div className="text-center">
+            <p className="font-display text-base font-extrabold text-ink">{pct.toFixed(0)}%</p>
+          </div>
+        </ProgressRing>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="truncate font-display text-base font-bold text-ink">{goal.goalName}</p>
+            {goal.completed && (
+              <span className="chip bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15">
+                <Trophy size={12} /> Done
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-sm text-ink-soft">
+            <span className="font-semibold text-ink">{formatPeso(goal.currentAmount)}</span> of{' '}
+            {formatPeso(goal.targetAmount)}
+          </p>
           {goal.targetDate && (
-            <p className="text-xs text-gray-400 mt-0.5">Target: {formatDate(goal.targetDate)}</p>
+            <p className="mt-1 flex items-center gap-1 text-xs text-ink-faint">
+              <CalendarClock size={12} /> Target {estimateDate(goal.targetDate)}
+            </p>
           )}
         </div>
-        {goal.completed && (
-          <span className="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-            Completed
-          </span>
-        )}
       </div>
 
-      <div className="mb-3">
-        <div className="flex justify-between text-xs text-gray-400 mb-1.5">
-          <span>{formatPeso(goal.currentAmount)} saved</span>
-          <span>{formatPeso(goal.targetAmount)} goal</span>
-        </div>
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all ${barColor}`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-        <p className="text-xs text-gray-400 mt-1 text-right">{pct.toFixed(1)}%</p>
+      <div className="mt-4 rounded-2xl bg-surface-soft/60 px-3 py-2">
+        <p className="text-xs text-ink-soft">
+          {goal.completed ? '🎉 Goal reached — amazing discipline!' : `${formatPeso(remaining)} to go · ${quote}`}
+        </p>
       </div>
 
-      <div className="flex gap-2 pt-1 border-t border-gray-50">
+      <div className="mt-3 flex gap-2 border-t border-surface-border/60 pt-3">
         <button
           onClick={() => onEdit(goal)}
-          className="flex-1 text-xs text-gray-500 hover:text-blue-600 py-1.5"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-1.5 text-xs font-semibold text-ink-soft hover:bg-surface-soft hover:text-nu-blue-600"
         >
-          Edit
+          <Pencil size={13} /> Edit
         </button>
         <button
           onClick={() => onDelete(goal.id)}
-          className="flex-1 text-xs text-gray-500 hover:text-red-500 py-1.5"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-1.5 text-xs font-semibold text-ink-soft hover:bg-surface-soft hover:text-rose-500"
         >
-          Delete
+          <Trash2 size={13} /> Delete
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

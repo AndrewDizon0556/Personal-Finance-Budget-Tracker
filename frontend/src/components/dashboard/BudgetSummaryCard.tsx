@@ -1,32 +1,37 @@
+import { motion } from 'framer-motion';
 import type { Budget } from '../../types/budget';
+import { categoryStyle } from '../../lib/categories';
+import { formatPeso, clamp } from '../../lib/utils';
 
 interface BudgetSummaryCardProps {
   budgets: Budget[];
 }
 
-const formatPeso = (amount: number) =>
-  `₱${amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
 function BudgetRow({ budget }: { budget: Budget }) {
-  const pct = budget.budgetAmount > 0
-    ? Math.min((budget.spentAmount / budget.budgetAmount) * 100, 100)
-    : 0;
-
-  const barColor =
-    pct >= 90 ? 'bg-red-400' : pct >= 60 ? 'bg-yellow-400' : 'bg-blue-400';
+  const pct = budget.budgetAmount > 0 ? clamp((budget.spentAmount / budget.budgetAmount) * 100, 0, 100) : 0;
+  const style = categoryStyle(budget.categoryName);
+  const Icon = style.icon;
+  const barColor = pct >= 90 ? 'bg-rose-400' : pct >= 60 ? 'bg-nu-gold-400' : 'bg-nu-blue-500';
 
   return (
     <div>
-      <div className="flex justify-between text-sm mb-1">
-        <span className="text-gray-700 font-medium">{budget.categoryName}</span>
-        <span className="text-gray-400">
+      <div className="mb-1.5 flex items-center justify-between text-sm">
+        <span className="flex items-center gap-2 font-medium text-ink">
+          <span className={`grid h-7 w-7 place-items-center rounded-lg ${style.bg} ${style.fg}`}>
+            <Icon size={14} />
+          </span>
+          {budget.categoryName}
+        </span>
+        <span className="text-xs text-ink-faint">
           {formatPeso(budget.spentAmount)} / {formatPeso(budget.budgetAmount)}
         </span>
       </div>
-      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${barColor}`}
-          style={{ width: `${pct}%` }}
+      <div className="h-2 overflow-hidden rounded-full bg-surface-soft">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className={`h-full rounded-full ${barColor}`}
         />
       </div>
     </div>
@@ -34,20 +39,9 @@ function BudgetRow({ budget }: { budget: Budget }) {
 }
 
 export default function BudgetSummaryCard({ budgets }: BudgetSummaryCardProps) {
-  if (budgets.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <p className="text-sm font-semibold text-gray-700 mb-3">Budgets</p>
-        <p className="text-xs text-gray-400 text-center py-4">
-          No budgets set for this month.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <p className="text-sm font-semibold text-gray-700 mb-4">Budgets</p>
+    <div className="card p-5">
+      <p className="mb-4 text-sm font-semibold text-ink">Category Budgets</p>
       <div className="space-y-4">
         {budgets.map((b) => (
           <BudgetRow key={b.id} budget={b} />

@@ -1,28 +1,65 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Plus, TrendingUp, CalendarDays, Coins, ArrowRight, Receipt } from 'lucide-react';
 import dashboardService from '../services/dashboardService';
-import { useExpenseStore } from '../store/expenseStore';
+import insightsService from '../services/insightsService';
+import { useUiStore } from '../store/uiStore';
+import { useAuthStore } from '../store/authStore';
 import type { DashboardData } from '../types/dashboard';
 import BalanceCard from '../components/dashboard/BalanceCard';
 import BudgetSummaryCard from '../components/dashboard/BudgetSummaryCard';
 import RecentTransactionsList from '../components/dashboard/RecentTransactionsList';
 import RunwayWidget from '../components/dashboard/RunwayWidget';
-import ExpenseModal from '../components/expense/ExpenseModal';
+import InsightsWidget, { type Insight } from '../components/dashboard/InsightsWidget';
+import StatCard from '../components/ui/StatCard';
+import PageHeader from '../components/ui/PageHeader';
+import EmptyState from '../components/ui/EmptyState';
+import { staggerContainer } from '../lib/motion';
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function deriveInsights(d: DashboardData): Insight[] {
+  const out: Insight[] = [];
+  const allowance = d.monthlyAllowance ?? 0;
+  if (allowance > 0) {
+    const spentPct = (d.totalSpentThisMonth / allowance) * 100;
+    if (spentPct >= 85) out.push({ tone: 'warning', text: "You're close to exceeding your allowance this month. Ease up on spending." });
+    else if (spentPct <= 50) out.push({ tone: 'positive', text: 'Great job staying well under your budget so far. Keep it up!' });
+  }
+  if (d.runwayStatus === 'CRITICAL') out.push({ tone: 'warning', text: 'Your funds may run out before your next allowance. Spend carefully.' });
+  if (d.runwayStatus === 'SAFE' && d.estimatedDaysRemaining >= d.daysUntilNextAllowance) out.push({ tone: 'celebrate', text: 'Your money will comfortably last until your next allowance. ' });
+  const topBudget = [...d.budgets].sort((a, b) => b.spentAmount - a.spentAmount)[0];
+  if (topBudget && topBudget.spentAmount > 0) out.push({ tone: 'info', text: `${topBudget.categoryName} is your biggest spend category this month.` });
+  return out.slice(0, 3);
+}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { categories, fetchCategories, addExpense } = useExpenseStore();
+  const user = useAuthStore((s) => s.user);
+  const { openExpenseModal, mutationTick } = useUiStore();
 
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  const [insights, setInsights] = useState<Insight[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const loadDashboard = async () => {
     try {
-      setIsLoading(true);
       const data = await dashboardService.getDashboard();
       setDashboard(data);
+      // Prefer backend-computed insights; fall back to client-side derivation.
+      try {
+        const remote = await insightsService.getInsights();
+        setInsights(remote.length > 0 ? remote : deriveInsights(data));
+      } catch {
+        setInsights(deriveInsights(data));
+      }
     } catch {
       setError('Failed to load dashboard.');
     } finally {
@@ -32,100 +69,120 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadDashboard();
-    fetchCategories();
-  }, []);
-
-  const handleAddExpense = async (data: {
-    categoryId?: string;
-    amount: number;
-    notes?: string;
-    expenseDate: string;
-    transactionType?: 'EXPENSE' | 'INCOME';
-  }) => {
-    await addExpense({
-      categoryId: data.categoryId || undefined,
-      amount: data.amount,
-      notes: data.notes,
-      expenseDate: data.expenseDate,
-      transactionType: data.transactionType ?? 'EXPENSE',
-    });
-    await loadDashboard();
-  };
+  }, [mutationTick]);
+  const firstName = (user?.fullName ?? 'Student').split(' ')[0];
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-400 text-sm">Loading dashboard...</p>
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <div className="skeleton mb-6 h-10 w-64" />
+        <div className="skeleton mb-4 h-48 w-full" />
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="skeleton h-28 w-full" />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error || !dashboard) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-red-400 text-sm">{error ?? 'Something went wrong.'}</p>
+      <div className="mx-auto max-w-md px-4 py-16">
+        <EmptyState
+          icon={Receipt}
+          title="Couldn't load your dashboard"
+          message={error ?? 'Something went wrong. Please try again.'}
+          action={
+            <button onClick={loadDashboard} className="btn-primary">
+              Retry
+            </button>
+          }
+        />
       </div>
     );
   }
 
+  const hasActivity = dashboard.recentTransactions.length > 0;
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-gray-800">Dashboard</h1>
-          <p className="text-xs text-gray-400 mt-0.5">
-            {new Date().toLocaleDateString('en-PH', { month: 'long', year: 'numeric' })}
-          </p>
-        </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
-        >
-          + Add Expense
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <BalanceCard
-          monthlyAllowance={dashboard.monthlyAllowance}
-          totalSpent={dashboard.totalSpentThisMonth}
-          remainingBalance={dashboard.remainingBalance}
-          dailySafeSpend={dashboard.dailySafeSpend}
-          daysLeft={dashboard.daysLeftInMonth}
-        />
-
-        {dashboard.runwayStatus && (
-          <RunwayWidget
-            runwayStatus={dashboard.runwayStatus}
-            estimatedDaysRemaining={dashboard.estimatedDaysRemaining}
-            daysUntilNextAllowance={dashboard.daysUntilNextAllowance}
-            message={dashboard.runwayMessage}
-          />
-        )}
-
-        {dashboard.budgets.length > 0 && (
-          <BudgetSummaryCard budgets={dashboard.budgets} />
-        )}
-
-        <RecentTransactionsList transactions={dashboard.recentTransactions} />
-
-        {dashboard.recentTransactions.length > 0 && (
-          <button
-            onClick={() => navigate('/transactions')}
-            className="w-full text-center text-sm text-blue-500 hover:underline py-2"
-          >
-            View all transactions
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <PageHeader
+        title={`${greeting()}, ${firstName} 👋`}
+        subtitle={new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' })}
+        action={
+          <button onClick={() => openExpenseModal()} className="btn-gold hidden sm:inline-flex">
+            <Plus size={18} /> Add Transaction
           </button>
-        )}
-      </div>
-
-      <ExpenseModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddExpense}
-        categories={categories}
-        editingExpense={null}
+        }
       />
+
+      <div className="grid gap-5 lg:grid-cols-3">
+        {/* Main column */}
+        <div className="space-y-5 lg:col-span-2">
+          <BalanceCard
+            monthlyAllowance={dashboard.monthlyAllowance}
+            totalSpent={dashboard.totalSpentThisMonth}
+            remainingBalance={dashboard.remainingBalance}
+            dailySafeSpend={dashboard.dailySafeSpend}
+            daysLeft={dashboard.daysLeftInMonth}
+          />
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+          >
+            <StatCard label="Spent this month" value={dashboard.totalSpentThisMonth} icon={TrendingUp} />
+            <StatCard label="Safe to spend / day" value={dashboard.dailySafeSpend} icon={Coins} />
+            <StatCard
+              label="Days remaining"
+              value={dashboard.daysLeftInMonth}
+              icon={CalendarDays}
+              currency={false}
+              suffix="days"
+            />
+          </motion.div>
+
+          {hasActivity ? (
+            <>
+              <RecentTransactionsList transactions={dashboard.recentTransactions} />
+              <button
+                onClick={() => navigate('/transactions')}
+                className="flex w-full items-center justify-center gap-1.5 py-1 text-sm font-semibold text-nu-blue-600 hover:underline"
+              >
+                View all transactions <ArrowRight size={15} />
+              </button>
+            </>
+          ) : (
+            <EmptyState
+              icon={Receipt}
+              title="No transactions yet"
+              message="Start tracking your first expense and become financially smarter this semester."
+              action={
+                <button onClick={() => openExpenseModal()} className="btn-gold">
+                  <Plus size={18} /> Add your first
+                </button>
+              }
+            />
+          )}
+        </div>
+
+        {/* Side column */}
+        <div className="space-y-5">
+          {dashboard.runwayStatus && (
+            <RunwayWidget
+              runwayStatus={dashboard.runwayStatus}
+              estimatedDaysRemaining={dashboard.estimatedDaysRemaining}
+              daysUntilNextAllowance={dashboard.daysUntilNextAllowance}
+              message={dashboard.runwayMessage}
+            />
+          )}
+          <InsightsWidget insights={insights} />
+          {dashboard.budgets.length > 0 && <BudgetSummaryCard budgets={dashboard.budgets} />}
+        </div>
+      </div>
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Subscription } from '../../types/subscription';
+import Modal from '../ui/Modal';
+import TextField from '../ui/TextField';
 
 const subscriptionSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -20,12 +22,7 @@ interface SubscriptionModalProps {
   editingSub?: Subscription | null;
 }
 
-export default function SubscriptionModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  editingSub,
-}: SubscriptionModalProps) {
+export default function SubscriptionModal({ isOpen, onClose, onSubmit, editingSub }: SubscriptionModalProps) {
   const {
     register,
     handleSubmit,
@@ -46,80 +43,45 @@ export default function SubscriptionModal({
     }
   }, [editingSub, reset, isOpen]);
 
-  if (!isOpen) return null;
-
   const handleFormSubmit = async (data: SubscriptionFormData) => {
     await onSubmit(data);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm z-10">
-        <h3 className="text-base font-semibold text-gray-800 mb-5">
-          {editingSub ? 'Edit Subscription' : 'Add Subscription'}
-        </h3>
+    <Modal isOpen={isOpen} onClose={onClose} title={editingSub ? 'Edit Subscription' : 'Add Subscription'}>
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <TextField label="Name" placeholder="e.g. Spotify, Canva" error={errors.name?.message} {...register('name')} />
+        <TextField
+          label="Amount (₱)"
+          type="number"
+          step="0.01"
+          inputMode="decimal"
+          placeholder="0.00"
+          error={errors.amount?.message}
+          {...register('amount')}
+        />
+        <TextField
+          label="Renewal Date"
+          type="date"
+          error={errors.renewalDate?.message}
+          {...register('renewalDate')}
+        />
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
-            <input
-              type="text"
-              {...register('name')}
-              placeholder="e.g. Spotify, Canva"
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
-          </div>
+        <label className="flex cursor-pointer items-center gap-2.5 rounded-2xl bg-surface-soft/60 px-4 py-3 text-sm font-medium text-ink">
+          <input type="checkbox" {...register('active')} className="h-4 w-4 accent-nu-blue-700" />
+          Active subscription
+        </label>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Amount (₱)</label>
-            <input
-              type="number"
-              step="0.01"
-              {...register('amount')}
-              placeholder="0.00"
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-            {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount.message}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Renewal Date</label>
-            <input
-              type="date"
-              {...register('renewalDate')}
-              className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-            {errors.renewalDate && (
-              <p className="text-red-500 text-xs mt-1">{errors.renewalDate.message}</p>
-            )}
-          </div>
-
-          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-            <input type="checkbox" {...register('active')} className="accent-blue-600 w-4 h-4" />
-            Active
-          </label>
-
-          <div className="flex gap-2 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
-            >
-              {isSubmitting ? 'Saving...' : editingSub ? 'Save Changes' : 'Add'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex gap-2 pt-1">
+          <button type="button" onClick={onClose} className="btn-ghost flex-1">
+            Cancel
+          </button>
+          <button type="submit" disabled={isSubmitting} className="btn-primary flex-1">
+            {isSubmitting ? 'Saving...' : editingSub ? 'Save Changes' : 'Add'}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }
