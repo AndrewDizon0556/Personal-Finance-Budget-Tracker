@@ -22,8 +22,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ExpenseCategoryService {
 
+    // Student-focused defaults (match the dashboard category icons/colors).
     private static final List<String> DEFAULT_CATEGORIES = List.of(
-            "Food", "Transportation", "School Supplies", "Entertainment", "Health", "Others"
+            "Tuition", "Food", "Transportation", "School Supplies",
+            "Projects", "Load/Data", "Leisure", "Emergency"
     );
 
     private final ExpenseCategoryRepository categoryRepository;
