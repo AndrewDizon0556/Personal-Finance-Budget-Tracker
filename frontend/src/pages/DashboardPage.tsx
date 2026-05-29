@@ -63,8 +63,13 @@ export default function DashboardPage() {
       } catch {
         setInsights(deriveInsights(data));
       }
-    } catch {
-      setError('Failed to load dashboard.');
+    } catch (err: unknown) {
+      // Surface the real reason so the issue is diagnosable, not a generic message.
+      const e = err as { response?: { status?: number; data?: { message?: string } }; message?: string };
+      const status = e?.response?.status;
+      const detail = e?.response?.data?.message ?? e?.message ?? 'Unknown error';
+      console.error('Dashboard load failed:', status, detail, err);
+      setError(status ? `Error ${status}: ${detail}` : `Network error: ${detail}`);
     } finally {
       setIsLoading(false);
     }
