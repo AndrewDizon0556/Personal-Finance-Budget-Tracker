@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import dashboardService from '../services/dashboardService';
 import { useExpenseStore } from '../store/expenseStore';
 import type { DashboardData } from '../types/dashboard';
-import type { Expense } from '../types/expense';
 import BalanceCard from '../components/dashboard/BalanceCard';
 import BudgetSummaryCard from '../components/dashboard/BudgetSummaryCard';
 import RecentTransactionsList from '../components/dashboard/RecentTransactionsList';
