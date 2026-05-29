@@ -219,7 +219,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
           <Logo />
           <p className="text-xs text-ink-faint">
-            © {new Date().getFullYear()} Ipon Challenge · Andrew Dizon's project for NU Laguna
+            © {new Date().getFullYear()} Ipon Challenge · Andrew Dizon&apos;s project for NU Laguna
           </p>
         </div>
       </footer>

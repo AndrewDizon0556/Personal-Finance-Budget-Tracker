@@ -150,6 +150,6 @@ Security is treated as a core feature, not an afterthought:
 
 ## Acknowledgements
 
-Built as a full-stack portfolio project by a student of **National University
-Laguna**. Branding and theming are inspired by NU Laguna and are used for an
+Built as a full-stack portfolio project for **National University
+Laguna** by Vic Andrew A. Dizon. Branding and theming are inspired by NU Laguna and are used for an
 educational, non-commercial project.
