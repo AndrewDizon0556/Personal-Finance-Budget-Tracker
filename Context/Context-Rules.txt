@@ -1,0 +1,686 @@
+# Ipon Challenge — Vibe Coding Context & OOP Development Guide
+
+## Project Identity
+
+Project Name: Ipon Challenge
+Type: Student Personal Finance & Budget Tracker
+Tech Stack:
+
+* Java Spring Boot
+* React + TypeScript
+* PostgreSQL
+
+Tagline:
+“Track your allowance. Control your spending. Survive the semester.”
+
+---
+
+# Core Development Philosophy
+
+Ipon Challenge is not just a finance tracker.
+
+The system must feel:
+
+* simple
+* calm
+* student-friendly
+* practical
+* lightweight
+* realistic to student life
+
+The architecture must also reflect:
+
+* clean OOP design
+* maintainable code
+* scalable structure
+* real-world software engineering practices
+
+The system should never feel:
+
+* overly corporate
+* overly enterprise-heavy
+* overengineered
+* unnecessarily complicated
+
+---
+
+# Engineering Vibe
+
+## The Engineering Mindset
+
+When building features:
+
+* Think modular
+* Think reusable
+* Think maintainable
+* Think predictable
+* Think scalable
+* Think simple first
+
+Every feature should answer:
+
+> “Will future developers easily understand this?”
+
+If the answer is no:
+
+* simplify it
+* refactor it
+* modularize it
+
+---
+
+# Core OOP Philosophy
+
+## Objects Represent Real Student Finance Concepts
+
+Every object/class should represent a real-world concept.
+
+Examples:
+
+* User
+* Expense
+* Budget
+* Subscription
+* SavingsGoal
+* SplitBill
+
+Avoid fake abstraction or meaningless classes.
+
+---
+
+# Backend Vibe (Java Spring Boot)
+
+## Backend Must Feel
+
+* organized
+* layered
+* modular
+* readable
+* predictable
+
+---
+
+# Recommended Backend Structure
+
+```txt
+controller/
+service/
+repository/
+entity/
+dto/
+mapper/
+factory/
+strategy/
+observer/
+config/
+security/
+utils/
+```
+
+---
+
+# Layer Responsibilities
+
+## Controller Layer
+
+Handles:
+
+* API requests
+* validation
+* response formatting
+
+Controllers should NEVER:
+
+* calculate budgets
+* process prediction logic
+* access database directly
+
+Controllers must remain thin.
+
+---
+
+## Service Layer
+
+Handles:
+
+* business logic
+* calculations
+* workflows
+* system behavior
+
+Examples:
+
+* runway prediction
+* budget analysis
+* expense updates
+
+This is the heart of the application.
+
+---
+
+## Repository Layer
+
+Handles:
+
+* database access only
+
+Repositories should NEVER:
+
+* contain business logic
+* perform calculations
+* handle validations
+
+---
+
+# Frontend Vibe (React + TypeScript)
+
+## Frontend Must Feel
+
+* lightweight
+* organized
+* responsive
+* student-friendly
+* component-driven
+
+---
+
+# Recommended Frontend Structure
+
+```txt
+components/
+pages/
+layouts/
+hooks/
+services/
+store/
+types/
+utils/
+```
+
+---
+
+# Frontend Philosophy
+
+## Components Must Be Reusable
+
+Examples:
+
+* Button
+* Card
+* Modal
+* ExpenseForm
+* GoalProgressBar
+
+Avoid duplicate UI logic.
+
+---
+
+## State Must Be Predictable
+
+Use:
+
+* Zustand
+
+Avoid:
+
+* random scattered state
+* deeply nested prop drilling
+
+---
+
+## Business Logic Must Stay in Backend
+
+React should:
+
+* display data
+* manage interactions
+* call APIs
+
+React should NOT:
+
+* calculate runway prediction
+* manage financial algorithms
+* contain complex business rules
+
+---
+
+# OOP Principles Implementation Guide
+
+# 1. Encapsulation
+
+## Rule
+
+Protect internal object data.
+
+All entity fields:
+
+```java
+private
+```
+
+Expose controlled access only.
+
+---
+
+## Good Example
+
+```java
+public class Budget {
+    private double remainingBudget;
+
+    public void deductExpense(double amount) {
+        if(amount > 0) {
+            remainingBudget -= amount;
+        }
+    }
+}
+```
+
+---
+
+## Bad Example
+
+```java
+public double remainingBudget;
+```
+
+---
+
+# 2. Abstraction
+
+## Rule
+
+Hide complex calculations behind simple interfaces.
+
+Frontend should never know:
+
+* formulas
+* internal algorithms
+* system complexity
+
+---
+
+## Good Example
+
+```java
+allowancePredictor.predict();
+```
+
+Instead of exposing:
+
+* daily spending formulas
+* date calculations
+* analytics logic
+
+---
+
+# 3. Inheritance
+
+## Rule
+
+Use inheritance ONLY for real IS-A relationships.
+
+---
+
+## Good Example
+
+```txt
+Transaction
+ ├── StandardExpense
+ ├── SubscriptionExpense
+ └── SplitBillExpense
+```
+
+---
+
+## Bad Example
+
+```txt
+Dashboard extends User
+```
+
+---
+
+# 4. Composition Over Inheritance
+
+## Rule
+
+Prefer HAS-A relationships.
+
+---
+
+## Good Example
+
+```java
+class Dashboard {
+    private AnalyticsModule analytics;
+    private GoalModule goals;
+}
+```
+
+---
+
+# 5. Polymorphism
+
+## Rule
+
+Use shared contracts with different behaviors.
+
+---
+
+## Good Example
+
+```java
+interface NotificationService {
+    void send();
+}
+```
+
+Implementations:
+
+* EmailNotificationService
+* PushNotificationService
+
+---
+
+# SOLID Rules Context
+
+# Single Responsibility Principle
+
+Every class should have ONE responsibility only.
+
+---
+
+## Good
+
+```txt
+ExpenseService
+GoalService
+BudgetService
+```
+
+---
+
+## Bad
+
+```txt
+FinanceManagerEverythingService
+```
+
+---
+
+# Open/Closed Principle
+
+The system must allow new features without rewriting old logic.
+
+Future additions:
+
+* new transaction types
+* new budgeting modes
+* new notifications
+
+should be extendable.
+
+---
+
+# Interface Segregation Principle
+
+Interfaces should remain:
+
+* small
+* focused
+* specific
+
+---
+
+# Dependency Inversion Principle
+
+Always depend on abstractions.
+
+---
+
+## Good
+
+```java
+private NotificationService notificationService;
+```
+
+---
+
+## Bad
+
+```java
+private EmailNotificationService notificationService;
+```
+
+---
+
+# Design Patterns Context
+
+# Factory Pattern
+
+## Purpose
+
+Create transaction objects dynamically.
+
+---
+
+## Example
+
+```java
+TransactionFactory.create(type);
+```
+
+Supported:
+
+* Expense
+* Subscription
+* SplitBill
+
+---
+
+# Strategy Pattern
+
+## Purpose
+
+Dynamic budgeting behavior.
+
+Strategies:
+
+* NormalBudgetStrategy
+* SurvivalBudgetStrategy
+
+---
+
+# Observer Pattern
+
+## Purpose
+
+Automatic notifications.
+
+Examples:
+
+* subscription renewal alerts
+* budget warnings
+* savings progress notifications
+
+---
+
+# Singleton Pattern
+
+## Purpose
+
+Manage shared system resources.
+
+Allowed:
+
+* SessionManager
+* NotificationManager
+
+Avoid unnecessary singletons.
+
+---
+
+# Database Design Vibe
+
+## Database Must Feel
+
+* normalized
+* organized
+* scalable
+* clean
+
+---
+
+# Database Rules
+
+* Use UUID or proper IDs
+* Use foreign keys properly
+* Avoid duplicated data
+* Use enums for statuses/categories
+* Use timestamps consistently
+
+---
+
+# API Design Vibe
+
+## APIs Must Be
+
+* RESTful
+* predictable
+* consistent
+* easy to consume
+
+---
+
+# Good REST Examples
+
+```txt
+GET /expenses
+POST /expenses
+PUT /expenses/{id}
+DELETE /expenses/{id}
+```
+
+---
+
+# Clean Code Vibe
+
+# Always Prioritize
+
+* readability
+* simplicity
+* maintainability
+* consistency
+
+---
+
+# Avoid
+
+* giant classes
+* giant methods
+* unnecessary abstraction
+* overengineering
+* premature optimization
+
+---
+
+# Naming Rules
+
+## Classes
+
+Use clear nouns:
+
+* Expense
+* Budget
+* Subscription
+
+---
+
+## Services
+
+Use:
+
+* ExpenseService
+* GoalService
+
+---
+
+## Repositories
+
+Use:
+
+* ExpenseRepository
+
+---
+
+## Components
+
+Use:
+
+* ExpenseCard
+* GoalProgressCard
+
+---
+
+# React UI Vibe
+
+The UI should feel:
+
+* friendly
+* calm
+* lightweight
+* student-focused
+
+---
+
+# Design Rules
+
+Use:
+
+* soft spacing
+* rounded cards
+* minimal layout
+* clear financial summaries
+
+Avoid:
+
+* cluttered dashboards
+* enterprise-looking UI
+* excessive colors
+
+---
+
+# MVP Development Vibe
+
+## Priority Order
+
+1. Authentication
+2. Expense Tracking
+3. Budgeting
+4. Dashboard
+5. Allowance Predictor
+6. Savings Goals
+7. Analytics
+8. Subscriptions
+9. Split Bills
+
+---
+
+# Final Engineering Rule
+
+## “Keep the system modular, predictable, scalable, and understandable.”
+
+Good engineering for Ipon Challenge means:
+
+* students can easily use it
+* developers can easily maintain it
+* future features can easily scale
+
+The architecture should always favor:
+
+* simplicity
+* clean OOP structure
+* maintainability
+* readability
+* real-world engineering practices

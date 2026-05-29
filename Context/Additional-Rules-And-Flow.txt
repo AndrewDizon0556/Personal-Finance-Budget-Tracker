@@ -1,0 +1,123 @@
+# Additional Development Rules — Ipon Challenge
+
+1. Create and update CHANGELOG.md for every major feature or fix.
+
+2. Create unit tests for important business logic.
+
+3. Never place business logic inside React components.
+
+4. Keep controllers thin and simple.
+
+5. Always validate frontend and backend inputs.
+
+6. Use DTOs for API requests and responses.
+
+7. Use meaningful class and variable names.
+
+8. One class should only have one responsibility.
+
+9. One method should only do one task.
+
+10. Reuse components instead of duplicating code.
+
+11. Avoid hardcoded values and magic numbers.
+
+12. Use enums for statuses and categories.
+
+13. Follow consistent folder structure.
+
+14. Keep methods short and readable.
+
+15. Avoid giant classes and giant files.
+
+16. Use interfaces for shared behaviors.
+
+17. Prefer composition over inheritance.
+
+18. Add comments only for complex logic.
+
+19. Keep API naming RESTful and consistent.
+
+20. Handle exceptions using centralized exception handling.
+
+21. Never expose database entities directly to frontend.
+
+22. Use TypeScript types/interfaces properly.
+
+23. Avoid using "any" in TypeScript.
+
+24. Create reusable utility/helper functions carefully.
+
+25. Write scalable code for future features.
+
+26. Always separate UI logic from business logic.
+
+27. Keep database tables normalized.
+
+28. Use proper foreign key relationships.
+
+29. Always hash passwords using BCrypt.
+
+30. Protect private routes using JWT authentication.
+
+31. Create reusable form validation schemas.
+
+32. Keep state management centralized and predictable.
+
+33. Avoid unnecessary re-renders in React.
+
+34. Use loading and error states properly.
+
+35. Create reusable API service functions.
+
+36. Keep commits clean and meaningful.
+
+37. Use feature-based development when possible.
+
+38. Refactor duplicated logic immediately.
+
+39. Test critical financial calculations carefully.
+
+40. Prioritize readability over clever code.
+
+41. Always think about maintainability before optimization.
+
+42. Build MVP features first before advanced features.
+
+43. Every new feature must not break existing features.
+
+44. Keep UI simple, friendly, and student-focused.
+
+45. Follow clean architecture consistently across the project.
+
+46. Always check null/undefined values properly.
+
+47. Use proper HTTP status codes in APIs.
+
+48. Separate configuration from business logic.
+
+49. Keep reusable constants in dedicated files.
+
+50. Think long-term scalability when designing modules.
+
+51. Every feature should solve a real student problem.
+
+52. Avoid overengineering small features.
+
+53. Keep database queries optimized and simple.
+
+54. Use pagination for large transaction lists in the future.
+
+55. Ensure mobile responsiveness for all pages.
+
+56. Maintain consistent naming conventions across frontend and backend.
+
+57. Create modular services for future scalability.
+
+58. Ensure all forms have proper validation messages.
+
+59. Use soft-delete only when necessary.
+
+60. Keep the application simple, maintainable, and stable at all times.
+
+61. Always ask confirmation before starting new featugres.
