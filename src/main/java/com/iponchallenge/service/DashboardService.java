@@ -51,7 +51,15 @@ public class DashboardService {
                 ? monthlyAllowance.subtract(totalSpent)
                 : BigDecimal.ZERO.subtract(totalSpent);
 
-        int daysLeft = (int) ChronoUnit.DAYS.between(today, endOfMonth) + 1;
+        RunwayResponse runway = runwayService.getRunway(email);
+
+        // "Days left" follows the user's allowance cycle (weekly / bi-weekly / monthly),
+        // i.e. the days until their next allowance — not just the calendar month end.
+        // The client may still override this number for a custom budgeting horizon.
+        int daysLeft = runway.getDaysUntilNextAllowance();
+        if (daysLeft <= 0) {
+            daysLeft = (int) ChronoUnit.DAYS.between(today, endOfMonth) + 1;
+        }
         BigDecimal dailySafeSpend = calculateDailySafeSpend(remainingBalance, daysLeft);
 
         List<BudgetResponse> budgets = budgetRepository
@@ -61,8 +69,6 @@ public class DashboardService {
         List<ExpenseResponse> recent = expenseRepository
                 .findTop5ByUserOrderByExpenseDateDescCreatedAtDesc(user)
                 .stream().map(expenseMapper::toResponse).collect(Collectors.toList());
-
-        RunwayResponse runway = runwayService.getRunway(email);
 
         return DashboardResponse.builder()
                 .monthlyAllowance(monthlyAllowance)

@@ -6,6 +6,7 @@ import dashboardService from '../services/dashboardService';
 import insightsService from '../services/insightsService';
 import { useUiStore } from '../store/uiStore';
 import { useAuthStore } from '../store/authStore';
+import { usePrefsStore } from '../store/prefsStore';
 import type { DashboardData } from '../types/dashboard';
 import BalanceCard from '../components/dashboard/BalanceCard';
 import BudgetSummaryCard from '../components/dashboard/BudgetSummaryCard';
@@ -43,6 +44,8 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const { openExpenseModal, mutationTick } = useUiStore();
+  const daysLeftOverride = usePrefsStore((s) => s.daysLeftOverride);
+  const setDaysLeftOverride = usePrefsStore((s) => s.setDaysLeftOverride);
 
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [insights, setInsights] = useState<Insight[]>([]);
@@ -105,6 +108,11 @@ export default function DashboardPage() {
 
   const hasActivity = dashboard.recentTransactions.length > 0;
 
+  // Days-left can be overridden by the user; safe-to-spend recalculates from it.
+  const effectiveDays = daysLeftOverride && daysLeftOverride > 0 ? daysLeftOverride : dashboard.daysLeftInMonth;
+  const effectiveSafeSpend =
+    dashboard.remainingBalance > 0 && effectiveDays > 0 ? dashboard.remainingBalance / effectiveDays : 0;
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <PageHeader
@@ -124,8 +132,11 @@ export default function DashboardPage() {
             monthlyAllowance={dashboard.monthlyAllowance}
             totalSpent={dashboard.totalSpentThisMonth}
             remainingBalance={dashboard.remainingBalance}
-            dailySafeSpend={dashboard.dailySafeSpend}
-            daysLeft={dashboard.daysLeftInMonth}
+            dailySafeSpend={effectiveSafeSpend}
+            daysLeft={effectiveDays}
+            isCustomDays={daysLeftOverride != null}
+            onDaysLeftChange={setDaysLeftOverride}
+            onResetDaysLeft={() => setDaysLeftOverride(null)}
           />
 
           <motion.div
@@ -135,10 +146,10 @@ export default function DashboardPage() {
             className="grid grid-cols-1 gap-4 sm:grid-cols-3"
           >
             <StatCard label="Spent this month" value={dashboard.totalSpentThisMonth} icon={TrendingUp} />
-            <StatCard label="Safe to spend / day" value={dashboard.dailySafeSpend} icon={Coins} />
+            <StatCard label="Safe to spend / day" value={effectiveSafeSpend} icon={Coins} />
             <StatCard
               label="Days remaining"
-              value={dashboard.daysLeftInMonth}
+              value={effectiveDays}
               icon={CalendarDays}
               currency={false}
               suffix="days"

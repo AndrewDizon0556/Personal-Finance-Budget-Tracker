@@ -9,7 +9,10 @@ interface PrefsState {
   streakNudges: boolean;
   weeklyDigest: boolean;
   onboarded: boolean;
+  /** Manual override for the budgeting horizon (days). null = use schedule-derived default. */
+  daysLeftOverride: number | null;
   setOnboarded: (v: boolean) => void;
+  setDaysLeftOverride: (n: number | null) => void;
   toggle: (key: ToggleKey) => void;
 }
 
@@ -21,7 +24,9 @@ export const usePrefsStore = create<PrefsState>()(
       streakNudges: true,
       weeklyDigest: false,
       onboarded: false,
+      daysLeftOverride: null,
       setOnboarded: (v) => set({ onboarded: v }),
+      setDaysLeftOverride: (n) => set({ daysLeftOverride: n && n > 0 ? Math.floor(n) : null }),
       toggle: (key) => set((s) => ({ [key]: !s[key] }) as Pick<PrefsState, ToggleKey>),
     }),
     { name: 'ipon-prefs' },
