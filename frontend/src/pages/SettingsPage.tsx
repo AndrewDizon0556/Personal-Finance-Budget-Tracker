@@ -1,7 +1,12 @@
-import { Moon, Sun, Palette, Bell, Check } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Moon, Sun, Palette, Bell, Check, ShieldCheck, LogOut, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useThemeStore, ACCENT_PRESETS, type AccentKey } from '../store/themeStore';
 import { usePrefsStore } from '../store/prefsStore';
+import { useAuthStore } from '../store/authStore';
+import authService from '../services/authService';
 import PageHeader from '../components/ui/PageHeader';
+import TextField from '../components/ui/TextField';
 
 export default function SettingsPage() {
   const { mode, setMode, accent, setAccent } = useThemeStore();
@@ -73,7 +78,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Notifications */}
-      <div className="card p-6">
+      <div className="card mb-5 p-6">
         <div className="mb-5 flex items-center gap-2">
           <Bell size={16} className="text-accent" />
           <p className="text-sm font-semibold text-ink">Notifications</p>
@@ -90,6 +95,116 @@ export default function SettingsPage() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Security */}
+      <SecuritySection />
+    </div>
+  );
+}
+
+function SecuritySection() {
+  const { token, setAuth, clearAuth } = useAuthStore();
+  const navigate = useNavigate();
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const strongEnough =
+    next.length >= 12 && /[a-z]/.test(next) && /[A-Z]/.test(next) && /\d/.test(next) && /[^A-Za-z0-9]/.test(next);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+    if (!strongEnough) {
+      setError('New password must be 12+ chars with upper, lower, number, and a special character.');
+      return;
+    }
+    if (next !== confirm) {
+      setError('New passwords do not match.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await authService.changePassword(current, next);
+      setAuth(res.user, res.token); // adopt the freshly-issued token
+      setSuccess(true);
+      setCurrent('');
+      setNext('');
+      setConfirm('');
+    } catch (err: unknown) {
+      const e2 = err as { response?: { data?: { message?: string } } };
+      setError(e2.response?.data?.message ?? 'Could not change password.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const logoutAll = async () => {
+    if (!window.confirm('Log out of all devices? You will need to sign in again.')) return;
+    try {
+      await authService.logoutAll();
+    } catch {
+      /* even if it fails, clear locally */
+    }
+    clearAuth();
+    navigate('/login');
+  };
+
+  return (
+    <div className="card p-6">
+      <div className="mb-5 flex items-center gap-2">
+        <ShieldCheck size={16} className="text-accent" />
+        <p className="text-sm font-semibold text-ink">Security</p>
+      </div>
+
+      {success && (
+        <div className="mb-4 flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-600 dark:bg-emerald-500/10">
+          <CheckCircle2 size={16} /> Password changed. Other devices have been signed out.
+        </div>
+      )}
+      {error && (
+        <div className="mb-4 flex items-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600 dark:bg-rose-500/10">
+          <AlertCircle size={16} /> {error}
+        </div>
+      )}
+
+      <form onSubmit={submit} className="space-y-4">
+        <TextField
+          label="Current Password"
+          type="password"
+          value={current}
+          onChange={(e) => setCurrent(e.target.value)}
+          autoComplete="current-password"
+        />
+        <TextField
+          label="New Password"
+          type="password"
+          value={next}
+          onChange={(e) => setNext(e.target.value)}
+          autoComplete="new-password"
+          hint="(12+ chars, mixed case, number, symbol)"
+        />
+        <TextField
+          label="Confirm New Password"
+          type="password"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          autoComplete="new-password"
+        />
+        <button type="submit" disabled={busy || !token} className="btn-primary w-full">
+          {busy ? 'Updating...' : 'Change Password'}
+        </button>
+      </form>
+
+      <div className="mt-5 border-t border-surface-border/60 pt-5">
+        <button onClick={logoutAll} className="btn-ghost w-full text-rose-500">
+          <LogOut size={16} /> Log out of all devices
+        </button>
       </div>
     </div>
   );

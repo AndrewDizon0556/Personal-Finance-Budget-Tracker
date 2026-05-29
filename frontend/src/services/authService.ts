@@ -16,6 +16,18 @@ const authService = {
     const response = await axiosClient.get<User>('/api/auth/me');
     return response.data;
   },
+
+  changePassword: async (currentPassword: string, newPassword: string): Promise<AuthResponse> => {
+    const response = await axiosClient.put<AuthResponse>('/api/auth/password', {
+      currentPassword,
+      newPassword,
+    });
+    return response.data;
+  },
+
+  logoutAll: async (): Promise<void> => {
+    await axiosClient.post('/api/auth/logout-all');
+  },
 };
 
 export default authService;

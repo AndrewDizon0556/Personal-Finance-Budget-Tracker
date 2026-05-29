@@ -2,6 +2,7 @@ package com.iponchallenge.service;
 
 import com.iponchallenge.config.JwtUtils;
 import com.iponchallenge.dto.AuthResponse;
+import com.iponchallenge.dto.ChangePasswordRequest;
 import com.iponchallenge.dto.LoginRequest;
 import com.iponchallenge.dto.RegisterRequest;
 import com.iponchallenge.dto.UpdateProfileRequest;
@@ -11,6 +12,7 @@ import com.iponchallenge.exception.BadRequestException;
 import com.iponchallenge.exception.UnauthorizedException;
 import com.iponchallenge.mapper.UserMapper;
 import com.iponchallenge.repository.UserRepository;
+import com.iponchallenge.security.LoginAttemptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final UserMapper userMapper;
     private final ExpenseCategoryService expenseCategoryService;
+    private final LoginAttemptService loginAttemptService;
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -39,7 +42,7 @@ public class AuthService {
 
         User saved = userRepository.save(user);
         expenseCategoryService.createDefaultCategories(saved);
-        String token = jwtUtils.generateToken(saved.getEmail());
+        String token = jwtUtils.generateToken(saved.getEmail(), saved.getTokenVersion());
 
         return AuthResponse.builder()
                 .token(token)
@@ -48,19 +51,57 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
+        String email = request.getEmail();
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (loginAttemptService.isLocked(email)) {
+            throw new UnauthorizedException(
+                    "Account temporarily locked due to too many failed attempts. Try again in a few minutes.");
+        }
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            loginAttemptService.recordFailure(email);
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        String token = jwtUtils.generateToken(user.getEmail());
+        loginAttemptService.recordSuccess(email);
+        String token = jwtUtils.generateToken(user.getEmail(), user.getTokenVersion());
 
         return AuthResponse.builder()
                 .token(token)
                 .user(userMapper.toResponse(user))
                 .build();
+    }
+
+    /** Verifies the current password, sets a new one, and revokes all existing sessions. */
+    public AuthResponse changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BadRequestException("Current password is incorrect");
+        }
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new BadRequestException("New password must be different from the current one");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setTokenVersion(user.getTokenVersion() + 1); // invalidate old tokens
+        User saved = userRepository.save(user);
+
+        String token = jwtUtils.generateToken(saved.getEmail(), saved.getTokenVersion());
+        return AuthResponse.builder()
+                .token(token)
+                .user(userMapper.toResponse(saved))
+                .build();
+    }
+
+    /** Revokes every previously issued token for this user (log out of all devices). */
+    public void logoutAll(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+        user.setTokenVersion(user.getTokenVersion() + 1);
+        userRepository.save(user);
     }
 
     public UserResponse getMe(String email) {

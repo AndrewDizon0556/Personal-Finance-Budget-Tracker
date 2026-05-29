@@ -20,9 +20,10 @@ public class JwtUtils {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    public String generateToken(String email) {
+    public String generateToken(String email, int tokenVersion) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("tv", tokenVersion)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -31,6 +32,11 @@ public class JwtUtils {
 
     public String extractEmail(String token) {
         return extractClaims(token).getSubject();
+    }
+
+    public int extractTokenVersion(String token) {
+        Object tv = extractClaims(token).get("tv");
+        return tv instanceof Number ? ((Number) tv).intValue() : -1;
     }
 
     public boolean isTokenValid(String token) {

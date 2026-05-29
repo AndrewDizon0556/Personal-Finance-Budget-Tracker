@@ -41,14 +41,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         if (jwtUtils.isTokenValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String email = jwtUtils.extractEmail(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            try {
+                String email = jwtUtils.extractEmail(token);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Reject tokens minted before a logout-all / password change (version mismatch).
+                boolean versionOk = !(userDetails instanceof CustomUserDetails)
+                        || ((CustomUserDetails) userDetails).getTokenVersion() == jwtUtils.extractTokenVersion(token);
+
+                if (versionOk) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (Exception ignored) {
+                // Invalid/unknown principal — leave context unauthenticated.
+            }
         }
 
         chain.doFilter(request, response);

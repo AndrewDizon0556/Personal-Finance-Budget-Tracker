@@ -11,10 +11,16 @@ import TextField from '../components/ui/TextField';
 
 const registerSchema = z
   .object({
-    fullName: z.string().min(1, 'Full name is required'),
-    schoolName: z.string().optional(),
+    fullName: z.string().min(1, 'Full name is required').max(100, 'Full name is too long'),
+    schoolName: z.string().max(120, 'School name is too long').optional(),
     email: z.string().email('Invalid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
+    password: z
+      .string()
+      .min(12, 'Password must be at least 12 characters')
+      .regex(/[a-z]/, 'Include at least one lowercase letter')
+      .regex(/[A-Z]/, 'Include at least one uppercase letter')
+      .regex(/\d/, 'Include at least one number')
+      .regex(/[^A-Za-z0-9]/, 'Include at least one special character'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
   .refine((data) => data.password === data.confirmPassword, {
