@@ -1,0 +1,33 @@
+<svg width="512" height="640" viewBox="0 0 512 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ipon Challenge">
+  <defs>
+    <linearGradient id="v-bg" x1="128" y1="0" x2="384" y2="384" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4D5DB4"/><stop offset="0.55" stop-color="#35408E"/><stop offset="1" stop-color="#232A57"/>
+    </linearGradient>
+    <linearGradient id="v-gold" x1="160" y1="60" x2="360" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD94D"/><stop offset="1" stop-color="#F5B300"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon centered -->
+  <svg x="128" y="16" width="256" height="256" viewBox="0 0 512 512">
+    <rect width="512" height="512" rx="116" fill="url(#v-bg)"/>
+    <circle cx="256" cy="296" r="120" fill="url(#v-gold)"/>
+    <circle cx="256" cy="296" r="100" fill="none" stroke="#232A57" stroke-opacity="0.18" stroke-width="6"/>
+    <g stroke="#232A57" stroke-linecap="round" fill="none">
+      <path d="M248 224 V372" stroke-width="26"/>
+      <path d="M248 228 h26 a48 46 0 0 1 0 92 h-26" stroke-width="26"/>
+      <path d="M206 256 H286" stroke-width="16"/>
+      <path d="M206 286 H286" stroke-width="16"/>
+    </g>
+    <polygon points="256,116 340,152 256,188 172,152" fill="url(#v-gold)" stroke="#232A57" stroke-opacity="0.25" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="256" cy="152" r="7" fill="#232A57" fill-opacity="0.55"/>
+    <path d="M340 152 V196" stroke="url(#v-gold)" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="340" cy="202" r="8" fill="url(#v-gold)"/>
+  </svg>
+
+  <!-- Wordmark (light background) -->
+  <text x="256" y="360" text-anchor="middle" font-family="'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif" font-size="76" font-weight="800" letter-spacing="-1.5">
+    <tspan fill="#232A57">Ipon</tspan><tspan fill="#F5B300">Challenge</tspan>
+  </text>
+  <text x="256" y="402" text-anchor="middle" font-family="'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#6B7280">STUDENT BUDGET TRACKER</text>
+</svg>

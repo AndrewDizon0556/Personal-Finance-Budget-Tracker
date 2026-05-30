@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ipon Challenge">
+  <!-- Single-colour mark. Inherits text color via currentColor. -->
+  <g fill="currentColor" stroke="currentColor">
+    <rect x="16" y="16" width="480" height="480" rx="108" fill="none" stroke-width="14"/>
+    <circle cx="256" cy="296" r="118" fill="none" stroke-width="16"/>
+    <g stroke-linecap="round" fill="none">
+      <path d="M248 226 V370" stroke-width="24"/>
+      <path d="M248 230 h26 a46 44 0 0 1 0 88 h-26" stroke-width="24"/>
+      <path d="M208 258 H284" stroke-width="15"/>
+      <path d="M208 286 H284" stroke-width="15"/>
+    </g>
+    <polygon points="256,116 340,152 256,188 172,152" fill="currentColor" stroke="none"/>
+    <path d="M340 152 V198" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="340" cy="204" r="8" stroke="none"/>
+  </g>
+</svg>
