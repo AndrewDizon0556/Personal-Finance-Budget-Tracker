@@ -27,8 +27,7 @@ export default function MobileNav() {
           className="pointer-events-auto grid h-14 w-14 place-items-center rounded-full bg-nu-gradient-gold text-nu-blue-900 shadow-glow outline-none focus-visible:ring-4 focus-visible:ring-nu-gold-300"
           aria-label="Add transaction"
         >
-          <span className="absolute inset-0 animate-pulse-ring rounded-full bg-nu-gold-400" />
-          <Plus size={26} strokeWidth={2.5} className="relative" />
+          <Plus size={26} strokeWidth={2.5} />
         </motion.button>
       </div>
 
