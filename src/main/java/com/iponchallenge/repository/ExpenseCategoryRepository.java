@@ -1,5 +1,6 @@
 package com.iponchallenge.repository;
 
+import com.iponchallenge.entity.CategoryType;
 import com.iponchallenge.entity.ExpenseCategory;
 import com.iponchallenge.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory
     Optional<ExpenseCategory> findByIdAndUser(UUID id, User user);
 
     boolean existsByIdAndUser(UUID id, User user);
+
+    boolean existsByUserAndType(User user, CategoryType type);
 }

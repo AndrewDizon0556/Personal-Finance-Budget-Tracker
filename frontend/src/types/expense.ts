@@ -1,8 +1,10 @@
 export type TransactionType = 'EXPENSE' | 'INCOME';
+export type CategoryType = 'EXPENSE' | 'INCOME';
 
 export interface ExpenseCategory {
   id: string;
   name: string;
+  type: CategoryType;
 }
 
 export interface Expense {

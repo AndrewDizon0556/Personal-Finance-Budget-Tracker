@@ -24,4 +24,11 @@ public class ExpenseCategory {
 
     @Column(nullable = false)
     private String name;
+
+    // columnDefinition provides a DB default so the NOT NULL column can be added
+    // to a table with existing rows (existing categories default to EXPENSE).
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(16) default 'EXPENSE'")
+    @Builder.Default
+    private CategoryType type = CategoryType.EXPENSE;
 }

@@ -1,5 +1,6 @@
 package com.iponchallenge.dto;
 
+import com.iponchallenge.entity.CategoryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,4 +18,5 @@ public class ExpenseCategoryResponse {
 
     private UUID id;
     private String name;
+    private CategoryType type;
 }

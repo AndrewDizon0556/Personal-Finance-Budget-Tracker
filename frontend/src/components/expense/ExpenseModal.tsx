@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
-import type { Expense, ExpenseCategory } from '../../types/expense';
+import type { Expense, ExpenseCategory, TransactionType } from '../../types/expense';
 import Modal from '../ui/Modal';
 
 const expenseSchema = z.object({
@@ -47,6 +47,18 @@ export default function ExpenseModal({
 
   const type = watch('transactionType');
 
+  // Only categories matching the current transaction type are selectable.
+  const visibleCategories = categories.filter((c) => c.type === type);
+
+  // Switching type refreshes the category list and auto-selects a valid default,
+  // so income and expense categories can never be mixed.
+  const selectType = (next: TransactionType) => {
+    if (next === type) return;
+    setValue('transactionType', next);
+    const firstOfType = categories.find((c) => c.type === next);
+    setValue('categoryId', firstOfType ? firstOfType.id : '');
+  };
+
   useEffect(() => {
     if (editingExpense) {
       reset({
@@ -79,7 +91,7 @@ export default function ExpenseModal({
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
-            onClick={() => setValue('transactionType', 'EXPENSE')}
+            onClick={() => selectType('EXPENSE')}
             className={`flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all ${
               type === 'EXPENSE'
                 ? 'border-nu-gold-400 bg-nu-gold-50 text-nu-gold-700 dark:bg-nu-gold-500/10'
@@ -90,7 +102,7 @@ export default function ExpenseModal({
           </button>
           <button
             type="button"
-            onClick={() => setValue('transactionType', 'INCOME')}
+            onClick={() => selectType('INCOME')}
             className={`flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all ${
               type === 'INCOME'
                 ? 'border-emerald-400 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10'
@@ -115,12 +127,14 @@ export default function ExpenseModal({
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-ink">Category</label>
+          <label className="mb-1.5 block text-sm font-medium text-ink">
+            {type === 'INCOME' ? 'Income source' : 'Category'}
+          </label>
           <select {...register('categoryId')} className="input-field">
             <option value="">Uncategorized</option>
-            {categories.map((c) => (
+            {visibleCategories.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {type === 'INCOME' ? '↑' : '↓'} {c.name}
               </option>
             ))}
           </select>

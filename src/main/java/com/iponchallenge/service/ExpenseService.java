@@ -3,6 +3,7 @@ package com.iponchallenge.service;
 import com.iponchallenge.dto.ExpenseRequest;
 import com.iponchallenge.dto.ExpenseResponse;
 import com.iponchallenge.entity.Budget;
+import com.iponchallenge.entity.CategoryType;
 import com.iponchallenge.entity.Expense;
 import com.iponchallenge.entity.ExpenseCategory;
 import com.iponchallenge.entity.TransactionType;
@@ -53,7 +54,9 @@ public class ExpenseService {
     @Transactional
     public ExpenseResponse createExpense(String email, ExpenseRequest request) {
         User user = getUser(email);
-        ExpenseCategory category = resolveCategory(user, request.getCategoryId());
+        TransactionType txType = request.getTransactionType() != null
+                ? request.getTransactionType() : TransactionType.EXPENSE;
+        ExpenseCategory category = resolveCategory(user, request.getCategoryId(), txType);
 
         Expense expense = Expense.builder()
                 .user(user)
@@ -61,8 +64,7 @@ public class ExpenseService {
                 .amount(request.getAmount())
                 .notes(request.getNotes())
                 .expenseDate(request.getExpenseDate())
-                .transactionType(request.getTransactionType() != null
-                        ? request.getTransactionType() : TransactionType.EXPENSE)
+                .transactionType(txType)
                 .build();
 
         Expense saved = expenseRepository.save(expense);
@@ -85,14 +87,15 @@ public class ExpenseService {
             restoreToBudget(user, existing.getCategory(), existing.getAmount(), existing.getExpenseDate());
         }
 
-        ExpenseCategory newCategory = resolveCategory(user, request.getCategoryId());
+        TransactionType txType = request.getTransactionType() != null
+                ? request.getTransactionType() : TransactionType.EXPENSE;
+        ExpenseCategory newCategory = resolveCategory(user, request.getCategoryId(), txType);
 
         existing.setCategory(newCategory);
         existing.setAmount(request.getAmount());
         existing.setNotes(request.getNotes());
         existing.setExpenseDate(request.getExpenseDate());
-        existing.setTransactionType(request.getTransactionType() != null
-                ? request.getTransactionType() : TransactionType.EXPENSE);
+        existing.setTransactionType(txType);
 
         Expense saved = expenseRepository.save(existing);
 
@@ -137,10 +140,18 @@ public class ExpenseService {
         );
     }
 
-    private ExpenseCategory resolveCategory(User user, UUID categoryId) {
+    private ExpenseCategory resolveCategory(User user, UUID categoryId, TransactionType txType) {
         if (categoryId == null) return null;
-        return categoryRepository.findByIdAndUser(categoryId, user)
+        ExpenseCategory category = categoryRepository.findByIdAndUser(categoryId, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+        // A category may only be used with its matching transaction type
+        // (income categories for income, expense categories for expenses).
+        CategoryType expected = txType == TransactionType.INCOME ? CategoryType.INCOME : CategoryType.EXPENSE;
+        if (category.getType() != expected) {
+            throw new BadRequestException("Selected category does not match the transaction type");
+        }
+        return category;
     }
 
     private User getUser(String email) {

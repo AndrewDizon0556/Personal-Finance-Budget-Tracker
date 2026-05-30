@@ -2,6 +2,7 @@ package com.iponchallenge.service;
 
 import com.iponchallenge.dto.ExpenseCategoryRequest;
 import com.iponchallenge.dto.ExpenseCategoryResponse;
+import com.iponchallenge.entity.CategoryType;
 import com.iponchallenge.entity.ExpenseCategory;
 import com.iponchallenge.entity.User;
 import com.iponchallenge.exception.BadRequestException;
@@ -22,10 +23,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ExpenseCategoryService {
 
-    // Student-focused defaults (match the dashboard category icons/colors).
-    private static final List<String> DEFAULT_CATEGORIES = List.of(
+    // Student-focused spending categories (match the dashboard icons/colors).
+    private static final List<String> DEFAULT_EXPENSE_CATEGORIES = List.of(
             "Tuition", "Food", "Transportation", "School Supplies",
             "Projects", "Load/Data", "Leisure", "Emergency"
+    );
+
+    // Realistic student income sources.
+    private static final List<String> DEFAULT_INCOME_CATEGORIES = List.of(
+            "Allowance", "Part-Time Job", "Freelance Work", "Online Selling",
+            "Tutoring", "Scholarship", "Gift", "Refund", "Others"
     );
 
     private final ExpenseCategoryRepository categoryRepository;
@@ -35,15 +42,25 @@ public class ExpenseCategoryService {
 
     @Transactional
     public void createDefaultCategories(User user) {
-        DEFAULT_CATEGORIES.forEach(name -> categoryRepository.save(
-                ExpenseCategory.builder().user(user).name(name).build()
+        DEFAULT_EXPENSE_CATEGORIES.forEach(name -> categoryRepository.save(
+                ExpenseCategory.builder().user(user).name(name).type(CategoryType.EXPENSE).build()
+        ));
+        DEFAULT_INCOME_CATEGORIES.forEach(name -> categoryRepository.save(
+                ExpenseCategory.builder().user(user).name(name).type(CategoryType.INCOME).build()
         ));
     }
 
+    @Transactional
     public List<ExpenseCategoryResponse> getCategories(String email) {
         User user = getUser(email);
+        // Backfill income categories for accounts created before income categories existed.
+        ensureIncomeCategories(user);
         return categoryRepository.findByUserOrderByNameAsc(user).stream()
-                .map(cat -> new ExpenseCategoryResponse(cat.getId(), cat.getName()))
+                .map(cat -> ExpenseCategoryResponse.builder()
+                        .id(cat.getId())
+                        .name(cat.getName())
+                        .type(cat.getType())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -53,9 +70,14 @@ public class ExpenseCategoryService {
         ExpenseCategory category = ExpenseCategory.builder()
                 .user(user)
                 .name(request.getName().trim())
+                .type(request.getType() != null ? request.getType() : CategoryType.EXPENSE)
                 .build();
         ExpenseCategory saved = categoryRepository.save(category);
-        return new ExpenseCategoryResponse(saved.getId(), saved.getName());
+        return ExpenseCategoryResponse.builder()
+                .id(saved.getId())
+                .name(saved.getName())
+                .type(saved.getType())
+                .build();
     }
 
     @Transactional
@@ -74,6 +96,14 @@ public class ExpenseCategoryService {
 
         budgetRepository.deleteByCategory(category);
         categoryRepository.delete(category);
+    }
+
+    private void ensureIncomeCategories(User user) {
+        if (!categoryRepository.existsByUserAndType(user, CategoryType.INCOME)) {
+            DEFAULT_INCOME_CATEGORIES.forEach(name -> categoryRepository.save(
+                    ExpenseCategory.builder().user(user).name(name).type(CategoryType.INCOME).build()
+            ));
+        }
     }
 
     private User getUser(String email) {
