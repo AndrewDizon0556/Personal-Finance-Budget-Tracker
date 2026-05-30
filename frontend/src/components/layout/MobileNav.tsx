@@ -17,16 +17,20 @@ export default function MobileNav() {
 
   return (
     <>
-      {/* Center floating add button */}
-      <motion.button
-        whileTap={{ scale: 0.9 }}
-        onClick={() => openExpenseModal()}
-        className="fixed bottom-6 left-1/2 z-50 grid h-14 w-14 -translate-x-1/2 place-items-center rounded-full bg-nu-gradient-gold text-nu-blue-900 shadow-glow lg:hidden"
-        aria-label="Add transaction"
-      >
-        <span className="absolute inset-0 animate-pulse-ring rounded-full bg-nu-gold-400" />
-        <Plus size={26} strokeWidth={2.5} className="relative" />
-      </motion.button>
+      {/* Center floating add button.
+          Centering is done by a full-width flex container (not a CSS transform),
+          so Framer Motion's whileTap scale can't override the positioning. */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-50 flex justify-center lg:hidden">
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => openExpenseModal()}
+          className="pointer-events-auto grid h-14 w-14 place-items-center rounded-full bg-nu-gradient-gold text-nu-blue-900 shadow-glow outline-none focus-visible:ring-4 focus-visible:ring-nu-gold-300"
+          aria-label="Add transaction"
+        >
+          <span className="absolute inset-0 animate-pulse-ring rounded-full bg-nu-gold-400" />
+          <Plus size={26} strokeWidth={2.5} className="relative" />
+        </motion.button>
+      </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 glass-nav border-t lg:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5 items-center px-2 pb-[env(safe-area-inset-bottom)] pt-2">
