@@ -1,13 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Receipt, Target, BarChart3, Plus } from 'lucide-react';
+import { Home, Receipt, Target, Users, Plus } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 
+// 4 primary destinations flank the centered "+" FAB (2 left, 2 right).
 const ITEMS = [
   { to: '/dashboard', label: 'Home', icon: Home },
   { to: '/transactions', label: 'Activity', icon: Receipt },
   { to: '/goals', label: 'Goals', icon: Target },
-  { to: '/analytics', label: 'Stats', icon: BarChart3 },
+  { to: '/split-bills', label: 'Split', icon: Users },
 ];
 
 /** Mobile-only bottom navigation with a center floating add button. */

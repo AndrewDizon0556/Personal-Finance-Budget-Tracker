@@ -1,20 +1,35 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import {
+  LogOut,
+  User,
+  Settings,
+  ChevronDown,
+  LayoutDashboard,
+  Receipt,
+  Target,
+  CreditCard,
+  Users,
+  BarChart3,
+  type LucideIcon,
+} from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import Logo from '../brand/Logo';
 import NotificationBell from '../notifications/NotificationBell';
 import ThemeToggle from '../ui/ThemeToggle';
 import LevelChip from '../gamification/LevelChip';
 
-const NAV_LINKS = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/transactions', label: 'Transactions' },
-  { to: '/goals', label: 'Goals' },
-  { to: '/subscriptions', label: 'Subscriptions' },
-  { to: '/split-bills', label: 'Split' },
-  { to: '/analytics', label: 'Analytics' },
+// Single source of truth for the primary destinations. The desktop top-nav
+// renders the labels; the mobile account menu renders the same list with icons,
+// so every feature is reachable on a phone (the bottom bar only holds a few).
+const NAV_LINKS: { to: string; label: string; icon: LucideIcon }[] = [
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/transactions', label: 'Transactions', icon: Receipt },
+  { to: '/goals', label: 'Goals', icon: Target },
+  { to: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
+  { to: '/split-bills', label: 'Split Bills', icon: Users },
+  { to: '/analytics', label: 'Analytics', icon: BarChart3 },
 ];
 
 export default function Navbar() {
@@ -99,12 +114,33 @@ export default function Navbar() {
                   initial={{ opacity: 0, y: -8, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                  className="glass-strong absolute right-0 z-30 mt-2 w-52 overflow-hidden rounded-3xl p-1.5"
+                  className="glass-strong absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-3xl p-1.5"
                 >
                   <div className="border-b border-surface-border/60 px-3 py-2.5">
                     <p className="truncate text-sm font-semibold text-ink">{user?.fullName ?? 'Student'}</p>
                     <p className="truncate text-xs text-ink-faint">{user?.email}</p>
                   </div>
+
+                  {/* Mobile-only full navigation. The bottom bar only holds a few
+                      destinations, so every feature is listed here on phones.
+                      Hidden on desktop (lg), where the top nav already covers them. */}
+                  <div className="max-h-[55vh] overflow-y-auto lg:hidden">
+                    {NAV_LINKS.map(({ to, label, icon: Icon }) => {
+                      const active = location.pathname === to;
+                      return (
+                        <Link
+                          key={to}
+                          to={to}
+                          onClick={() => setMenuOpen(false)}
+                          className={`menu-item ${active ? 'font-semibold text-nu-blue-700' : ''}`}
+                        >
+                          <Icon size={16} /> {label}
+                        </Link>
+                      );
+                    })}
+                    <div className="my-1 border-t border-surface-border/60" />
+                  </div>
+
                   <Link to="/profile" onClick={() => setMenuOpen(false)} className="menu-item">
                     <User size={16} /> Profile
                   </Link>
