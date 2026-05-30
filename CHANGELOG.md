@@ -149,3 +149,57 @@
 - Entities are never exposed to the frontend directly (always via DTOs)
 - JWT is stateless — no server-side sessions
 - Password hashing uses BCrypt via Spring Security's `PasswordEncoder`
+
+---
+
+## [Sprint 5] — UI/UX Redesign & Gamification — 2026-05-30
+
+### Added
+#### Frontend
+- NU-Laguna design system: blue/gold palette, glassmorphism, custom fonts,
+  Framer Motion animations, dark/light mode + customizable accent colors
+- Redesigned every screen (landing, auth, dashboard, transactions, goals,
+  analytics, subscriptions, split bills, profile) + reusable UI primitives
+- New app shell: glass top navbar, mobile bottom navigation, floating add button
+- First-time onboarding wizard; friendly empty states; loading skeletons
+- Customizable "Days left" budgeting horizon (schedule-derived default + manual override)
+
+#### Backend
+- Gamification endpoint `GET /api/gamification/me` — XP, levels, streaks,
+  achievements computed from real activity
+- Smart insights endpoint `GET /api/insights` — rule-based financial insights
+- Dashboard "days left" made allowance-cycle aware (via `RunwayService`)
+
+---
+
+## [Sprint 6] — Security Hardening (OWASP-aligned) — 2026-05-30
+
+### Added / Changed
+- Strong password policy (12+ chars, complexity) on register + change — client + server
+- JWT token-version claim → "log out of all devices" + revoke on password change
+- `ChangePasswordRequest`, `PUT /api/auth/password`, `POST /api/auth/logout-all`
+- `LoginAttemptService` (account lockout) + `RateLimitFilter` (per-IP throttle)
+- Role scaffolding (`Role` STUDENT/ADMIN), `CustomUserDetails`
+- Security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy)
+- `401` authentication entry point; hardened error responses; request size limits
+- Frontend: Zod password policy, axios 401 auto-logout, Settings security section,
+  `vercel.json` security headers
+- Migration-safe `NOT NULL` columns (DB defaults) for existing rows
+
+---
+
+## [Sprint 7] — Branding, Fixes, Categories & Documentation — 2026-05-30
+
+### Added / Fixed
+- Brand logo (coin + graduation cap + peso) as vector assets; favicon, lockups,
+  monochrome + dark variants; wired into the app
+- **Fix:** wallet remaining balance now includes income
+  (`allowance + income − expenses`); added `DashboardServiceTest` (JUnit + Mockito)
+- **Fix:** restored `open-in-view` to resolve a 500 on categorized data
+- Income/expense **category types** (`CategoryType`): type-aware transaction form
+  (filtered dropdown, auto-reset on type switch, ↑/↓ indicators) + backend
+  validation preventing mismatched categories; income-category backfill for
+  existing accounts
+- **Fix:** centered the mobile floating add button (Framer transform conflict)
+- Documentation suite: `README.md`, `CHANGELOG.md`, `PRESENTATION.txt`,
+  `OOP_DOCUMENTATION.md`, `ARCHITECTURE.md`, `TESTING_REPORT.md`
