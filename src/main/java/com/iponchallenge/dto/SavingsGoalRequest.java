@@ -2,6 +2,7 @@ package com.iponchallenge.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -23,9 +24,11 @@ public class SavingsGoalRequest {
 
     @NotNull(message = "Target amount is required")
     @DecimalMin(value = "0.01", message = "Target amount must be greater than zero")
+    @Digits(integer = 10, fraction = 2, message = "Target amount is too large")
     private BigDecimal targetAmount;
 
     @DecimalMin(value = "0.00", message = "Current amount cannot be negative")
+    @Digits(integer = 10, fraction = 2, message = "Current amount is too large")
     private BigDecimal currentAmount;
 
     @JsonFormat(pattern = "yyyy-MM-dd")

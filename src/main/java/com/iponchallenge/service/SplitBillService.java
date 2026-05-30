@@ -36,18 +36,35 @@ public class SplitBillService {
     @Transactional
     public SplitBillResponse createSplitBill(String email, SplitBillRequest request) {
         User user = getUser(email);
-        BigDecimal amountPerMember = request.getTotalAmount()
-                .divide(BigDecimal.valueOf(request.getMemberCount()), 2, RoundingMode.HALF_UP);
 
         SplitBill splitBill = SplitBill.builder()
                 .user(user)
                 .title(request.getTitle().trim())
                 .totalAmount(request.getTotalAmount())
                 .memberCount(request.getMemberCount())
-                .amountPerMember(amountPerMember)
+                .amountPerMember(perMember(request.getTotalAmount(), request.getMemberCount()))
                 .build();
 
         return splitBillMapper.toResponse(splitBillRepository.save(splitBill));
+    }
+
+    @Transactional
+    public SplitBillResponse updateSplitBill(String email, UUID id, SplitBillRequest request) {
+        User user = getUser(email);
+        SplitBill splitBill = splitBillRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Split bill not found"));
+
+        splitBill.setTitle(request.getTitle().trim());
+        splitBill.setTotalAmount(request.getTotalAmount());
+        splitBill.setMemberCount(request.getMemberCount());
+        splitBill.setAmountPerMember(perMember(request.getTotalAmount(), request.getMemberCount()));
+
+        return splitBillMapper.toResponse(splitBillRepository.save(splitBill));
+    }
+
+    /** Even per-member share, rounded to 2 dp. memberCount is validated ≥ 2 upstream. */
+    private BigDecimal perMember(BigDecimal total, int memberCount) {
+        return total.divide(BigDecimal.valueOf(memberCount), 2, RoundingMode.HALF_UP);
     }
 
     @Transactional

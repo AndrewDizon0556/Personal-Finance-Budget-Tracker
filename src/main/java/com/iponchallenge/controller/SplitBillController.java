@@ -32,6 +32,14 @@ public class SplitBillController {
                 .body(splitBillService.createSplitBill(auth.getName(), request));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<SplitBillResponse> updateSplitBill(
+            @PathVariable UUID id,
+            @Valid @RequestBody SplitBillRequest request,
+            Authentication auth) {
+        return ResponseEntity.ok(splitBillService.updateSplitBill(auth.getName(), id, request));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSplitBill(@PathVariable UUID id, Authentication auth) {
         splitBillService.deleteSplitBill(auth.getName(), id);

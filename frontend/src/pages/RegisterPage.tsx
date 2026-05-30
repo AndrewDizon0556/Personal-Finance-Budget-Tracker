@@ -101,7 +101,7 @@ export default function RegisterPage() {
         <TextField
           label="Password"
           type="password"
-          placeholder="Min. 8 characters"
+          placeholder="Min. 12 chars, mixed case, number & symbol"
           error={errors.password?.message}
           {...register('password')}
         />

@@ -12,6 +12,11 @@ const splitBillService = {
     return response.data;
   },
 
+  updateSplitBill: async (id: string, payload: SplitBillPayload): Promise<SplitBill> => {
+    const response = await axiosClient.put<SplitBill>(`/api/split-bills/${id}`, payload);
+    return response.data;
+  },
+
   deleteSplitBill: async (id: string): Promise<void> => {
     await axiosClient.delete(`/api/split-bills/${id}`);
   },

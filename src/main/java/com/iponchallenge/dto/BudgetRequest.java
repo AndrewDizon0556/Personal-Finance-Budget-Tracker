@@ -1,6 +1,7 @@
 package com.iponchallenge.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class BudgetRequest {
 
     @NotNull(message = "Budget amount is required")
     @DecimalMin(value = "0.01", message = "Budget amount must be greater than zero")
+    @Digits(integer = 10, fraction = 2, message = "Budget amount is too large")
     private BigDecimal budgetAmount;
 
     private Integer month;

@@ -3,6 +3,7 @@ package com.iponchallenge.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.iponchallenge.entity.TransactionType;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class ExpenseRequest {
 
     @NotNull(message = "Amount is required")
     @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
+    @Digits(integer = 10, fraction = 2, message = "Amount is too large")
     private BigDecimal amount;
 
     private String notes;

@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Copy, Check, Trash2, Calculator } from 'lucide-react';
+import { Users, Copy, Check, Trash2, Calculator, Pencil } from 'lucide-react';
 import splitBillService from '../services/splitBillService';
 import type { SplitBill } from '../types/splitBill';
 import PageHeader from '../components/ui/PageHeader';
@@ -24,6 +25,7 @@ export default function SplitBillsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const {
     register,
@@ -48,12 +50,52 @@ export default function SplitBillsPage() {
   const onSubmit = async (data: SplitFormData) => {
     setActionError(null);
     try {
+      if (editingId) {
+        const updated = await splitBillService.updateSplitBill(editingId, data);
+        if (!updated || updated.id == null) {
+          setActionError('The split bill could not be updated. Please try again.');
+          return;
+        }
+        setBills((prev) => prev.map((b) => (b.id === editingId ? updated : b)));
+        setEditingId(null);
+        reset();
+        return;
+      }
+
       const result = await splitBillService.createSplitBill(data);
+      // Guard: never push an empty/invalid record into the list (would crash the
+      // render and blank the page). Surface a clear message instead.
+      if (!result || result.id == null) {
+        setActionError('The split bill could not be saved. Please try again.');
+        return;
+      }
       setBills((prev) => [result, ...prev]);
       reset();
-    } catch {
-      setActionError('Failed to create split bill.');
+    } catch (err) {
+      // Prefer the backend's validation/error message when available.
+      const message = axios.isAxiosError(err)
+        ? err.response?.data?.message ?? 'Failed to save split bill. Please check your connection and try again.'
+        : 'Failed to save split bill. Please try again.';
+      setActionError(message);
     }
+  };
+
+  const startEdit = (bill: SplitBill) => {
+    setEditingId(bill.id);
+    setActionError(null);
+    reset({
+      title: bill.title,
+      totalAmount: bill.totalAmount,
+      memberCount: bill.memberCount,
+    });
+    // Bring the form into view (it sits at the top, above the history list).
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setActionError(null);
+    reset();
   };
 
   const handleDelete = async (id: string) => {
@@ -81,7 +123,9 @@ export default function SplitBillsPage() {
       <div className="card mb-6 p-6">
         <div className="mb-4 flex items-center gap-2">
           <Calculator size={18} className="text-accent" />
-          <p className="text-sm font-semibold text-ink">Calculate Split</p>
+          <p className="text-sm font-semibold text-ink">
+            {editingId ? 'Edit Split' : 'Calculate Split'}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -127,9 +171,16 @@ export default function SplitBillsPage() {
             )}
           </AnimatePresence>
 
-          <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
-            {isSubmitting ? 'Calculating...' : 'Calculate & Save'}
-          </button>
+          <div className="flex gap-2">
+            {editingId && (
+              <button type="button" onClick={cancelEdit} className="btn-ghost flex-1">
+                Cancel
+              </button>
+            )}
+            <button type="submit" disabled={isSubmitting} className="btn-primary flex-1">
+              {isSubmitting ? 'Saving...' : editingId ? 'Update Split' : 'Calculate & Save'}
+            </button>
+          </div>
         </form>
       </div>
 
@@ -151,30 +202,42 @@ export default function SplitBillsPage() {
         <EmptyState icon={Users} title="No split bills yet" message="Calculate your first split above and it'll show up here." />
       ) : (
         <div className="space-y-2.5">
-          {bills.map((bill) => (
+          {bills.filter(Boolean).map((bill) => (
             <div key={bill.id} className="card p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-ink">{bill.title}</p>
                   <p className="text-xs text-ink-faint">
-                    {bill.memberCount} members · {formatShortDate(bill.createdAt)}
+                    {bill.memberCount ?? 0} members
+                    {bill.createdAt ? ` · ${formatShortDate(bill.createdAt)}` : ''}
                   </p>
-                  <p className="mt-1 text-xs text-ink-soft">{bill.shareMessage}</p>
+                  {bill.shareMessage && (
+                    <p className="mt-1 text-xs text-ink-soft">{bill.shareMessage}</p>
+                  )}
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="font-display text-base font-bold text-ink">
-                    {formatPeso(bill.amountPerMember)}
+                    {formatPeso(bill.amountPerMember ?? 0)}
                     <span className="text-xs font-normal text-ink-faint">/person</span>
                   </p>
                   <div className="mt-1 flex items-center justify-end gap-1">
                     <button
                       onClick={() => copyToClipboard(bill.id, bill.shareMessage)}
+                      aria-label="Copy share message"
                       className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface-soft hover:text-nu-blue-600"
                     >
                       {copiedId === bill.id ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
                     </button>
                     <button
+                      onClick={() => startEdit(bill)}
+                      aria-label="Edit split bill"
+                      className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface-soft hover:text-nu-blue-600"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
                       onClick={() => handleDelete(bill.id)}
+                      aria-label="Delete split bill"
                       className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface-soft hover:text-rose-500"
                     >
                       <Trash2 size={14} />
