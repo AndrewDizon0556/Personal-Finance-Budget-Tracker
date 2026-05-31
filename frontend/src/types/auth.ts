@@ -1,4 +1,4 @@
-export type AllowanceSchedule = 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
+export type AllowanceSchedule = 'DAILY' | 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
 
 export interface User {
   id: string;

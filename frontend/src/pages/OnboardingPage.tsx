@@ -139,8 +139,8 @@ export default function OnboardingPage() {
 
                   <div className="mt-4">
                     <label className="mb-1.5 block text-sm font-medium text-white/80">How often?</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {(['WEEKLY', 'BIWEEKLY', 'MONTHLY'] as AllowanceSchedule[]).map((s) => (
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {(['DAILY', 'WEEKLY', 'BIWEEKLY', 'MONTHLY'] as AllowanceSchedule[]).map((s) => (
                         <button
                           key={s}
                           onClick={() => setSchedule(s)}

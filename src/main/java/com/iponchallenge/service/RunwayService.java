@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
 @Service
@@ -43,7 +44,10 @@ public class RunwayService {
 
         BigDecimal avgDailySpending = calculateAvgDailySpending(user, today);
         int estimatedDaysRemaining = calculateEstimatedDays(remainingBalance, avgDailySpending);
-        int daysUntilNextAllowance = calculateDaysUntilNextAllowance(user.getAllowanceSchedule(), today);
+        // Anchor the allowance cycle on the account's creation date so the count
+        // reflects the user's actual schedule, not an arbitrary calendar boundary.
+        LocalDate anchor = user.getCreatedAt() != null ? user.getCreatedAt().toLocalDate() : today;
+        int daysUntilNextAllowance = calculateDaysUntilNextAllowance(user.getAllowanceSchedule(), today, anchor);
 
         RunwayStatus status = determineStatus(estimatedDaysRemaining, daysUntilNextAllowance);
         String message = buildMessage(status, estimatedDaysRemaining);
@@ -72,21 +76,47 @@ public class RunwayService {
         return remaining.divide(avgDaily, 0, RoundingMode.FLOOR).intValue();
     }
 
-    private int calculateDaysUntilNextAllowance(AllowanceSchedule schedule, LocalDate today) {
-        if (schedule == null || schedule == AllowanceSchedule.MONTHLY) {
-            return (int) today.until(today.with(TemporalAdjusters.lastDayOfMonth()),
-                    java.time.temporal.ChronoUnit.DAYS) + 1;
+    /**
+     * Days until the user's next allowance payout, driven by their schedule and
+     * an anchor date (the start of their allowance cycle). Returns the full
+     * period when today is itself a payout day (the *next* one is a period away).
+     *
+     *   DAILY    -> 1
+     *   WEEKLY   -> 1..7   (period of 7 from the anchor)
+     *   BIWEEKLY -> 1..14  (period of 14 from the anchor)
+     *   MONTHLY  -> next occurrence of the anchor's day-of-month
+     */
+    private int calculateDaysUntilNextAllowance(AllowanceSchedule schedule, LocalDate today, LocalDate anchor) {
+        if (schedule == AllowanceSchedule.DAILY) {
+            return 1;
         }
         if (schedule == AllowanceSchedule.WEEKLY) {
-            return 8 - today.getDayOfWeek().getValue();
+            return daysIntoPeriodRemaining(anchor, today, 7);
         }
-        // BIWEEKLY: 1st–15th or 16th–end of month
-        int day = today.getDayOfMonth();
-        if (day <= 15) {
-            return 15 - day + 1;
+        if (schedule == AllowanceSchedule.BIWEEKLY) {
+            return daysIntoPeriodRemaining(anchor, today, 14);
         }
-        return (int) today.until(today.with(TemporalAdjusters.lastDayOfMonth()),
-                java.time.temporal.ChronoUnit.DAYS) + 1;
+        // MONTHLY (also the default when schedule is null): same day-of-month next cycle.
+        return monthlyDaysUntilNext(anchor, today);
+    }
+
+    /** For a fixed-length cycle: days remaining until the next multiple of {@code period} from the anchor. */
+    private int daysIntoPeriodRemaining(LocalDate anchor, LocalDate today, int period) {
+        long elapsed = ChronoUnit.DAYS.between(anchor, today);
+        // Normalize into [0, period) even if today is before the anchor.
+        long into = ((elapsed % period) + period) % period;
+        return (int) (period - into); // into==0 (a payout day) -> a full period until the next
+    }
+
+    /** Days until the next occurrence of the anchor's day-of-month (clamped to short months). */
+    private int monthlyDaysUntilNext(LocalDate anchor, LocalDate today) {
+        int targetDom = anchor.getDayOfMonth();
+        LocalDate thisMonth = today.withDayOfMonth(Math.min(targetDom, today.lengthOfMonth()));
+        LocalDate next = thisMonth.isAfter(today)
+                ? thisMonth
+                : today.plusMonths(1).withDayOfMonth(
+                        Math.min(targetDom, today.plusMonths(1).lengthOfMonth()));
+        return (int) ChronoUnit.DAYS.between(today, next);
     }
 
     private RunwayStatus determineStatus(int estimated, int daysUntilNext) {

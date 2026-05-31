@@ -16,7 +16,7 @@ const profileSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
   schoolName: z.string().optional(),
   monthlyAllowance: z.coerce.number().min(0, 'Must be 0 or more').optional(),
-  allowanceSchedule: z.enum(['WEEKLY', 'BIWEEKLY', 'MONTHLY']).optional(),
+  allowanceSchedule: z.enum(['DAILY', 'WEEKLY', 'BIWEEKLY', 'MONTHLY']).optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -165,6 +165,7 @@ export default function ProfilePage() {
                   <label className="mb-1.5 block text-sm font-medium text-ink">Allowance Schedule</label>
                   <select {...register('allowanceSchedule')} className="input-field">
                     <option value="">Select schedule</option>
+                    <option value="DAILY">Daily</option>
                     <option value="WEEKLY">Weekly</option>
                     <option value="BIWEEKLY">Bi-weekly (every 2 weeks)</option>
                     <option value="MONTHLY">Monthly</option>
