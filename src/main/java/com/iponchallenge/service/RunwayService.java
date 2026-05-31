@@ -37,10 +37,16 @@ public class RunwayService {
         BigDecimal totalSpent = expenseRepository.sumByUserAndDateBetweenAndType(
                 user, startOfMonth, endOfMonth, TransactionType.EXPENSE
         );
+        // Income raises the wallet just as it does on the dashboard. The runway MUST use
+        // the same remaining-balance formula (allowance + income − expenses); computing it
+        // from allowance alone made a large income divide a tiny balance → "0 days" runway.
+        BigDecimal totalIncome = expenseRepository.sumByUserAndDateBetweenAndType(
+                user, startOfMonth, endOfMonth, TransactionType.INCOME
+        );
 
-        BigDecimal monthlyAllowance = user.getMonthlyAllowance() != null
+        BigDecimal allowance = user.getMonthlyAllowance() != null
                 ? user.getMonthlyAllowance() : BigDecimal.ZERO;
-        BigDecimal remainingBalance = monthlyAllowance.subtract(totalSpent);
+        BigDecimal remainingBalance = allowance.add(totalIncome).subtract(totalSpent);
 
         BigDecimal avgDailySpending = calculateAvgDailySpending(user, today);
         int estimatedDaysRemaining = calculateEstimatedDays(remainingBalance, avgDailySpending);
