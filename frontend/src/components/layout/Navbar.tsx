@@ -17,6 +17,8 @@ import {
   Shield,
   Trophy,
   CalendarDays,
+  FileText,
+  MoreHorizontal,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
@@ -25,16 +27,23 @@ import NotificationBell from '../notifications/NotificationBell';
 import ThemeToggle from '../ui/ThemeToggle';
 import LevelChip from '../gamification/LevelChip';
 
-// Single source of truth for the primary destinations. The desktop top-nav
-// renders the labels; the mobile account menu renders the same list with icons,
-// so every feature is reachable on a phone (the bottom bar only holds a few).
-const NAV_LINKS: { to: string; label: string; icon: LucideIcon }[] = [
+type NavLink = { to: string; label: string; icon: LucideIcon };
+
+// Core destinations shown inline on the desktop top-nav (kept short so the bar
+// never overflows). Everything else lives under the "More" dropdown on desktop.
+const PRIMARY_LINKS: NavLink[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/transactions', label: 'Transactions', icon: Receipt },
   { to: '/goals', label: 'Goals', icon: Target },
+  { to: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { to: '/report', label: 'Reports', icon: FileText },
+];
+
+// Secondary destinations — desktop "More" dropdown; on mobile they appear in the
+// account menu alongside the primary links so every feature is reachable.
+const MORE_LINKS: NavLink[] = [
   { to: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
   { to: '/split-bills', label: 'Split Bills', icon: Users },
-  { to: '/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/semester-budget', label: 'Semester', icon: GraduationCap },
   { to: '/financial-literacy', label: 'Learn', icon: BookOpen },
   { to: '/emergency-fund', label: 'Emergency', icon: Shield },
@@ -42,20 +51,31 @@ const NAV_LINKS: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/school-calendar', label: 'Calendar', icon: CalendarDays },
 ];
 
+// Full list — single source of truth for the mobile account menu.
+const NAV_LINKS: NavLink[] = [...PRIMARY_LINKS, ...MORE_LINKS];
+
 export default function Navbar() {
   const { user, clearAuth } = useAuthStore();
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Close the More dropdown whenever the route changes.
+  useEffect(() => { setMoreOpen(false); }, [location.pathname]);
+
+  const moreActive = MORE_LINKS.some((l) => l.to === location.pathname);
 
   const handleLogout = () => {
     clearAuth();
@@ -78,7 +98,7 @@ export default function Navbar() {
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
-            {NAV_LINKS.map((link) => {
+            {PRIMARY_LINKS.map((link) => {
               const active = location.pathname === link.to;
               return (
                 <Link
@@ -99,6 +119,50 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            {/* "More" dropdown holds the remaining destinations on desktop. */}
+            <div className="relative" ref={moreRef}>
+              <button
+                onClick={() => setMoreOpen((v) => !v)}
+                className="relative flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
+              >
+                {moreActive && !PRIMARY_LINKS.some((l) => l.to === location.pathname) && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-xl bg-nu-blue-700"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className={`relative flex items-center gap-1 ${moreActive ? 'text-white' : 'text-ink-soft hover:text-ink'}`}>
+                  More <MoreHorizontal size={15} />
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {moreOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    className="glass-strong absolute left-0 z-30 mt-2 w-52 overflow-hidden rounded-3xl p-1.5"
+                  >
+                    {MORE_LINKS.map(({ to, label, icon: Icon }) => {
+                      const active = location.pathname === to;
+                      return (
+                        <Link
+                          key={to}
+                          to={to}
+                          onClick={() => setMoreOpen(false)}
+                          className={`menu-item ${active ? 'font-semibold text-nu-blue-700' : ''}`}
+                        >
+                          <Icon size={16} /> {label}
+                        </Link>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </nav>
         </div>
 
