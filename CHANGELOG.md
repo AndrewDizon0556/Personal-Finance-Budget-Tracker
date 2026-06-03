@@ -1,5 +1,42 @@
 # Changelog — Ipon Challenge
 
+## [Sprint 9] — 2026-06-03
+
+### Added
+
+#### Offline-First PWA
+
+**Frontend**
+- Installed `dexie` (IndexedDB ORM) and `vite-plugin-pwa` (service worker + manifest)
+- `vite.config.ts` — added VitePWA plugin: app manifest (name, icons, display:standalone, start_url:/dashboard), Workbox NetworkFirst cache for API calls (24h TTL), CacheFirst for static assets
+- `src/db/database.ts` — Dexie `ipon_database` with tables: expenses, categories, budgets, goals, offlineQueue
+- `src/store/offlineStore.ts` — Zustand store: isOnline, pendingSync, lastSync, isSyncing (lastSync persisted across sessions)
+- `src/sync/SyncManager.ts` — singleton; listens for browser online/offline events; enqueues changes; posts to POST /api/sync on reconnect; handles idMapping responses to reconcile offline→server IDs in Dexie
+- `src/repositories/ExpenseRepository.ts` — online: calls API + caches to Dexie; offline: reads Dexie + enqueues to SyncManager
+- `src/repositories/BudgetRepository.ts` — same pattern
+- `src/repositories/SavingsGoalRepository.ts` — same pattern
+- `expenseStore.ts`, `budgetStore.ts`, `goalStore.ts` — updated to call repositories instead of services directly
+- `OfflineBanner.tsx` — sticky banner below navbar: 🟡 Offline Mode (amber), 🔄 Syncing (blue), ✅ All synced (green); shows pending count and last sync time; manual Sync now button
+- `PrivateLayout.tsx` — initializes SyncManager on mount; renders OfflineBanner
+
+**Legal & Compliance**
+- `src/pages/TermsPage.tsx` — Terms of Service at /terms
+- `src/pages/PrivacyPage.tsx` — Privacy Policy at /privacy (covers data collection, BCrypt, JWT, IndexedDB, Railway/Vercel, user rights)
+- `PublicLayout.tsx` — footer with Terms, Privacy, MIT License links
+- `LICENSE` — MIT License (Vic Andrew A. Dizon, 2026)
+- Routes /terms and /privacy added to AppRouter (public, no auth required)
+
+**Backend**
+- `Expense`, `Budget`, `SavingsGoal` entities — added `offline_id` VARCHAR(36) and `last_updated` TIMESTAMP columns (Hibernate auto-migrates via ddl-auto=update)
+- `ExpenseRequest` — added optional `offlineId` field; `ExpenseService.createExpense` sets it on the entity for idempotency
+- `SyncItemDto` — queueId, offlineId, entity, operation, payload (Map)
+- `SyncRequestDto` — List<SyncItemDto> with @Valid
+- `SyncResponseDto` — synced[], failed[], idMappings[] (offlineId→serverId for CREATE ops)
+- `SyncService` — processes each queue item by entity+operation; delegates to existing ExpenseService/BudgetService/SavingsGoalService; uses Jackson ObjectMapper.convertValue for payload deserialization; returns per-item success/failure
+- `SyncController` — POST /api/sync (authenticated); thin controller delegates to SyncService
+
+---
+
 ## [Sprint 8] — 2026-06-03
 
 ### Added

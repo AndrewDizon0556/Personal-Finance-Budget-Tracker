@@ -41,4 +41,10 @@ public class Budget {
 
     @Column(nullable = false)
     private Integer year;
+
+    @Column(name = "offline_id", length = 36)
+    private String offlineId;
+
+    @Column(name = "last_updated")
+    private java.time.LocalDateTime lastUpdated;
 }

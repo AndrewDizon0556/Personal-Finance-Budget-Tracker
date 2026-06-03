@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Budget, BudgetPayload } from '../types/budget';
-import budgetService from '../services/budgetService';
+import { BudgetRepository } from '../repositories/BudgetRepository';
 
 interface BudgetState {
   budgets: Budget[];
@@ -21,7 +21,7 @@ export const useBudgetStore = create<BudgetState>((set) => ({
   fetchBudgets: async (month, year) => {
     set({ isLoading: true, error: null });
     try {
-      const budgets = await budgetService.getBudgets(month, year);
+      const budgets = await BudgetRepository.getAll(month, year);
       set({ budgets, isLoading: false });
     } catch {
       set({ error: 'Failed to load budgets', isLoading: false });
@@ -29,19 +29,19 @@ export const useBudgetStore = create<BudgetState>((set) => ({
   },
 
   addBudget: async (payload) => {
-    const budget = await budgetService.createBudget(payload);
+    const budget = await BudgetRepository.create(payload);
     set((state) => ({ budgets: [...state.budgets, budget] }));
   },
 
   editBudget: async (id, payload) => {
-    const updated = await budgetService.updateBudget(id, payload);
+    const updated = await BudgetRepository.update(id, payload);
     set((state) => ({
       budgets: state.budgets.map((b) => (b.id === id ? updated : b)),
     }));
   },
 
   removeBudget: async (id) => {
-    await budgetService.deleteBudget(id);
+    await BudgetRepository.remove(id);
     set((state) => ({ budgets: state.budgets.filter((b) => b.id !== id) }));
   },
 }));

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { SavingsGoal, SavingsGoalPayload } from '../types/goal';
-import goalService from '../services/goalService';
+import { SavingsGoalRepository } from '../repositories/SavingsGoalRepository';
 
 interface GoalState {
   goals: SavingsGoal[];
@@ -21,7 +21,7 @@ export const useGoalStore = create<GoalState>((set) => ({
   fetchGoals: async () => {
     set({ isLoading: true, error: null });
     try {
-      const goals = await goalService.getGoals();
+      const goals = await SavingsGoalRepository.getAll();
       set({ goals, isLoading: false });
     } catch {
       set({ error: 'Failed to load goals', isLoading: false });
@@ -29,19 +29,19 @@ export const useGoalStore = create<GoalState>((set) => ({
   },
 
   addGoal: async (payload) => {
-    const goal = await goalService.createGoal(payload);
+    const goal = await SavingsGoalRepository.create(payload);
     set((state) => ({ goals: [goal, ...state.goals] }));
   },
 
   editGoal: async (id, payload) => {
-    const updated = await goalService.updateGoal(id, payload);
+    const updated = await SavingsGoalRepository.update(id, payload);
     set((state) => ({
       goals: state.goals.map((g) => (g.id === id ? updated : g)),
     }));
   },
 
   removeGoal: async (id) => {
-    await goalService.deleteGoal(id);
+    await SavingsGoalRepository.remove(id);
     set((state) => ({ goals: state.goals.filter((g) => g.id !== id) }));
   },
 }));

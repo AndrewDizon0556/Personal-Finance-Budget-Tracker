@@ -7,13 +7,20 @@ import authService from '../services/authService';
 import Navbar from '../components/layout/Navbar';
 import MobileNav from '../components/layout/MobileNav';
 import GlobalExpenseModal from '../components/expense/GlobalExpenseModal';
+import OfflineBanner from '../components/ui/OfflineBanner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import { syncManager } from '../sync/SyncManager';
 
 export default function PrivateLayout() {
   const { isAuthenticated, user, setAuth, token } = useAuthStore();
   const fetchGamification = useGamificationStore((s) => s.fetch);
   const mutationTick = useUiStore((s) => s.mutationTick);
   const location = useLocation();
+
+  // Initialize offline detection and auto-sync on first mount
+  useEffect(() => {
+    syncManager.init();
+  }, []);
 
   // Rehydrate user from token on refresh
   useEffect(() => {
@@ -39,6 +46,7 @@ export default function PrivateLayout() {
   return (
     <div className="min-h-screen bg-[rgb(var(--page-bg))] bg-nu-mesh">
       <Navbar />
+      <OfflineBanner />
       <main className="pb-28 lg:pb-12">
         {/* Keyed by route so a crash on one page shows a friendly message instead
             of blanking the whole app, and clears automatically on navigation. */}

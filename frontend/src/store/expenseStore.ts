@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Expense, ExpenseCategory, ExpensePayload } from '../types/expense';
-import expenseService from '../services/expenseService';
+import { ExpenseRepository } from '../repositories/ExpenseRepository';
 
 interface ExpenseState {
   expenses: Expense[];
@@ -24,7 +24,7 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
   fetchExpenses: async (month, year) => {
     set({ isLoading: true, error: null });
     try {
-      const expenses = await expenseService.getExpenses(month, year);
+      const expenses = await ExpenseRepository.getAll(month, year);
       set({ expenses, isLoading: false });
     } catch {
       set({ error: 'Failed to load expenses', isLoading: false });
@@ -33,7 +33,7 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
 
   fetchCategories: async () => {
     try {
-      const categories = await expenseService.getCategories();
+      const categories = await ExpenseRepository.getCategories();
       set({ categories });
     } catch {
       set({ error: 'Failed to load categories' });
@@ -41,19 +41,19 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
   },
 
   addExpense: async (payload) => {
-    const expense = await expenseService.createExpense(payload);
+    const expense = await ExpenseRepository.create(payload);
     set((state) => ({ expenses: [expense, ...state.expenses] }));
   },
 
   editExpense: async (id, payload) => {
-    const updated = await expenseService.updateExpense(id, payload);
+    const updated = await ExpenseRepository.update(id, payload);
     set((state) => ({
       expenses: state.expenses.map((e) => (e.id === id ? updated : e)),
     }));
   },
 
   removeExpense: async (id) => {
-    await expenseService.deleteExpense(id);
+    await ExpenseRepository.remove(id);
     set((state) => ({ expenses: state.expenses.filter((e) => e.id !== id) }));
   },
 }));

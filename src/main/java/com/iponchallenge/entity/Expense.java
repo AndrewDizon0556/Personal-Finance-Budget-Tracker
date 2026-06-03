@@ -46,4 +46,10 @@ public class Expense {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "offline_id", length = 36)
+    private String offlineId;
+
+    @Column(name = "last_updated")
+    private LocalDateTime lastUpdated;
 }

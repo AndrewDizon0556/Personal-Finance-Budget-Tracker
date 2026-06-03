@@ -34,4 +34,7 @@ public class ExpenseRequest {
     private LocalDate expenseDate;
 
     private TransactionType transactionType = TransactionType.EXPENSE;
+
+    // Set by the sync endpoint to enable idempotent offline→online reconciliation
+    private String offlineId;
 }

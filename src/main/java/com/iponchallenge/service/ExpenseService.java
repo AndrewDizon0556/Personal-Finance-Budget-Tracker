@@ -65,6 +65,8 @@ public class ExpenseService {
                 .notes(request.getNotes())
                 .expenseDate(request.getExpenseDate())
                 .transactionType(txType)
+                .offlineId(request.getOfflineId())
+                .lastUpdated(java.time.LocalDateTime.now())
                 .build();
 
         Expense saved = expenseRepository.save(expense);

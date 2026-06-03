@@ -16,6 +16,8 @@ import SettingsPage from '../pages/SettingsPage';
 import SemesterBudgetPage from '../pages/SemesterBudgetPage';
 import FinancialLiteracyPage from '../pages/FinancialLiteracyPage';
 import LessonPage from '../pages/LessonPage';
+import TermsPage from '../pages/TermsPage';
+import PrivacyPage from '../pages/PrivacyPage';
 
 export default function AppRouter() {
   return (
@@ -26,6 +28,8 @@ export default function AppRouter() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
         </Route>
 
         {/* Standalone full-screen onboarding (auth-gated inside) */}
