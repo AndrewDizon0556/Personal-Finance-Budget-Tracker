@@ -2,6 +2,7 @@ package com.iponchallenge.service;
 
 import com.iponchallenge.dto.RunwayResponse;
 import com.iponchallenge.entity.AllowanceSchedule;
+import com.iponchallenge.entity.Expense;
 import com.iponchallenge.entity.RunwayStatus;
 import com.iponchallenge.entity.TransactionType;
 import com.iponchallenge.entity.User;
@@ -16,12 +17,18 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class RunwayService {
 
-    private static final int LOOKBACK_DAYS = 14;
+    private static final int LOOKBACK_DAYS = 30;
+
+    // A single purchase larger than this fraction of the allowance is treated as a
+    // one-off (tuition, a gadget, a big transport cost) and excluded from the daily
+    // spending pace, so it doesn't crash the runway estimate.
+    private static final BigDecimal ONE_OFF_ALLOWANCE_FRACTION = new BigDecimal("0.40");
 
     private final UserRepository userRepository;
     private final ExpenseRepository expenseRepository;
@@ -68,12 +75,37 @@ public class RunwayService {
                 .build();
     }
 
+    /**
+     * Average "everyday" spending per day over the lookback window.
+     *
+     * One-off large purchases (tuition, a gadget, a big transport cost) are excluded
+     * so a single exceptional expense isn't mistaken for a daily habit — otherwise the
+     * runway crashes to a few days even when plenty of money remains.
+     */
     private BigDecimal calculateAvgDailySpending(User user, LocalDate today) {
         LocalDate lookbackStart = today.minusDays(LOOKBACK_DAYS);
-        BigDecimal total = expenseRepository.sumByUserAndDateBetweenAndType(
-                user, lookbackStart, today, TransactionType.EXPENSE
-        );
-        return total.divide(BigDecimal.valueOf(LOOKBACK_DAYS), 2, RoundingMode.HALF_UP);
+
+        List<Expense> expenses = expenseRepository
+                .findByUserAndExpenseDateBetweenOrderByExpenseDateDescCreatedAtDesc(user, lookbackStart, today)
+                .stream()
+                .filter(e -> e.getTransactionType() == TransactionType.EXPENSE)
+                .toList();
+
+        if (expenses.isEmpty()) return BigDecimal.ZERO;
+
+        // Threshold above which an expense counts as a one-off (only when an allowance is set).
+        BigDecimal allowance = user.getMonthlyAllowance() != null
+                ? user.getMonthlyAllowance() : BigDecimal.ZERO;
+        BigDecimal oneOffThreshold = allowance.compareTo(BigDecimal.ZERO) > 0
+                ? allowance.multiply(ONE_OFF_ALLOWANCE_FRACTION)
+                : null; // no allowance configured → don't exclude anything
+
+        BigDecimal everydayTotal = expenses.stream()
+                .map(Expense::getAmount)
+                .filter(amount -> oneOffThreshold == null || amount.compareTo(oneOffThreshold) <= 0)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return everydayTotal.divide(BigDecimal.valueOf(LOOKBACK_DAYS), 2, RoundingMode.HALF_UP);
     }
 
     private int calculateEstimatedDays(BigDecimal remaining, BigDecimal avgDaily) {

@@ -2,6 +2,7 @@ package com.iponchallenge.service;
 
 import com.iponchallenge.dto.RunwayResponse;
 import com.iponchallenge.entity.AllowanceSchedule;
+import com.iponchallenge.entity.Expense;
 import com.iponchallenge.entity.RunwayStatus;
 import com.iponchallenge.entity.TransactionType;
 import com.iponchallenge.entity.User;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -110,5 +112,37 @@ class RunwayServiceTest {
         stubSums("100", "0");
 
         assertThat(runwayService.getRunway(EMAIL).getDaysUntilNextAllowance()).isEqualTo(1);
+    }
+
+    /**
+     * Regression: a single one-off purchase (e.g. ₱15,000 tuition/transport) must NOT
+     * be treated as daily spending. With ₱14,900 still in the wallet the runway should
+     * stay healthy, not crash to a few days and flag CRITICAL.
+     */
+    @Test
+    void oneOffLargeExpense_isExcludedFromDailyPace() {
+        stubUser(new BigDecimal("15000"), AllowanceSchedule.MONTHLY);
+        stubSums("100", "0"); // this month: only ₱100 spent → remaining ₱14,900
+
+        when(expenseRepository.findByUserAndExpenseDateBetweenOrderByExpenseDateDescCreatedAtDesc(
+                any(), any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(
+                        expense("15000", LocalDate.now().minusDays(4)), // one-off, must be excluded
+                        expense("100", LocalDate.now())                  // everyday spending
+                ));
+
+        RunwayResponse r = runwayService.getRunway(EMAIL);
+
+        assertThat(r.getRemainingBalance()).isEqualByComparingTo("14900");
+        assertThat(r.getEstimatedDaysRemaining()).isGreaterThan(30);
+        assertThat(r.getRunwayStatus()).isEqualTo(RunwayStatus.SAFE);
+    }
+
+    private Expense expense(String amount, LocalDate date) {
+        return Expense.builder()
+                .amount(new BigDecimal(amount))
+                .transactionType(TransactionType.EXPENSE)
+                .expenseDate(date)
+                .build();
     }
 }
