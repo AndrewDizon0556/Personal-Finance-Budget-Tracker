@@ -13,6 +13,9 @@ import SubscriptionsPage from '../pages/SubscriptionsPage';
 import SplitBillsPage from '../pages/SplitBillsPage';
 import ProfilePage from '../pages/ProfilePage';
 import SettingsPage from '../pages/SettingsPage';
+import SemesterBudgetPage from '../pages/SemesterBudgetPage';
+import FinancialLiteracyPage from '../pages/FinancialLiteracyPage';
+import LessonPage from '../pages/LessonPage';
 
 export default function AppRouter() {
   return (
@@ -38,6 +41,10 @@ export default function AppRouter() {
           <Route path="/split-bills" element={<SplitBillsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/semester-budget" element={<SemesterBudgetPage />} />
+          <Route path="/semester-budget/:id" element={<SemesterBudgetPage />} />
+          <Route path="/financial-literacy" element={<FinancialLiteracyPage />} />
+          <Route path="/financial-literacy/:id" element={<LessonPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

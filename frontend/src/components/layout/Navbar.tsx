@@ -12,6 +12,8 @@ import {
   CreditCard,
   Users,
   BarChart3,
+  GraduationCap,
+  BookOpen,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
@@ -30,6 +32,8 @@ const NAV_LINKS: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
   { to: '/split-bills', label: 'Split Bills', icon: Users },
   { to: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { to: '/semester-budget', label: 'Semester', icon: GraduationCap },
+  { to: '/financial-literacy', label: 'Learn', icon: BookOpen },
 ];
 
 export default function Navbar() {

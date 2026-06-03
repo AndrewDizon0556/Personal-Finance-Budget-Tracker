@@ -1,5 +1,65 @@
 # Changelog — Ipon Challenge
 
+## [Sprint 8] — 2026-06-03
+
+### Added
+
+#### Feature: Semester Budget Mode
+
+**Backend (Java Spring Boot)**
+- `SemesterBudget` entity mapped to `semester_budget` table: semesterName, startDate, endDate, totalBudget, targetSavings, allowanceSchedule
+- `SemesterBudgetRepository` with `findByUserOrderByStartDateDesc` and `findByIdAndUser`
+- `SemesterBudgetRequest` DTO with Bean Validation (`@NotBlank`, `@NotNull`, `@DecimalMin`, date cross-field validation)
+- `SemesterBudgetResponse` DTO with computed fields: totalSpent, remaining, weeklyBudget, totalWeeks, weeksElapsed, weeksRemaining, progressPercentage, status, statusMessage
+- `WeeklyBreakdownResponse` DTO per 7-day window: allocatedAmount, spentAmount, remainingAmount, usagePercentage, status (SAFE/WARNING/OVERSPENT/UPCOMING), isCurrent flag
+- `SemesterBudgetMapper` — computes week counts, elapsed weeks, weekly allocation, progress %, and status message from dates and spent totals
+- `SemesterBudgetService` — full CRUD; reuses `ExpenseRepository.sumByUserAndDateBetweenAndType` to compute semester spending without new DB queries; `getWeeklyBreakdown()` generates per-week windows on the fly
+- `SemesterBudgetController` — GET /api/semester-budget, GET /{id}, GET /{id}/weekly-breakdown, POST, PUT /{id}, DELETE /{id}
+- `SemesterBudgetServiceTest` — 5 unit tests: progress%, ON_TRACK/WARNING statuses, current-week flagging, UPCOMING weeks
+
+#### Feature: Financial Literacy Module — Student Edition
+
+**Backend (Java Spring Boot)**
+- `FinancialLesson` entity mapped to `financial_lessons` table: title, description, content (TEXT/JSON), category, difficulty, orderIndex, icon, estimatedMinutes, hasCalculator
+- `UserLessonProgress` entity mapped to `user_lesson_progress` table: user FK, lesson FK, completed, score, completedAt; unique constraint on (user_id, lesson_id)
+- `FinancialLessonRepository` — `findAllByOrderByOrderIndexAsc`, `existsByOrderIndex`
+- `UserLessonProgressRepository` — `findByUser`, `findByUserAndLesson`, `countByUserAndCompleted`
+- `LessonResponse` DTO — lesson fields + user-specific: completed, score, completedAt
+- `UserProgressResponse` DTO — totalLessons, completedLessons, completionPercentage, currentStreak, averageScore, level, levelMessage
+- `LessonMapper` — combines FinancialLesson + UserLessonProgress into LessonResponse
+- `FinancialLiteracyService` — getLessons (with per-user completion map), getLesson, completeLesson (upsert progress), getUserProgress (level + streak calculation)
+- `FinancialLiteracyController` — GET /api/financial-lessons, GET /{id}, POST /{id}/complete, GET /progress
+- `LessonDataSeeder` (ApplicationRunner) — seeds 10 student-focused lessons on first boot; idempotent (skips if lessons exist)
+- 10 seeded lessons with rich JSON content blocks (intro, tips, example, callout, quiz): Make Your Baon Last the Week · Compound Interest · Preparing for Tuition Day · First Credit Card · 50-30-20 Rule · Emergency Fund · Tracking Small Expenses · Group Expenses · Understanding Debt · Financial Goals
+- `FinancialLiteracyServiceTest` — 5 unit tests: lesson completion status, completeLesson upsert, progress level (BEGINNER→ADVANCED), streak calculation
+
+#### Frontend (React + TypeScript)
+
+**Semester Budget**
+- `src/types/semesterBudget.ts` — SemesterBudget, WeeklyBreakdown, SemesterBudgetPayload interfaces
+- `src/services/semesterBudgetService.ts` — typed Axios client for all semester budget endpoints
+- `src/store/semesterBudgetStore.ts` — Zustand store: semesters[], fetchSemesters, addSemester, editSemester, removeSemester
+- `SemesterBudgetForm` — React Hook Form + Zod; fields: semesterName, startDate, endDate, totalBudget, targetSavings, allowanceSchedule; cross-field end > start validation
+- `WeeklyBreakdownChart` — Recharts BarChart with per-week colour coding (green/amber/red/grey); dashed reference line at allocation; custom tooltip
+- `SemesterBudgetCard` — progress bar, status chip, 3-stat grid (total/spent/weekly), status message, navigate to detail
+- `SemesterBudgetPage` — list view with create/edit inline form; detail view (param `/semester-budget/:id`) with current-week highlight card and full week-by-week table
+
+**Financial Literacy**
+- `src/types/lesson.ts` — Lesson, UserProgress, ContentBlock union type (intro/tips/example/callout/calculator/quiz)
+- `src/services/financialLiteracyService.ts` — typed Axios client for lessons and progress endpoints
+- `ProgressTracker` — lesson completion bar, level chip, 3-stat row (completed/streak/avg score)
+- `LearningCard` — lesson card with category chip, difficulty chip, estimated time, calculator badge, completed indicator
+- `CompoundCalculator` — interactive compound interest calculator (principal, rate, years → future value, interest earned, multiplier)
+- `FinancialLiteracyPage` — lesson grid with category filter chips and ProgressTracker summary
+- `LessonPage` — renders all JSON content block types; embedded QuizBlock with answer validation; CompoundCalculator for Module 2; Mark as Complete button (requires quiz answer if lesson has quiz)
+
+**Navigation & Routing**
+- Added `/semester-budget` and `/semester-budget/:id` routes (protected)
+- Added `/financial-literacy` and `/financial-literacy/:id` routes (protected)
+- Added `Semester` (GraduationCap) and `Learn` (BookOpen) to desktop Navbar and mobile account menu
+
+---
+
 ## [Sprint 1] — 2026-05-29
 
 ### Added
