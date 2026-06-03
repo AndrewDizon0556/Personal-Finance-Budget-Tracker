@@ -129,7 +129,7 @@ Create a database, then provide configuration via environment variables
 | --- | --- | --- |
 | `PGHOST` / `PGPORT` / `PGDATABASE` | Postgres connection | `localhost` / `5432` / `ipon_challenge` |
 | `PGUSER` / `PGPASSWORD` | Postgres credentials | `postgres` / `postgres` |
-| `JWT_SECRET` | Signing key for JWTs (set a strong value) | dev fallback |
+| `JWT_SECRET` | Signing key for JWTs — **required** (the app won't start without it) | _none — must be set_ |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins | `http://localhost:5173` |
 | `AI_API_KEY` | AI provider key — only needed when AI Coach is enabled (never hardcode) | unset (AI disabled) |
 | `AI_MODEL` | AI model identifier | `claude-haiku-4-5-20251001` |
