@@ -59,4 +59,9 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    // Tracks the last date an automatic allowance income was injected.
+    // Null means auto-allowance has never run or is disabled.
+    @Column(name = "last_allowance_paid_at")
+    private java.time.LocalDate lastAllowancePaidAt;
 }

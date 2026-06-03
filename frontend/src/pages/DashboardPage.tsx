@@ -11,8 +11,8 @@ import type { DashboardData } from '../types/dashboard';
 import BalanceCard from '../components/dashboard/BalanceCard';
 import BudgetSummaryCard from '../components/dashboard/BudgetSummaryCard';
 import RecentTransactionsList from '../components/dashboard/RecentTransactionsList';
-import RunwayWidget from '../components/dashboard/RunwayWidget';
 import InsightsWidget, { type Insight } from '../components/dashboard/InsightsWidget';
+import AllowanceRunwayCard from '../components/finance/AllowanceRunwayCard';
 import StatCard from '../components/ui/StatCard';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
@@ -188,14 +188,7 @@ export default function DashboardPage() {
 
         {/* Side column */}
         <div className="space-y-5">
-          {dashboard.runwayStatus && (
-            <RunwayWidget
-              runwayStatus={dashboard.runwayStatus}
-              estimatedDaysRemaining={dashboard.estimatedDaysRemaining}
-              daysUntilNextAllowance={dashboard.daysUntilNextAllowance}
-              message={dashboard.runwayMessage}
-            />
-          )}
+          <AllowanceRunwayCard />
           <InsightsWidget insights={insights} />
           <HealthScoreCard />
           {dashboard.budgets.length > 0 && <BudgetSummaryCard budgets={dashboard.budgets} />}

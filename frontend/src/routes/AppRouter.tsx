@@ -21,6 +21,7 @@ import PrivacyPage from '../pages/PrivacyPage';
 import EmergencyFundPage from '../pages/EmergencyFundPage';
 import ChallengesPage from '../pages/ChallengesPage';
 import SchoolCalendarPage from '../pages/SchoolCalendarPage';
+import ReportPage from '../pages/ReportPage';
 
 export default function AppRouter() {
   return (
@@ -55,6 +56,7 @@ export default function AppRouter() {
           <Route path="/emergency-fund" element={<EmergencyFundPage />} />
           <Route path="/challenges" element={<ChallengesPage />} />
           <Route path="/school-calendar" element={<SchoolCalendarPage />} />
+          <Route path="/report" element={<ReportPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
