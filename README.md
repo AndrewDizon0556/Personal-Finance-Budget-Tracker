@@ -13,6 +13,22 @@ in a modern, gamified experience that makes budgeting feel less like a chore.
 
 ---
 
+## Install the app (PWA)
+
+Ipon Challenge is a Progressive Web App, so you can install it like a native app —
+no app store needed. Open the live link above, then:
+
+- **Android (Chrome):** tap the **⋮** menu → **Add to Home screen** → **Install**.
+- **iPhone/iPad (Safari):** tap **Share** → **Add to Home Screen**.
+- **Desktop (Chrome/Edge):** click the **install icon** (⊕) in the address bar, or
+  the **⋮** menu → **Install Ipon Challenge**.
+
+Once installed it opens full-screen, keeps you logged in, and works offline — any
+expenses you add without internet are saved locally and synced automatically when
+you reconnect.
+
+---
+
 ## Overview
 
 Most budgeting apps are built for working professionals. Ipon Challenge is built for
@@ -24,29 +40,45 @@ database.
 ## Features
 
 **Money management**
-- Allowance tracking with daily safe-to-spend guidance and an allowance "runway"
-  predictor (weekly / bi-weekly / monthly cycles)
+- **Smart Allowance Runway 2.0** — daily safe-to-spend, risk level (green / yellow / red),
+  spending trend, estimated exhaustion date, and a 4-week projection chart
+- **Recurring allowance automation** — allowance is auto-credited on your schedule
+  (daily / weekly / bi-weekly / monthly)
 - Fast expense and income logging with student-specific categories
   (Tuition, Food, Transportation, School Supplies, Projects, Load/Data, Leisure, Emergency)
+- **Semester Budget Mode** — plan a whole semester and get a weekly spending breakdown
 - Savings goals with animated progress rings and milestone tracking
+- **Emergency Fund** — dedicated safety-net savings by category (Medical, Transport, School, General)
 - Subscription tracker and a quick bill-splitter for group expenses
+- **Before You Buy** — a spending-impact check before each expense is saved
 
 **Insight & motivation**
 - Analytics with spending-by-category and weekly trend charts
+- **Financial Health Score** — a 0–100 score across savings, budget, spending,
+  challenges, and emergency-fund habits
 - Smart financial insights generated from your real spending
+- **No-Spend Challenges** — gamified challenges (No Milk Tea, Save ₱50/day, …) that award XP
 - Gamification: XP, levels, no-overspend streaks, and unlockable achievements
+- **Financial Literacy** — student-focused lessons with quizzes and a compound-interest calculator
+
+**Planning & reports**
+- **School Calendar** — track exams, projects, and tuition deadlines with budget suggestions
+- **Reports** — monthly report with charts, exportable as **PDF** (print) or **CSV**
 
 **Experience**
+- **Offline-first PWA** — installable on phone/desktop; works without internet and
+  auto-syncs when the connection returns
 - Light/dark mode with customizable accent colors
 - First-time onboarding flow and friendly empty states
-- Responsive layout with a mobile bottom nav and quick-add button
+- Responsive layout with a mobile bottom nav, "More" menu, and quick-add button
 
 ## Tech Stack
 
 | Layer | Technologies |
 | --- | --- |
 | **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, Recharts, Zustand, React Hook Form + Zod, Axios |
-| **Backend** | Java 17, Spring Boot 3.2, Spring Security, Spring Data JPA (Hibernate), Bean Validation, JJWT |
+| **Offline / PWA** | vite-plugin-pwa (Workbox service worker), Dexie (IndexedDB) |
+| **Backend** | Java 17, Spring Boot 3.2, Spring Security, Spring Data JPA (Hibernate), Bean Validation, JJWT, Spring Scheduling |
 | **Database** | PostgreSQL |
 | **Hosting** | Vercel (frontend) · Railway (backend + PostgreSQL) |
 
@@ -64,17 +96,20 @@ The project is a clean two-tier application:
 Personal-Finance-Budget-Tracker/
 ├── src/main/java/com/iponchallenge/   # Spring Boot API
 │   ├── controller/                    # REST endpoints
-│   ├── service/                       # Business logic
+│   ├── service/                       # Business logic (incl. allowance scheduler)
 │   ├── repository/                    # Spring Data JPA repositories
 │   ├── entity/  dto/  mapper/         # Domain, API contracts, mapping
-│   ├── security/  config/             # JWT filter, rate limiting, Spring Security
+│   ├── security/  config/             # JWT filter, rate limiting, seeders
+│   ├── ai/                            # AI Coach scaffold (controller/service/dto/config)
 │   └── exception/                     # Centralized error handling
 ├── src/main/resources/                # application.properties
-└── frontend/                          # React + TypeScript app
+└── frontend/                          # React + TypeScript PWA
     └── src/
         ├── pages/  components/        # Screens and UI building blocks
-        ├── store/                     # Zustand state (auth, theme, prefs)
+        ├── store/                     # Zustand state (auth, theme, offline, …)
         ├── services/  api/            # API clients
+        ├── repositories/              # Online/offline data layer
+        ├── db/  sync/                 # Dexie (IndexedDB) + SyncManager
         └── lib/                       # Helpers, motion variants, theme
 ```
 
@@ -96,6 +131,8 @@ Create a database, then provide configuration via environment variables
 | `PGUSER` / `PGPASSWORD` | Postgres credentials | `postgres` / `postgres` |
 | `JWT_SECRET` | Signing key for JWTs (set a strong value) | dev fallback |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins | `http://localhost:5173` |
+| `AI_API_KEY` | AI provider key — only needed when AI Coach is enabled (never hardcode) | unset (AI disabled) |
+| `AI_MODEL` | AI model identifier | `claude-haiku-4-5-20251001` |
 
 Run the API (defaults to `http://localhost:8080`):
 
@@ -144,9 +181,19 @@ Security is treated as a core feature, not an afterthought:
 
 ## Roadmap
 
+- **AI Coach** — budget advice, auto-categorization, and a student finance tutor
+  (backend scaffold is in place under `ai/`; provider integration is next)
 - Refresh-token rotation with HTTP-only cookies (single-domain hosting)
-- Budget management UI and recurring-allowance automation
-- Exportable reports and richer analytics
+- Push notifications for budget alerts and upcoming school events
+- Richer analytics and multi-month report comparisons
+
+## License
+
+Released under the **MIT License** — see [LICENSE](LICENSE) for details.
+NU Laguna branding elements are used for an educational, non-commercial project
+and remain the property of National University Laguna. See also the in-app
+[Terms of Service](https://personal-finance-budget-tracker-seven.vercel.app/terms)
+and [Privacy Policy](https://personal-finance-budget-tracker-seven.vercel.app/privacy).
 
 ## Acknowledgements
 

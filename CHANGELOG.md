@@ -1,5 +1,32 @@
 # Changelog — Ipon Challenge
 
+## [Sprint 11] — 2026-06-04
+
+### Added — Feature Completion & Navigation
+
+- **Allowance Runway 2.0 (frontend)** — `AllowanceRunwayCard` with Recharts 4-week
+  projection chart, risk level (GREEN/YELLOW/RED), spending trend, and recommended
+  daily spend; replaces the older `RunwayWidget` on the Dashboard
+- **Recurring Allowance Automation** — `@EnableScheduling`; `AllowanceSchedulerService`
+  runs daily and injects an INCOME transaction for each user whose allowance is due
+  (DAILY/WEEKLY/BIWEEKLY/MONTHLY); `User.lastAllowancePaidAt` tracks the cycle;
+  `GET /api/allowance/schedule` reports the next payout date
+- **PDF Report** — `ReportPage` at `/report`: month/year picker, income/expense/net
+  summary, category pie + bar charts, full transaction table, and browser
+  "Save as PDF" via `window.print()` (print-optimised layout) plus CSV export
+- **AI structure (complete)** — `ai/dto/AiCoachRequest`, `ai/dto/AiCoachResponse`,
+  `ai/config/AiConfig` (reads `AI_API_KEY` + `AI_MODEL` from env, `isEnabled()` guard)
+
+### Changed — Navigation (PC + Mobile)
+
+- Desktop top-nav restructured: 5 core links inline (Dashboard, Transactions, Goals,
+  Analytics, Reports) + a **"More"** dropdown for the rest, fixing the 11-item overflow
+- **Reports** added to navigation (previously a route with no link — unreachable)
+- Mobile account menu renders the full link list, so every feature (Reports, Emergency,
+  Challenges, Calendar, …) is reachable on phones
+
+---
+
 ## [Sprint 10] — 2026-06-04
 
 ### Added — Student Financial Assistant (10 Features)
