@@ -18,6 +18,9 @@ import FinancialLiteracyPage from '../pages/FinancialLiteracyPage';
 import LessonPage from '../pages/LessonPage';
 import TermsPage from '../pages/TermsPage';
 import PrivacyPage from '../pages/PrivacyPage';
+import EmergencyFundPage from '../pages/EmergencyFundPage';
+import ChallengesPage from '../pages/ChallengesPage';
+import SchoolCalendarPage from '../pages/SchoolCalendarPage';
 
 export default function AppRouter() {
   return (
@@ -49,6 +52,9 @@ export default function AppRouter() {
           <Route path="/semester-budget/:id" element={<SemesterBudgetPage />} />
           <Route path="/financial-literacy" element={<FinancialLiteracyPage />} />
           <Route path="/financial-literacy/:id" element={<LessonPage />} />
+          <Route path="/emergency-fund" element={<EmergencyFundPage />} />
+          <Route path="/challenges" element={<ChallengesPage />} />
+          <Route path="/school-calendar" element={<SchoolCalendarPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

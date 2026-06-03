@@ -14,6 +14,9 @@ import {
   BarChart3,
   GraduationCap,
   BookOpen,
+  Shield,
+  Trophy,
+  CalendarDays,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
@@ -34,6 +37,9 @@ const NAV_LINKS: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/semester-budget', label: 'Semester', icon: GraduationCap },
   { to: '/financial-literacy', label: 'Learn', icon: BookOpen },
+  { to: '/emergency-fund', label: 'Emergency', icon: Shield },
+  { to: '/challenges', label: 'Challenges', icon: Trophy },
+  { to: '/school-calendar', label: 'Calendar', icon: CalendarDays },
 ];
 
 export default function Navbar() {

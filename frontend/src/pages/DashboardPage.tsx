@@ -16,6 +16,7 @@ import InsightsWidget, { type Insight } from '../components/dashboard/InsightsWi
 import StatCard from '../components/ui/StatCard';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
+import HealthScoreCard from '../components/finance/HealthScoreCard';
 import { staggerContainer } from '../lib/motion';
 
 function greeting() {
@@ -196,6 +197,7 @@ export default function DashboardPage() {
             />
           )}
           <InsightsWidget insights={insights} />
+          <HealthScoreCard />
           {dashboard.budgets.length > 0 && <BudgetSummaryCard budgets={dashboard.budgets} />}
         </div>
       </div>

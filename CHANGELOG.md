@@ -1,5 +1,22 @@
 # Changelog — Ipon Challenge
 
+## [Sprint 10] — 2026-06-04
+
+### Added — Student Financial Assistant (10 Features)
+
+- **Emergency Fund** — entity, service, controller, page; CRUD + contribute; progress ring; categories (Medical/Transport/School/General)
+- **Challenges** — Challenge + UserChallengeProgress entities; 8 seeded challenges; auto-progress computation (NO_SPEND/SAVINGS_TARGET/STREAK); ChallengesPage
+- **Before You Buy** — PurchaseAdvisorService + AdvisorModal; intercepts EXPENSE submits; shows budget impact, risk level (LOW/MEDIUM/HIGH), remaining after purchase
+- **Financial Health Score** — 5-factor scoring (savings, budget, spending, challenges, emergency fund); HealthScoreCard with animated score ring on Dashboard
+- **School Calendar** — SchoolEvent entity; CRUD + upcoming view; budget suggestions (save ₱X/day for events with estimated cost); SchoolCalendarPage
+- **AllowancePrediction 2.0** — extends RunwayService; adds riskLevel (GREEN/YELLOW/RED), spendingTrend, estimatedExhaustionDate, dailyRecommended, 4-week projections
+- **CSV Export** — GET /api/export/csv?month=&year=; triggered from HealthScoreCard download button
+- **AI Placeholder** — `ai/service/AiCoachService` + `ai/controller/AiCoachController` stubbed; 501 response; API key guidance documented
+- **Unit tests** — EmergencyFundServiceTest (5), ChallengeServiceTest (4), FinancialHealthScoreServiceTest (3)
+- **Routes** — /emergency-fund, /challenges, /school-calendar added; Emergency/Challenges/Calendar in Navbar
+
+---
+
 ## [Sprint 9] — 2026-06-03
 
 ### Added
