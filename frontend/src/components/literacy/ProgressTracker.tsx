@@ -1,4 +1,4 @@
-import { BookOpen, Flame, Star, TrendingUp } from 'lucide-react';
+import { BookOpen, Flame, Star } from 'lucide-react';
 import type { UserProgress } from '../../types/lesson';
 
 interface Props {
