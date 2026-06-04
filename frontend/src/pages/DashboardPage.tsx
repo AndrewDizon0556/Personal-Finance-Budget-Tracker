@@ -134,9 +134,9 @@ export default function DashboardPage() {
         }
       />
 
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         {/* Main column */}
-        <div className="space-y-5 lg:col-span-2">
+        <div className="min-w-0 space-y-5 lg:col-span-2">
           <BalanceCard
             monthlyAllowance={dashboard.monthlyAllowance}
             totalSpent={dashboard.totalSpentThisMonth}
@@ -188,7 +188,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Side column */}
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <AllowanceRunwayCard />
           <InsightsWidget insights={insights} />
           <HealthScoreCard />
