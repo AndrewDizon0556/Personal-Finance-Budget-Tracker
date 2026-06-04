@@ -19,7 +19,6 @@ import {
   CalendarDays,
   FileText,
   HelpCircle,
-  MoreHorizontal,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
@@ -61,23 +60,15 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const moreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  // Close the More dropdown whenever the route changes.
-  useEffect(() => { setMoreOpen(false); }, [location.pathname]);
-
-  const moreActive = MORE_LINKS.some((l) => l.to === location.pathname);
 
   const handleLogout = () => {
     clearAuth();
@@ -121,50 +112,6 @@ export default function Navbar() {
                 </Link>
               );
             })}
-
-            {/* "More" dropdown holds the remaining destinations on desktop. */}
-            <div className="relative" ref={moreRef}>
-              <button
-                onClick={() => setMoreOpen((v) => !v)}
-                className="relative flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
-              >
-                {moreActive && !PRIMARY_LINKS.some((l) => l.to === location.pathname) && (
-                  <motion.span
-                    layoutId="nav-pill"
-                    className="absolute inset-0 rounded-xl bg-nu-blue-700"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className={`relative flex items-center gap-1 ${moreActive ? 'text-white' : 'text-ink-soft hover:text-ink'}`}>
-                  More <MoreHorizontal size={15} />
-                </span>
-              </button>
-
-              <AnimatePresence>
-                {moreOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                    className="glass-strong absolute left-0 z-30 mt-2 w-52 overflow-hidden rounded-3xl p-1.5"
-                  >
-                    {MORE_LINKS.map(({ to, label, icon: Icon }) => {
-                      const active = location.pathname === to;
-                      return (
-                        <Link
-                          key={to}
-                          to={to}
-                          onClick={() => setMoreOpen(false)}
-                          className={`menu-item ${active ? 'font-semibold text-nu-blue-700' : ''}`}
-                        >
-                          <Icon size={16} /> {label}
-                        </Link>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </nav>
         </div>
 

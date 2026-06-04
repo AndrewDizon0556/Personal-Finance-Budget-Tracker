@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Target, PiggyBank, Flag } from 'lucide-react';
 import { useGoalStore } from '../store/goalStore';
@@ -17,10 +18,21 @@ export default function GoalsPage() {
   const { goals, isLoading, error, fetchGoals, addGoal, editGoal, removeGoal } = useGoalStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     fetchGoals();
   }, []);
+
+  // Deep-link from the quick-action FAB ("Create Goal") opens the form straight away.
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setEditingGoal(null);
+      setIsModalOpen(true);
+      searchParams.delete('new');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const totalSaved = goals.reduce((sum, g) => sum + g.currentAmount, 0);
   const totalTarget = goals.reduce((sum, g) => sum + g.targetAmount, 0);

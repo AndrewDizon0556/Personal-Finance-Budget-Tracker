@@ -10,7 +10,7 @@ import type { PurchaseAdvisor } from '../../types/financialHealth';
 /** App-wide expense modal with Before-You-Buy advisor for EXPENSE transactions. */
 export default function GlobalExpenseModal() {
   const { categories, fetchCategories, addExpense, editExpense } = useExpenseStore();
-  const { expenseModalOpen, editingExpense, closeExpenseModal, bumpMutation } = useUiStore();
+  const { expenseModalOpen, editingExpense, expensePreset, closeExpenseModal, bumpMutation } = useUiStore();
 
   // Advisor state — holds pending payload until user confirms or cancels
   const [pendingPayload, setPendingPayload] = useState<ExpensePayload | null>(null);
@@ -84,6 +84,7 @@ export default function GlobalExpenseModal() {
         onSubmit={handleSubmit}
         categories={categories}
         editingExpense={editingExpense}
+        preset={expensePreset}
       />
 
       <AdvisorModal

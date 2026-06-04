@@ -24,6 +24,8 @@ interface ExpenseModalProps {
   onSubmit: (data: ExpenseFormData) => Promise<void>;
   categories: ExpenseCategory[];
   editingExpense?: Expense | null;
+  /** Defaults applied for a new transaction (e.g. opened as "Add Income"). */
+  preset?: { transactionType?: TransactionType; notes?: string } | null;
 }
 
 export default function ExpenseModal({
@@ -32,6 +34,7 @@ export default function ExpenseModal({
   onSubmit,
   categories,
   editingExpense,
+  preset,
 }: ExpenseModalProps) {
   const {
     register,
@@ -69,15 +72,17 @@ export default function ExpenseModal({
         transactionType: editingExpense.transactionType,
       });
     } else {
+      const presetType = preset?.transactionType ?? 'EXPENSE';
+      const firstOfType = categories.find((c) => c.type === presetType);
       reset({
-        categoryId: '',
+        categoryId: firstOfType?.id ?? '',
         amount: undefined,
-        notes: '',
+        notes: preset?.notes ?? '',
         expenseDate: new Date().toISOString().split('T')[0],
-        transactionType: 'EXPENSE',
+        transactionType: presetType,
       });
     }
-  }, [editingExpense, reset, isOpen]);
+  }, [editingExpense, preset, reset, isOpen]);
 
   const handleFormSubmit = async (data: ExpenseFormData) => {
     await onSubmit(data);

@@ -240,7 +240,7 @@ export default function SemesterBudgetPage() {
       {!showForm && (
         <button
           onClick={openCreate}
-          className="fixed bottom-24 right-4 z-30 grid h-12 w-12 place-items-center rounded-full bg-nu-gradient-gold text-nu-blue-900 shadow-glow sm:hidden"
+          className="fixed bottom-24 left-4 z-30 grid h-12 w-12 place-items-center rounded-full bg-nu-gradient-gold text-nu-blue-900 shadow-glow sm:hidden"
           aria-label="New semester budget"
         >
           <Plus size={22} strokeWidth={2.5} />
