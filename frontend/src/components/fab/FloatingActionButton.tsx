@@ -188,7 +188,7 @@ export default function FloatingActionButton() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.9 }}
               transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-              className="absolute bottom-full right-0 mb-3 whitespace-nowrap rounded-2xl bg-surface px-3.5 py-2 text-sm font-bold text-nu-blue-700 shadow-card ring-1 ring-surface-border/60"
+              className="absolute bottom-full right-0 mb-3 whitespace-nowrap rounded-2xl bg-surface px-3.5 py-2 text-sm font-bold text-nu-blue-700 shadow-card ring-1 ring-surface-border/60 dark:text-nu-blue-200"
             >
               Great job! 🎉
               <span className="absolute -bottom-1 right-6 h-2.5 w-2.5 rotate-45 bg-surface ring-1 ring-surface-border/60" />

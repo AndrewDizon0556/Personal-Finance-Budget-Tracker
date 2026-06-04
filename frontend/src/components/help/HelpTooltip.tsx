@@ -17,8 +17,11 @@ interface HelpTooltipProps {
 }
 
 const SIDE_CLASSES: Record<Side, string> = {
-  top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-  bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
+  // Top/bottom anchor to the trigger's left edge (not centered) so the bubble
+  // never clips off-screen when the trigger sits near the left edge — e.g. the
+  // (?) beside a left-aligned page title on a narrow phone.
+  top: 'bottom-full left-0 mb-2',
+  bottom: 'top-full left-0 mt-2',
   left: 'right-full top-1/2 -translate-y-1/2 mr-2',
   right: 'left-full top-1/2 -translate-y-1/2 ml-2',
 };
@@ -64,7 +67,7 @@ export default function HelpTooltip({ content, label = 'More information', side 
             exit={{ opacity: 0, y: 4, scale: 0.96 }}
             transition={{ duration: 0.15 }}
             className={cn(
-              'glass-strong absolute z-50 w-56 rounded-2xl px-3.5 py-2.5 text-left text-xs font-medium leading-relaxed text-ink shadow-float',
+              'glass-strong absolute z-50 w-[min(15rem,calc(100vw-2rem))] rounded-2xl px-3.5 py-2.5 text-left text-xs font-medium leading-relaxed text-ink shadow-float',
               SIDE_CLASSES[side],
             )}
           >
