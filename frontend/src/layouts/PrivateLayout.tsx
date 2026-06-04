@@ -68,10 +68,13 @@ export default function PrivateLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--page-bg))] bg-nu-mesh">
+    <div className="min-h-screen overflow-x-clip bg-[rgb(var(--page-bg))] bg-nu-mesh">
       <Navbar />
       <OfflineBanner />
-      <main className="pb-28 lg:pb-12">
+      {/* Bottom padding clears BOTH the mobile bottom-nav and the floating
+          bulldog FAB (which sits at ~9.25rem + safe-area), so the last card on a
+          page is never hidden underneath the FAB on phones. */}
+      <main className="pb-[calc(9.5rem+env(safe-area-inset-bottom))] lg:pb-12">
         {/* Keyed by route so a crash on one page shows a friendly message instead
             of blanking the whole app, and clears automatically on navigation. */}
         <ErrorBoundary key={location.pathname}>
