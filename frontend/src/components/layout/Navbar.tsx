@@ -18,6 +18,7 @@ import {
   Trophy,
   CalendarDays,
   FileText,
+  HelpCircle,
   MoreHorizontal,
   type LucideIcon,
 } from 'lucide-react';
@@ -49,6 +50,7 @@ const MORE_LINKS: NavLink[] = [
   { to: '/emergency-fund', label: 'Emergency', icon: Shield },
   { to: '/challenges', label: 'Challenges', icon: Trophy },
   { to: '/school-calendar', label: 'Calendar', icon: CalendarDays },
+  { to: '/help', label: 'Help Center', icon: HelpCircle },
 ];
 
 // Full list — single source of truth for the mobile account menu.

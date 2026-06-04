@@ -8,6 +8,7 @@ import schoolEventService from '../services/schoolEventService';
 import type { SchoolEvent, SchoolEventPayload, EventCategory } from '../types/schoolEvent';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
+import EmptyStateGuide from '../components/help/EmptyStateGuide';
 import TextField from '../components/ui/TextField';
 import { formatPeso } from '../lib/utils';
 import { staggerContainer, fadeUpItem, popIn } from '../lib/motion';
@@ -129,9 +130,15 @@ export default function SchoolCalendarPage() {
       {isLoading ? (
         <div className="space-y-3">{[0,1,2].map(i => <div key={i} className="skeleton h-20 w-full" />)}</div>
       ) : events.length === 0 ? (
-        <EmptyState icon={CalendarDays} title={tab === 'upcoming' ? 'No upcoming events' : 'No events yet'}
-          message="Add exams, projects, or tuition deadlines to get budget suggestions."
-          action={<button onClick={openCreate} className="btn-gold"><Plus size={18} /> Add Event</button>} />
+        tab === 'upcoming' ? (
+          <EmptyState icon={CalendarDays} title="No upcoming events"
+            message="You're all clear for now. Add a deadline to plan ahead."
+            action={<button onClick={openCreate} className="btn-gold"><Plus size={18} /> Add Event</button>} />
+        ) : (
+          <EmptyStateGuide emoji="📅" title="No events yet"
+            message="Add exams, projects, or tuition deadlines so Ipon Challenge can suggest budget adjustments."
+            actionLabel="Add Event" onAction={openCreate} helpHref="/help#getting-started" />
+        )
       ) : (
         <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-3">
           {events.map(ev => (

@@ -5,9 +5,11 @@ import { useExpenseStore } from '../store/expenseStore';
 import { useUiStore } from '../store/uiStore';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
+import EmptyStateGuide from '../components/help/EmptyStateGuide';
 import TransactionRow from '../components/transactions/TransactionRow';
 import { formatPeso } from '../lib/utils';
 import { staggerContainer } from '../lib/motion';
+import { TOOLTIPS } from '../lib/helpContent';
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -67,6 +69,7 @@ export default function TransactionsPage() {
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       <PageHeader
         title="Transactions"
+        help={TOOLTIPS.transactions}
         subtitle="Every peso, tracked."
         action={
           <button onClick={() => openExpenseModal()} className="btn-gold hidden sm:inline-flex">
@@ -143,16 +146,22 @@ export default function TransactionsPage() {
           ))}
         </div>
       ) : groups.length === 0 ? (
-        <EmptyState
-          icon={Receipt}
-          title="No transactions here"
-          message={query || filter !== 'ALL' ? 'Try adjusting your filters.' : 'Add your first transaction for this period.'}
-          action={
-            <button onClick={() => openExpenseModal()} className="btn-gold">
-              <Plus size={18} /> Add Transaction
-            </button>
-          }
-        />
+        query || filter !== 'ALL' ? (
+          <EmptyState
+            icon={Receipt}
+            title="No matching transactions"
+            message="Try adjusting your search or filters to find what you're looking for."
+          />
+        ) : (
+          <EmptyStateGuide
+            emoji="🎒"
+            title="No expenses yet"
+            message="Start tracking your first expense to understand your spending habits."
+            actionLabel="Add Expense"
+            onAction={() => openExpenseModal()}
+            helpHref="/help#expenses"
+          />
+        )
       ) : (
         <div className="space-y-6">
           {groups.map(([date, items]) => (

@@ -10,8 +10,11 @@ import SemesterBudgetForm from '../components/semesterBudget/SemesterBudgetForm'
 import WeeklyBreakdownChart from '../components/semesterBudget/WeeklyBreakdownChart';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
+import EmptyStateGuide from '../components/help/EmptyStateGuide';
+import FeatureGuide from '../components/help/FeatureGuide';
 import { formatPeso, clamp } from '../lib/utils';
 import { staggerContainer, popIn } from '../lib/motion';
+import { TOOLTIPS, GUIDE, SEMESTER_BUDGET_STEPS } from '../lib/helpContent';
 
 // ─── Detail view for a single semester ───────────────────────────────────────
 function SemesterDetailPage() {
@@ -166,6 +169,7 @@ export default function SemesterBudgetPage() {
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       <PageHeader
         title="Semester Budget"
+        help={TOOLTIPS.semesterBudget}
         subtitle="Plan your finances for the whole semester."
         action={
           !showForm ? (
@@ -174,6 +178,12 @@ export default function SemesterBudgetPage() {
             </button>
           ) : undefined
         }
+      />
+
+      <FeatureGuide
+        guideName={GUIDE.SEMESTER_GUIDE}
+        title="Semester Budget"
+        steps={SEMESTER_BUDGET_STEPS}
       />
 
       <AnimatePresence>
@@ -205,15 +215,13 @@ export default function SemesterBudgetPage() {
       ) : error ? (
         <EmptyState icon={GraduationCap} title="Couldn't load semester budgets" message={error} />
       ) : semesters.length === 0 ? (
-        <EmptyState
-          icon={GraduationCap}
+        <EmptyStateGuide
+          emoji="🎓"
           title="No semester budgets yet"
-          message="Create your first semester budget to see your weekly spending breakdown and stay on track all semester long."
-          action={
-            <button onClick={openCreate} className="btn-gold">
-              <Plus size={18} /> Create Semester Budget
-            </button>
-          }
+          message="Divide your total semester money into a realistic weekly budget so it lasts the whole term."
+          actionLabel="Create Semester Budget"
+          onAction={openCreate}
+          helpHref="/help#semester-budget"
         />
       ) : (
         <motion.div

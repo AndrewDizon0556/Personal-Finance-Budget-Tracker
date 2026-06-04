@@ -7,9 +7,11 @@ import GoalCard from '../components/goals/GoalCard';
 import GoalModal from '../components/goals/GoalModal';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
+import EmptyStateGuide from '../components/help/EmptyStateGuide';
 import AnimatedNumber from '../components/ui/AnimatedNumber';
 import { formatPeso } from '../lib/utils';
 import { staggerContainer } from '../lib/motion';
+import { TOOLTIPS } from '../lib/helpContent';
 
 export default function GoalsPage() {
   const { goals, isLoading, error, fetchGoals, addGoal, editGoal, removeGoal } = useGoalStore();
@@ -47,6 +49,7 @@ export default function GoalsPage() {
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       <PageHeader
         title="Savings Goals"
+        help={TOOLTIPS.goals}
         subtitle="Turn your dreams into milestones."
         action={
           <button onClick={openCreate} className="btn-gold hidden sm:inline-flex">
@@ -82,15 +85,13 @@ export default function GoalsPage() {
       ) : error ? (
         <EmptyState icon={Target} title="Couldn't load goals" message={error} />
       ) : goals.length === 0 ? (
-        <EmptyState
-          icon={Target}
+        <EmptyStateGuide
+          emoji="🎯"
           title="No savings goals yet"
-          message="Save for a new laptop, tuition, or a barkada trip. Create your first goal and watch your progress grow."
-          action={
-            <button onClick={openCreate} className="btn-gold">
-              <Plus size={18} /> Create a Goal
-            </button>
-          }
+          message="Create a goal and track your progress until you reach your target — a laptop, tuition, or a barkada trip."
+          actionLabel="Create a Goal"
+          onAction={openCreate}
+          helpHref="/help#savings"
         />
       ) : (
         <motion.div

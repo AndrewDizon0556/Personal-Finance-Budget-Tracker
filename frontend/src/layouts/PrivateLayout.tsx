@@ -3,10 +3,14 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useGamificationStore } from '../store/gamificationStore';
 import { useUiStore } from '../store/uiStore';
+import { useHelpStore } from '../store/helpStore';
+import { usePrefsStore } from '../store/prefsStore';
+import { GUIDE } from '../lib/helpContent';
 import authService from '../services/authService';
 import Navbar from '../components/layout/Navbar';
 import MobileNav from '../components/layout/MobileNav';
 import GlobalExpenseModal from '../components/expense/GlobalExpenseModal';
+import OnboardingTour from '../components/help/OnboardingTour';
 import OfflineBanner from '../components/ui/OfflineBanner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { syncManager } from '../sync/SyncManager';
@@ -17,10 +21,29 @@ export default function PrivateLayout() {
   const mutationTick = useUiStore((s) => s.mutationTick);
   const location = useLocation();
 
+  // Help / guidance state — hydrate durable completion, then auto-play the
+  // first-time tour once setup is done and the student hasn't seen it yet.
+  const hydrateHelp = useHelpStore((s) => s.hydrateFromServer);
+  const helpHydrated = useHelpStore((s) => s.hydrated);
+  const tipsEnabled = useHelpStore((s) => s.tipsEnabled);
+  const tourCompleted = useHelpStore((s) => s.completed[GUIDE.WELCOME_TOUR]);
+  const openTour = useHelpStore((s) => s.openTour);
+  const onboarded = usePrefsStore((s) => s.onboarded);
+
   // Initialize offline detection and auto-sync on first mount
   useEffect(() => {
     syncManager.init();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) hydrateHelp();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (helpHydrated && isAuthenticated && onboarded && tipsEnabled && !tourCompleted) {
+      openTour();
+    }
+  }, [helpHydrated, isAuthenticated, onboarded, tipsEnabled, tourCompleted]);
 
   // Rehydrate user from token on refresh
   useEffect(() => {
@@ -56,6 +79,7 @@ export default function PrivateLayout() {
       </main>
       <MobileNav />
       <GlobalExpenseModal />
+      <OnboardingTour />
     </div>
   );
 }

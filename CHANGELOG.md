@@ -1,5 +1,40 @@
 # Changelog — Ipon Challenge
 
+## [Sprint 12] — 2026-06-04
+
+### Added — Contextual Help & Onboarding System
+
+A "Student-Friendly Guidance System" that teaches users while they use the app,
+without clutter or excessive popups. Help appears naturally inside features.
+
+- **Contextual help tooltips** — subtle `?` icons (`HelpTooltip`) on the Dashboard,
+  Transactions, Goals, Semester Budget, and Challenges page headers, explaining each
+  feature in one line; honor a global "Show tips" preference and work on hover,
+  keyboard focus, and tap
+- **First-time guided tour** — `OnboardingTour`, a 5-step centered walkthrough
+  (Welcome → Allowance → Expenses → Savings → Dashboard) that auto-plays once after
+  setup, is skippable, and is replayable from Settings → Help and the Help Center
+- **Guidance-first empty states** — `EmptyStateGuide` replaces dead-end "No data"
+  messages on Transactions, Goals, Semester Budget, Challenges, Calendar, and the
+  Dashboard with a friendly emoji, a clear next action, and a "Learn how it works"
+  deep link into the Help Center
+- **Step-by-step feature guide** — `FeatureGuide` inline stepper on Semester Budget
+  ("Step X of N") that auto-expands for first-timers and collapses to a slim reopener
+  once completed
+- **Help Center** — `/help` page with searchable accordion sections (Getting Started,
+  Allowance, Expenses, Savings, Semester Budget, Challenges, Reports), each with a
+  short explanation, numbered how-to, and common questions; deep-linkable via `#section`
+- **Help preferences (Settings)** — Show tips ON/OFF, Restart tutorial, Reset all guides
+- **Smart help logic (persistence)** — `user_help_preferences` table
+  (`UserHelpPreference` entity + repository) and `GET/PUT /api/help/preferences`,
+  `POST /api/help/reset`; the client `helpStore` (Zustand, persisted, offline-first)
+  is the instant source of truth and best-effort mirrors completion to the backend so
+  finished tours follow the student across devices and never repeat
+- **Tests** — Vitest + Testing Library setup; coverage for first-time onboarding,
+  tooltip visibility, guide completion, and reset-tutorial logic
+
+---
+
 ## [Sprint 11] — 2026-06-04
 
 ### Added — Feature Completion & Navigation

@@ -16,8 +16,10 @@ import AllowanceRunwayCard from '../components/finance/AllowanceRunwayCard';
 import StatCard from '../components/ui/StatCard';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
+import EmptyStateGuide from '../components/help/EmptyStateGuide';
 import HealthScoreCard from '../components/finance/HealthScoreCard';
 import { staggerContainer } from '../lib/motion';
+import { TOOLTIPS } from '../lib/helpContent';
 
 function greeting() {
   const h = new Date().getHours();
@@ -123,6 +125,7 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <PageHeader
         title={`${greeting()}, ${firstName} 👋`}
+        help={TOOLTIPS.dashboard}
         subtitle={new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' })}
         action={
           <button onClick={() => openExpenseModal()} className="btn-gold hidden sm:inline-flex">
@@ -173,15 +176,13 @@ export default function DashboardPage() {
               </button>
             </>
           ) : (
-            <EmptyState
-              icon={Receipt}
+            <EmptyStateGuide
+              emoji="🎒"
               title="No transactions yet"
-              message="Start tracking your first expense and become financially smarter this semester."
-              action={
-                <button onClick={() => openExpenseModal()} className="btn-gold">
-                  <Plus size={18} /> Add your first
-                </button>
-              }
+              message="Start tracking your first expense so Ipon Challenge can learn your spending habits."
+              actionLabel="Add Expense"
+              onAction={() => openExpenseModal()}
+              helpHref="/help#expenses"
             />
           )}
         </div>

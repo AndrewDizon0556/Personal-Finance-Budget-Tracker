@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, CheckCircle2, Play, RefreshCw, LogOut } from 'lucide-react';
+import { CheckCircle2, Play, RefreshCw, LogOut } from 'lucide-react';
 import challengeService from '../services/challengeService';
 import type { Challenge } from '../types/challenge';
 import PageHeader from '../components/ui/PageHeader';
-import EmptyState from '../components/ui/EmptyState';
+import EmptyStateGuide from '../components/help/EmptyStateGuide';
 import { staggerContainer, fadeUpItem } from '../lib/motion';
 import { clamp } from '../lib/utils';
+import { TOOLTIPS } from '../lib/helpContent';
 
 const TYPE_ICONS: Record<string, string> = {
   NO_SPEND: '🚫', SAVINGS_TARGET: '💰', STREAK: '🔥',
@@ -59,7 +60,7 @@ export default function ChallengesPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <PageHeader title="Challenges" subtitle="Complete challenges. Earn XP. Build better habits." />
+      <PageHeader title="Challenges" help={TOOLTIPS.challenges} subtitle="Complete challenges. Earn XP. Build better habits." />
 
       {challenges.length > 0 && (
         <div className="mb-6 grid grid-cols-3 gap-3">
@@ -89,7 +90,12 @@ export default function ChallengesPage() {
             </Section>
           )}
           {challenges.length === 0 && (
-            <EmptyState icon={Trophy} title="No challenges yet" message="Check back soon — new challenges are coming!" />
+            <EmptyStateGuide
+              emoji="🏆"
+              title="No challenges yet"
+              message="Challenges help you build better saving habits and earn XP. Check back soon — new ones are coming!"
+              helpHref="/help#challenges"
+            />
           )}
         </div>
       )}

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Moon, Sun, Palette, Bell, Check, ShieldCheck, LogOut, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Moon, Sun, Palette, Bell, Check, ShieldCheck, LogOut, AlertCircle, CheckCircle2, LifeBuoy, PlayCircle, RotateCcw } from 'lucide-react';
 import { useThemeStore, ACCENT_PRESETS, type AccentKey } from '../store/themeStore';
 import { usePrefsStore } from '../store/prefsStore';
 import { useAuthStore } from '../store/authStore';
+import { useHelpStore } from '../store/helpStore';
 import authService from '../services/authService';
 import PageHeader from '../components/ui/PageHeader';
 import TextField from '../components/ui/TextField';
@@ -97,8 +98,56 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Help preferences */}
+      <HelpPreferencesSection />
+
       {/* Security */}
       <SecuritySection />
+    </div>
+  );
+}
+
+function HelpPreferencesSection() {
+  const navigate = useNavigate();
+  const tipsEnabled = useHelpStore((s) => s.tipsEnabled);
+  const setTipsEnabled = useHelpStore((s) => s.setTipsEnabled);
+  const resetAllGuides = useHelpStore((s) => s.resetAllGuides);
+  const openTour = useHelpStore((s) => s.openTour);
+
+  const restartTour = () => {
+    resetAllGuides();
+    openTour();
+    navigate('/dashboard');
+  };
+
+  const resetGuides = () => {
+    if (!window.confirm('Reset all tips and guides? They will appear again as you use the app.')) return;
+    resetAllGuides();
+  };
+
+  return (
+    <div className="card mb-5 p-6">
+      <div className="mb-5 flex items-center gap-2">
+        <LifeBuoy size={16} className="text-accent" />
+        <p className="text-sm font-semibold text-ink">Help &amp; Tips</p>
+      </div>
+
+      <div className="mb-4 flex items-center justify-between gap-4 rounded-2xl bg-surface-soft/60 px-4 py-3">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-ink">Show tips</p>
+          <p className="text-xs text-ink-soft">Display the small (?) help icons and coach-marks around the app.</p>
+        </div>
+        <Toggle on={tipsEnabled} onClick={() => setTipsEnabled(!tipsEnabled)} />
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button onClick={restartTour} className="btn-ghost justify-start">
+          <PlayCircle size={16} /> Restart tutorial
+        </button>
+        <button onClick={resetGuides} className="btn-ghost justify-start">
+          <RotateCcw size={16} /> Reset all guides
+        </button>
+      </div>
     </div>
   );
 }
