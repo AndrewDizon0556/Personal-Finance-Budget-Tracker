@@ -1,33 +1,47 @@
 <svg width="1120" height="320" viewBox="0 0 1120 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ipon Challenge">
   <defs>
-    <linearGradient id="h-bg" x1="32" y1="32" x2="288" y2="288" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4D5DB4"/><stop offset="0.55" stop-color="#35408E"/><stop offset="1" stop-color="#232A57"/>
+    <linearGradient id="h-bg" x1="40" y1="20" x2="472" y2="500" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5566C2"/><stop offset="0.5" stop-color="#35408E"/><stop offset="1" stop-color="#1E2450"/>
     </linearGradient>
-    <linearGradient id="h-gold" x1="96" y1="96" x2="256" y2="288" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFD94D"/><stop offset="1" stop-color="#F5B300"/>
+    <radialGradient id="h-sheen" cx="0.32" cy="0.22" r="0.9">
+      <stop stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.55" stop-color="#ffffff" stop-opacity="0.04"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="h-coin" cx="0.38" cy="0.30" r="0.92">
+      <stop stop-color="#FFE88F"/><stop offset="0.55" stop-color="#FFD23D"/><stop offset="1" stop-color="#E89A00"/>
+    </radialGradient>
+    <linearGradient id="h-cap" x1="172" y1="116" x2="340" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE88F"/><stop offset="1" stop-color="#F0A800"/>
     </linearGradient>
+    <filter id="h-soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
   </defs>
 
   <!-- Icon -->
   <svg x="16" y="32" width="256" height="256" viewBox="0 0 512 512">
     <rect width="512" height="512" rx="116" fill="url(#h-bg)"/>
-    <circle cx="256" cy="296" r="120" fill="url(#h-gold)"/>
-    <circle cx="256" cy="296" r="100" fill="none" stroke="#232A57" stroke-opacity="0.18" stroke-width="6"/>
+    <rect width="512" height="512" rx="116" fill="url(#h-sheen)"/>
+    <rect x="6" y="6" width="500" height="500" rx="111" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2"/>
+    <ellipse cx="256" cy="322" rx="116" ry="116" fill="#0F1330" fill-opacity="0.38" filter="url(#h-soft)"/>
+    <circle cx="256" cy="296" r="120" fill="url(#h-coin)"/>
+    <circle cx="256" cy="296" r="118.5" fill="none" stroke="#B97A00" stroke-opacity="0.40" stroke-width="3"/>
+    <circle cx="256" cy="296" r="100" fill="none" stroke="#7C4509" stroke-opacity="0.20" stroke-width="6"/>
+    <path d="M164 244 A108 108 0 0 1 320 206" fill="none" stroke="#FFFFFF" stroke-opacity="0.40" stroke-width="7" stroke-linecap="round"/>
     <g stroke="#232A57" stroke-linecap="round" fill="none">
       <path d="M248 224 V372" stroke-width="26"/>
       <path d="M248 228 h26 a48 46 0 0 1 0 92 h-26" stroke-width="26"/>
       <path d="M206 256 H286" stroke-width="16"/>
       <path d="M206 286 H286" stroke-width="16"/>
     </g>
-    <polygon points="256,116 340,152 256,188 172,152" fill="url(#h-gold)" stroke="#232A57" stroke-opacity="0.25" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="256" cy="190" rx="84" ry="12" fill="#0F1330" fill-opacity="0.20" filter="url(#h-soft)"/>
+    <polygon points="256,116 340,152 256,188 172,152" fill="url(#h-cap)" stroke="#7C4509" stroke-opacity="0.30" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="256,116 340,152 256,152 172,152" fill="#ffffff" fill-opacity="0.16"/>
     <circle cx="256" cy="152" r="7" fill="#232A57" fill-opacity="0.55"/>
-    <path d="M340 152 V196" stroke="url(#h-gold)" stroke-width="6" stroke-linecap="round"/>
-    <circle cx="340" cy="202" r="8" fill="url(#h-gold)"/>
+    <path d="M340 152 V196" stroke="#F0A800" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="340" cy="202" r="8" fill="url(#h-cap)"/>
   </svg>
 
   <!-- Wordmark (for light backgrounds) -->
   <text x="300" y="190" font-family="'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif" font-size="118" font-weight="800" letter-spacing="-2">
     <tspan fill="#232A57">Ipon</tspan><tspan fill="#F5B300">Challenge</tspan>
   </text>
-  <text x="302" y="248" font-family="'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif" font-size="34" font-weight="600" letter-spacing="2" fill="#6B7280">STUDENT BUDGET TRACKER</text>
+  <text x="302" y="248" font-family="'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif" font-size="34" font-weight="600" letter-spacing="2" fill="#6B7280">PERSONAL BUDGET TRACKER</text>
 </svg>
