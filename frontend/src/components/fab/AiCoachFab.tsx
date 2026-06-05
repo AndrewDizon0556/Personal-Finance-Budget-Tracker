@@ -1,15 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Send, X, Loader2, Sparkles } from 'lucide-react';
-import aiService, { type AiCoachType } from '../../services/aiService';
+import { Send, X, Loader2, Sparkles, Check } from 'lucide-react';
+import aiService, { type AiCoachType, type ProposedAction } from '../../services/aiService';
+import { useUiStore } from '../../store/uiStore';
 import CoachAvatar, { type CoachVariant } from './CoachAvatar';
 
-type Msg = { role: 'user' | 'ai'; text: string };
+type Msg = {
+  role: 'user' | 'ai';
+  text: string;
+  action?: ProposedAction;
+  actionState?: 'pending' | 'done' | 'cancelled';
+};
 
 const QUICK: { label: string; type: AiCoachType; input: string }[] = [
   { label: "How's my budget?", type: 'budget_advice', input: 'How am I doing with my budget this month?' },
   { label: 'Can I afford ₱1,000?', type: 'tutor_question', input: 'Can I afford to spend ₱1,000 right now without hurting my budget or savings goals?' },
-  { label: 'How can I save more?', type: 'tutor_question', input: 'Based on my spending, how can I save more money each week?' },
+  { label: 'Log ₱150 food', type: 'tutor_question', input: 'Add a ₱150 food expense for today.' },
 ];
 
 const AVATAR_KEY = 'ipon-coach-avatar';
@@ -32,6 +38,8 @@ export default function AiCoachFab() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  // Lets the rest of the app refresh (dashboard, lists) after the AI saves something.
+  const bumpMutation = useUiStore((s) => s.bumpMutation);
 
   // Persist the avatar choice.
   useEffect(() => {
@@ -56,7 +64,15 @@ export default function AiCoachFab() {
     setLoading(true);
     try {
       const res = await aiService.coach(type, trimmed);
-      setMessages((m) => [...m, { role: 'ai', text: res.reply }]);
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'ai',
+          text: res.reply,
+          action: res.action ?? undefined,
+          actionState: res.action ? 'pending' : undefined,
+        },
+      ]);
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
@@ -65,6 +81,37 @@ export default function AiCoachFab() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // User tapped "Confirm" on a proposed action — execute it, then refresh the app.
+  const confirmAction = async (index: number) => {
+    const action = messages[index]?.action;
+    if (!action || loading) return;
+    setLoading(true);
+    try {
+      const res = await aiService.executeAction(action);
+      setMessages((m) =>
+        m.map((msg, i) => (i === index ? { ...msg, actionState: 'done' as const } : msg)).concat({ role: 'ai', text: res.message }),
+      );
+      bumpMutation();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        "I couldn't complete that action. Please try again.";
+      setMessages((m) =>
+        m.map((mm, i) => (i === index ? { ...mm, actionState: 'cancelled' as const } : mm)).concat({ role: 'ai', text: msg }),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelAction = (index: number) => {
+    setMessages((m) =>
+      m
+        .map((msg, i) => (i === index ? { ...msg, actionState: 'cancelled' as const } : msg))
+        .concat({ role: 'ai', text: "Okay, I won't make that change." }),
+    );
   };
 
   return (
@@ -137,25 +184,58 @@ export default function AiCoachFab() {
                   </div>
                 ) : messages.length === 0 ? (
                   <p className="text-sm text-ink-soft">
-                    Hi! 👋 I can see your balance, spending, budgets, and goals — so ask me anything,
-                    like <span className="font-medium text-ink">"Can I afford ₱2,000 this week?"</span> or
-                    <span className="font-medium text-ink"> "How am I doing this month?"</span>
+                    Hi! 👋 I can see your balance, spending, budgets, and goals — and I can
+                    <span className="font-medium text-ink"> record income, expenses, and goals</span> for you
+                    (you confirm first). Try <span className="font-medium text-ink">"Can I afford ₱2,000?"</span> or
+                    <span className="font-medium text-ink"> "Add my ₱5,000 allowance."</span>
                   </p>
                 ) : (
-                  messages.map((m, i) => (
-                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start gap-2'}`}>
-                      {m.role === 'ai' && <CoachAvatar variant={variant} size={28} className="mt-0.5 shadow-sm" />}
-                      <div
-                        className={`max-w-[80%] whitespace-pre-wrap px-3.5 py-2 text-sm shadow-sm ${
-                          m.role === 'user'
-                            ? 'rounded-2xl rounded-br-md bg-nu-gradient text-white'
-                            : 'rounded-2xl rounded-bl-md bg-surface text-ink ring-1 ring-surface-border/60'
-                        }`}
-                      >
-                        {m.text}
+                  messages.map((m, i) =>
+                    m.role === 'user' ? (
+                      <div key={i} className="flex justify-end">
+                        <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-nu-gradient px-3.5 py-2 text-sm text-white shadow-sm">
+                          {m.text}
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ) : (
+                      <div key={i} className="flex justify-start gap-2">
+                        <CoachAvatar variant={variant} size={28} className="mt-0.5 shadow-sm" />
+                        <div className="flex max-w-[82%] flex-col gap-2">
+                          <div className="whitespace-pre-wrap rounded-2xl rounded-bl-md bg-surface px-3.5 py-2 text-sm text-ink shadow-sm ring-1 ring-surface-border/60">
+                            {m.text}
+                          </div>
+
+                          {/* Confirmation card for a proposed action */}
+                          {m.action && m.actionState === 'pending' && (
+                            <div className="rounded-2xl border border-nu-blue-200 bg-nu-blue-50/70 p-2.5 dark:border-nu-blue-700/60 dark:bg-nu-blue-500/10">
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => confirmAction(i)}
+                                  disabled={loading}
+                                  className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-nu-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-nu-blue-700 disabled:opacity-50"
+                                >
+                                  <Check size={14} /> Confirm
+                                </button>
+                                <button
+                                  onClick={() => cancelAction(i)}
+                                  disabled={loading}
+                                  className="flex-1 rounded-xl bg-surface-soft px-3 py-1.5 text-xs font-semibold text-ink-soft ring-1 ring-surface-border/60 transition hover:text-ink disabled:opacity-50"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                          {m.actionState === 'done' && (
+                            <span className="text-[11px] font-medium text-emerald-600">✓ Saved to your account</span>
+                          )}
+                          {m.action && m.actionState === 'cancelled' && (
+                            <span className="text-[11px] text-ink-faint">Cancelled — nothing was changed</span>
+                          )}
+                        </div>
+                      </div>
+                    ),
+                  )
                 )}
                 {loading && (
                   <div className="flex items-center gap-2">
