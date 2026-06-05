@@ -1,11 +1,12 @@
 # Ipon Challenge
 
-**Track your allowance. Control your spending. Survive the semester.**
+**Track your money. Control your spending. Build the saving habit.**
 
-Ipon Challenge is a student-focused personal finance and budget tracker built for
-National University Laguna students. It helps students manage their allowance,
-log everyday expenses, set savings goals, and build healthy money habits — wrapped
-in a modern, gamified experience that makes budgeting feel less like a chore.
+Ipon Challenge is a personal finance and budget tracker for **students and anyone
+on a budget**. It helps you manage your allowance or income, log everyday expenses,
+set savings goals, and build healthy money habits — wrapped in a modern, gamified
+experience that makes budgeting feel less like a chore. It began with student life
+in mind, and works just as well for professionals, families, and first-time savers.
 
 > *Ipon* is the Filipino word for "saving up."
 
@@ -31,11 +32,12 @@ you reconnect.
 
 ## Overview
 
-Most budgeting apps are built for working professionals. Ipon Challenge is built for
-student life: weekly or monthly *baon*, school-specific spending categories, and a
-"safe-to-spend per day" figure that keeps you on track until your next allowance.
-It pairs a clean React dashboard with a secure Spring Boot API and a PostgreSQL
-database.
+Ipon Challenge works for everyone — students living on a weekly *baon*, professionals
+managing a salary, or anyone who just wants their money to last. It started with
+student life in mind (allowance scheduling, school-friendly categories, and a
+"safe-to-spend per day" figure that keeps you on track until your next payout) and
+broadened from there. It pairs a clean React dashboard with a secure Spring Boot API
+and a PostgreSQL database.
 
 ## Features
 
@@ -44,8 +46,8 @@ database.
   spending trend, estimated exhaustion date, and a 4-week projection chart
 - **Recurring allowance automation** — allowance is auto-credited on your schedule
   (daily / weekly / bi-weekly / monthly)
-- Fast expense and income logging with student-specific categories
-  (Tuition, Food, Transportation, School Supplies, Projects, Load/Data, Leisure, Emergency)
+- Fast expense and income logging with ready-made categories
+  (Food, Transportation, Bills, Leisure, Emergency, plus student-friendly ones like Tuition, School Supplies, Projects, Load/Data)
 - **Semester Budget Mode** — plan a whole semester and get a weekly spending breakdown
 - Savings goals with animated progress rings and milestone tracking
 - **Emergency Fund** — dedicated safety-net savings by category (Medical, Transport, School, General)
@@ -59,7 +61,13 @@ database.
 - Smart financial insights generated from your real spending
 - **No-Spend Challenges** — gamified challenges (No Milk Tea, Save ₱50/day, …) that award XP
 - Gamification: XP, levels, no-overspend streaks, and unlockable achievements
-- **Financial Literacy** — student-focused lessons with quizzes and a compound-interest calculator
+- **Financial Literacy** — practical lessons with quizzes and a compound-interest calculator
+
+**Admin**
+- **App Growth Dashboard (admin-only)** — aggregated usage and engagement analytics:
+  total / new / active users, total app usage, a signup-growth chart, and an activity
+  summary. Locked behind role-based access (server-side `ADMIN` check) and hidden from
+  regular users; exposes aggregated stats only, never individual user data.
 
 **Planning & reports**
 - **School Calendar** — track exams, projects, and tuition deadlines with budget suggestions
@@ -167,8 +175,10 @@ Security is treated as a core feature, not an afterthought:
 - **Brute-force protection** — account lockout after repeated failures plus
   per-IP rate limiting on auth endpoints.
 - **Authorization** — every endpoint requires authentication (except login and
-  register); all data access is scoped to the current user; role scaffolding
-  (`STUDENT` / `ADMIN`) is in place.
+  register); all data access is scoped to the current user. **Role-based access
+  control** (`STUDENT` / `ADMIN`) is enforced server-side — admin-only endpoints
+  (`/api/admin/**`) reject non-admins with `403`, and admin UI is hidden from
+  regular users.
 - **Hardening** — security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy,
   Permissions-Policy), strict input validation, request-size limits, and generic
   error responses that never leak stack traces or internals.
