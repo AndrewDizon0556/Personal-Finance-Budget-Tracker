@@ -16,5 +16,9 @@ public class AiCoachResponse {
     private String reply;        // AI-generated text
     private String type;         // echoed from request
     private int tokensUsed;      // for usage tracking (future)
-    private String model;        // model used (e.g. "claude-sonnet-4-6")
+    private String model;        // model used (e.g. "gemini-2.5-flash-lite")
+
+    // When set, the AI is PROPOSING a change that needs the user's confirmation
+    // (posted back to /api/ai/action). Null for plain advice replies.
+    private ProposedAction action;
 }

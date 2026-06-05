@@ -13,16 +13,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Thin client for Google Gemini's {@code generateContent} REST endpoint.
- *
- * Uses the JDK HTTP client + Jackson (already on the classpath) — no extra
- * dependency. The API key is sent in the {@code x-goog-api-key} header (never in
- * the URL, so it can't leak into access logs). Any failure surfaces as an
- * {@link AiUnavailableException} so callers can degrade gracefully.
+ * Thin client for Google Gemini's {@code generateContent} REST endpoint, with
+ * optional function calling. Uses the JDK HTTP client + Jackson (no extra
+ * dependency). The API key is sent in the {@code x-goog-api-key} header so it
+ * never lands in access logs. Failures surface as {@link AiUnavailableException}.
  */
 @Slf4j
 @Component
@@ -36,29 +35,56 @@ public class GeminiClient {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    /**
-     * Sends a prompt to Gemini and returns the generated text.
-     *
-     * @param systemInstruction high-level persona / rules for the model
-     * @param userPrompt        the actual user-facing request (+ any context)
-     * @param maxOutputTokens   cap on the response length (controls cost/latency)
-     */
+    /** Plain text generation (no tools). */
     public String generate(String systemInstruction, String userPrompt, int maxOutputTokens) {
+        JsonNode candidate = sendAndGetCandidate(baseBody(systemInstruction, userPrompt, maxOutputTokens));
+        String text = firstText(candidate);
+        if (text == null || text.isEmpty()) {
+            throw new AiUnavailableException("The AI returned an empty reply. Please try again.");
+        }
+        return text;
+    }
+
+    /**
+     * Generation with function calling. Returns either the model's text reply or
+     * the function call it chose. {@code functionDeclarations} is the Gemini
+     * tool schema list.
+     */
+    public GeminiResult generateWithTools(String systemInstruction, String userPrompt,
+                                          Object functionDeclarations, int maxOutputTokens) {
+        Map<String, Object> body = baseBody(systemInstruction, userPrompt, maxOutputTokens);
+        body.put("tools", List.of(Map.of("functionDeclarations", functionDeclarations)));
+        body.put("toolConfig", Map.of("functionCallingConfig", Map.of("mode", "AUTO")));
+
+        JsonNode candidate = sendAndGetCandidate(body);
+        JsonNode parts = candidate.path("content").path("parts");
+        if (parts.isArray()) {
+            for (JsonNode part : parts) {
+                JsonNode call = part.path("functionCall");
+                if (!call.isMissingNode() && call.has("name")) {
+                    return GeminiResult.ofCall(call.path("name").asText(), call.path("args"));
+                }
+            }
+        }
+        String text = firstText(candidate);
+        return GeminiResult.ofText(text == null || text.isEmpty()
+                ? "I'm not sure how to help with that — could you rephrase?" : text);
+    }
+
+    // --- internals ---
+
+    private Map<String, Object> baseBody(String systemInstruction, String userPrompt, int maxOutputTokens) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("system_instruction", Map.of("parts", List.of(Map.of("text", systemInstruction))));
+        body.put("contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", userPrompt)))));
+        body.put("generationConfig", Map.of("maxOutputTokens", maxOutputTokens, "temperature", 0.7));
+        return body;
+    }
+
+    /** Sends the request, validates status, and returns candidate[0]. */
+    private JsonNode sendAndGetCandidate(Map<String, Object> body) {
         try {
-            Map<String, Object> body = Map.of(
-                    "system_instruction", Map.of("parts", List.of(Map.of("text", systemInstruction))),
-                    "contents", List.of(Map.of(
-                            "role", "user",
-                            "parts", List.of(Map.of("text", userPrompt))
-                    )),
-                    "generationConfig", Map.of(
-                            "maxOutputTokens", maxOutputTokens,
-                            "temperature", 0.7
-                    )
-            );
-
             String url = aiConfig.getBaseUrl() + "/models/" + aiConfig.getModel() + ":generateContent";
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .timeout(Duration.ofSeconds(25))
@@ -70,8 +96,8 @@ public class GeminiClient {
             HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                String detail = extractError(response.body());
-                log.warn("Gemini API HTTP {} (model={}): {}", response.statusCode(), aiConfig.getModel(), detail);
+                log.warn("Gemini API HTTP {} (model={}): {}", response.statusCode(), aiConfig.getModel(),
+                        extractError(response.body()));
                 throw new AiUnavailableException(switch (response.statusCode()) {
                     case 400 -> "The AI request was rejected. Try a shorter message.";
                     case 401, 403 -> "AI key was rejected. Check the AI_API_KEY setting.";
@@ -82,30 +108,30 @@ public class GeminiClient {
             }
 
             JsonNode candidate = objectMapper.readTree(response.body()).path("candidates").path(0);
-            JsonNode parts = candidate.path("content").path("parts");
-
-            if (!parts.isArray() || parts.isEmpty()) {
-                String finishReason = candidate.path("finishReason").asText("");
-                log.warn("Gemini returned no content (finishReason={}).", finishReason);
-                throw new AiUnavailableException(switch (finishReason) {
-                    case "SAFETY" -> "The AI couldn't answer that one. Try rephrasing.";
-                    case "MAX_TOKENS" -> "The reply got cut off. Try asking something more specific.";
-                    default -> "The AI couldn't generate a reply. Try rephrasing your question.";
-                });
+            if (candidate.isMissingNode()) {
+                throw new AiUnavailableException("The AI couldn't generate a reply. Try rephrasing your question.");
             }
-
-            String text = parts.path(0).path("text").asText("").trim();
-            if (text.isEmpty()) {
-                throw new AiUnavailableException("The AI returned an empty reply. Please try again.");
-            }
-            return text;
-
+            return candidate;
         } catch (AiUnavailableException e) {
             throw e;
         } catch (Exception e) {
             log.error("Gemini call failed: {}", e.getMessage());
             throw new AiUnavailableException("Couldn't reach the AI right now. Please try again in a moment.");
         }
+    }
+
+    /** First text part of a candidate, or null. */
+    private static String firstText(JsonNode candidate) {
+        JsonNode parts = candidate.path("content").path("parts");
+        if (parts.isArray()) {
+            for (JsonNode part : parts) {
+                JsonNode text = part.path("text");
+                if (text.isTextual() && !text.asText().isBlank()) {
+                    return text.asText().trim();
+                }
+            }
+        }
+        return null;
     }
 
     /** Pulls Gemini's {@code error.message} from an error body for clearer logs. */
