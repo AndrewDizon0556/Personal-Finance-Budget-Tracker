@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * Required env vars when AI features are enabled:
  *   AI_API_KEY  — Gemini API key (free from https://aistudio.google.com/app/apikey)
- *   AI_MODEL    — Gemini model id (optional; defaults to "gemini-2.0-flash")
+ *   AI_MODEL    — Gemini model id (optional; defaults to "gemini-2.5-flash-lite")
  *   AI_BASE_URL — API base (optional; defaults to the Gemini v1beta endpoint)
  */
 @Getter
@@ -25,7 +25,8 @@ public class AiConfig {
     @Value("${AI_API_KEY:NOT_SET}")
     private String apiKey;
 
-    @Value("${AI_MODEL:gemini-2.0-flash}")
+    // Fast, free-tier-friendly Gemini model. (gemini-2.0-flash was deprecated.)
+    @Value("${AI_MODEL:gemini-2.5-flash-lite}")
     private String model;
 
     @Value("${AI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}")

@@ -140,7 +140,7 @@ Create a database, then provide configuration via environment variables
 | `JWT_SECRET` | Signing key for JWTs — **required** (the app won't start without it) | _none — must be set_ |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins | `http://localhost:5173` |
 | `AI_API_KEY` | Google Gemini API key — enables the AI Coach (free key from [aistudio.google.com](https://aistudio.google.com/app/apikey); never hardcode) | unset (AI Coach off) |
-| `AI_MODEL` | Gemini model id | `gemini-2.0-flash` |
+| `AI_MODEL` | Gemini model id | `gemini-2.5-flash-lite` |
 | `AI_BASE_URL` | Gemini API base URL | Gemini v1beta endpoint |
 
 Run the API (defaults to `http://localhost:8080`):

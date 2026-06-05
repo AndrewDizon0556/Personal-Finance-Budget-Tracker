@@ -70,16 +70,28 @@ public class GeminiClient {
             HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                log.warn("Gemini API returned HTTP {}: {}", response.statusCode(), truncate(response.body()));
-                throw new AiUnavailableException("The AI provider returned an error. Please try again later.");
+                String detail = extractError(response.body());
+                log.warn("Gemini API HTTP {} (model={}): {}", response.statusCode(), aiConfig.getModel(), detail);
+                throw new AiUnavailableException(switch (response.statusCode()) {
+                    case 400 -> "The AI request was rejected. Try a shorter message.";
+                    case 401, 403 -> "AI key was rejected. Check the AI_API_KEY setting.";
+                    case 404 -> "AI model not found. Check the AI_MODEL setting.";
+                    case 429 -> "The AI is busy right now (quota reached). Please try again shortly.";
+                    default -> "The AI provider returned an error. Please try again later.";
+                });
             }
 
-            JsonNode parts = objectMapper.readTree(response.body())
-                    .path("candidates").path(0).path("content").path("parts");
+            JsonNode candidate = objectMapper.readTree(response.body()).path("candidates").path(0);
+            JsonNode parts = candidate.path("content").path("parts");
 
             if (!parts.isArray() || parts.isEmpty()) {
-                log.warn("Gemini returned no content for the request.");
-                throw new AiUnavailableException("The AI couldn't generate a reply. Try rephrasing your question.");
+                String finishReason = candidate.path("finishReason").asText("");
+                log.warn("Gemini returned no content (finishReason={}).", finishReason);
+                throw new AiUnavailableException(switch (finishReason) {
+                    case "SAFETY" -> "The AI couldn't answer that one. Try rephrasing.";
+                    case "MAX_TOKENS" -> "The reply got cut off. Try asking something more specific.";
+                    default -> "The AI couldn't generate a reply. Try rephrasing your question.";
+                });
             }
 
             String text = parts.path(0).path("text").asText("").trim();
@@ -93,6 +105,16 @@ public class GeminiClient {
         } catch (Exception e) {
             log.error("Gemini call failed: {}", e.getMessage());
             throw new AiUnavailableException("Couldn't reach the AI right now. Please try again in a moment.");
+        }
+    }
+
+    /** Pulls Gemini's {@code error.message} from an error body for clearer logs. */
+    private String extractError(String body) {
+        try {
+            String msg = objectMapper.readTree(body).path("error").path("message").asText("");
+            return msg.isBlank() ? truncate(body) : msg;
+        } catch (Exception e) {
+            return truncate(body);
         }
     }
 
