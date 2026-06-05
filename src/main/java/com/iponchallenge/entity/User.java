@@ -64,4 +64,16 @@ public class User {
     // Null means auto-allowance has never run or is disabled.
     @Column(name = "last_allowance_paid_at")
     private java.time.LocalDate lastAllowancePaidAt;
+
+    // --- Engagement tracking (powers the admin App Growth dashboard) ---
+    // Updated on every successful login. Null means the user has never logged in
+    // since tracking was introduced.
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    // Total successful logins — a simple, honest proxy for "app usage count".
+    // DB-level default keeps Hibernate auto-update safe on a populated table.
+    @Column(name = "login_count", nullable = false, columnDefinition = "bigint default 0")
+    @Builder.Default
+    private long loginCount = 0;
 }

@@ -37,4 +37,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
             @Param("end") LocalDate end,
             @Param("type") TransactionType type
     );
+
+    /** Number of distinct users who have logged at least one transaction (activated users). */
+    @Query("SELECT COUNT(DISTINCT e.user) FROM Expense e")
+    long countDistinctUsers();
 }

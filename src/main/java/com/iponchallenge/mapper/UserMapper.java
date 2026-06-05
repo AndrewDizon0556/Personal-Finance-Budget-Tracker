@@ -16,6 +16,7 @@ public class UserMapper {
                 .monthlyAllowance(user.getMonthlyAllowance())
                 .allowanceSchedule(user.getAllowanceSchedule())
                 .createdAt(user.getCreatedAt())
+                .role(user.getRole())
                 .build();
     }
 }

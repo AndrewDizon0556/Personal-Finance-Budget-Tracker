@@ -1,6 +1,7 @@
 package com.iponchallenge.dto;
 
 import com.iponchallenge.entity.AllowanceSchedule;
+import com.iponchallenge.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,4 +26,5 @@ public class UserResponse {
     private BigDecimal monthlyAllowance;
     private AllowanceSchedule allowanceSchedule;
     private LocalDateTime createdAt;
+    private Role role;
 }

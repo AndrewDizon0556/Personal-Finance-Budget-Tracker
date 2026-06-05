@@ -65,11 +65,17 @@ public class AuthService {
         }
 
         loginAttemptService.recordSuccess(email);
-        String token = jwtUtils.generateToken(user.getEmail(), user.getTokenVersion());
+
+        // Record engagement for the admin analytics dashboard (aggregated stats only).
+        user.setLastLoginAt(java.time.LocalDateTime.now());
+        user.setLoginCount(user.getLoginCount() + 1);
+        User saved = userRepository.save(user);
+
+        String token = jwtUtils.generateToken(saved.getEmail(), saved.getTokenVersion());
 
         return AuthResponse.builder()
                 .token(token)
-                .user(userMapper.toResponse(user))
+                .user(userMapper.toResponse(saved))
                 .build();
     }
 

@@ -1,4 +1,5 @@
 export type AllowanceSchedule = 'DAILY' | 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
+export type Role = 'STUDENT' | 'ADMIN';
 
 export interface User {
   id: string;
@@ -8,6 +9,7 @@ export interface User {
   monthlyAllowance: number | null;
   allowanceSchedule: AllowanceSchedule | null;
   createdAt: string;
+  role: Role;
 }
 
 export interface AuthResponse {

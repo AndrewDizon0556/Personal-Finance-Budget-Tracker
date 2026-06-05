@@ -164,6 +164,11 @@ export default function Navbar() {
                     <div className="my-1 border-t border-surface-border/60" />
                   </div>
 
+                  {user?.role === 'ADMIN' && (
+                    <Link to="/admin" onClick={() => setMenuOpen(false)} className="menu-item text-nu-blue-700">
+                      <BarChart3 size={16} /> App Growth
+                    </Link>
+                  )}
                   <Link to="/profile" onClick={() => setMenuOpen(false)} className="menu-item">
                     <User size={16} /> Profile
                   </Link>

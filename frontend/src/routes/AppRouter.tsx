@@ -23,6 +23,7 @@ import ChallengesPage from '../pages/ChallengesPage';
 import SchoolCalendarPage from '../pages/SchoolCalendarPage';
 import ReportPage from '../pages/ReportPage';
 import HelpCenterPage from '../pages/HelpCenterPage';
+import AdminPage from '../pages/AdminPage';
 
 export default function AppRouter() {
   return (
@@ -59,6 +60,7 @@ export default function AppRouter() {
           <Route path="/school-calendar" element={<SchoolCalendarPage />} />
           <Route path="/report" element={<ReportPage />} />
           <Route path="/help" element={<HelpCenterPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
