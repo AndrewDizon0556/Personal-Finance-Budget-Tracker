@@ -11,6 +11,7 @@ import Navbar from '../components/layout/Navbar';
 import MobileNav from '../components/layout/MobileNav';
 import GlobalExpenseModal from '../components/expense/GlobalExpenseModal';
 import FloatingActionButton from '../components/fab/FloatingActionButton';
+import AiCoachFab from '../components/fab/AiCoachFab';
 import OnboardingTour from '../components/help/OnboardingTour';
 import OfflineBanner from '../components/ui/OfflineBanner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
@@ -83,6 +84,7 @@ export default function PrivateLayout() {
       </main>
       <MobileNav />
       <FloatingActionButton />
+      <AiCoachFab />
       <GlobalExpenseModal />
       <OnboardingTour />
     </div>

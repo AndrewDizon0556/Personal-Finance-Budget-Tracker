@@ -1,0 +1,232 @@
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { Send, X, Loader2, Sparkles } from 'lucide-react';
+import aiService, { type AiCoachType } from '../../services/aiService';
+import CoachAvatar, { type CoachVariant } from './CoachAvatar';
+
+type Msg = { role: 'user' | 'ai'; text: string };
+
+const QUICK: { label: string; type: AiCoachType; input: string }[] = [
+  { label: "How's my budget?", type: 'budget_advice', input: 'How am I doing with my budget this month?' },
+  { label: 'How can I save more?', type: 'tutor_question', input: 'Give me practical ways to save more money each week.' },
+  { label: 'Tip of the day', type: 'tutor_question', input: 'Give me one simple money-saving tip.' },
+];
+
+const AVATAR_KEY = 'ipon-coach-avatar';
+
+function loadVariant(): CoachVariant {
+  return localStorage.getItem(AVATAR_KEY) === 'man' ? 'man' : 'woman';
+}
+
+/**
+ * Ipon Coach — the AI assistant, surfaced as a second floating action button
+ * (stacked above the bulldog quick-action FAB). Its icon is a customizable
+ * man/woman avatar; tapping it opens a chat panel powered by the AI backend.
+ */
+export default function AiCoachFab() {
+  const reduceMotion = useReducedMotion();
+  const [open, setOpen] = useState(false);
+  const [variant, setVariant] = useState<CoachVariant>(loadVariant);
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [messages, setMessages] = useState<Msg[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Persist the avatar choice.
+  useEffect(() => {
+    localStorage.setItem(AVATAR_KEY, variant);
+  }, [variant]);
+
+  // Check whether the AI Coach is configured (once).
+  useEffect(() => {
+    aiService.status().then((s) => setEnabled(s.enabled)).catch(() => setEnabled(false));
+  }, []);
+
+  // Auto-scroll to the latest message.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [messages, loading]);
+
+  const send = async (type: AiCoachType, text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
+    setMessages((m) => [...m, { role: 'user', text: trimmed }]);
+    setInput('');
+    setLoading(true);
+    try {
+      const res = await aiService.coach(type, trimmed);
+      setMessages((m) => [...m, { role: 'ai', text: res.reply }]);
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        'Sorry, I could not respond right now. Please try again.';
+      setMessages((m) => [...m, { role: 'ai', text: msg }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <AnimatePresence>
+        {open && (
+          <>
+            {/* Tap-away scrim */}
+            <motion.button
+              type="button"
+              aria-hidden="true"
+              tabIndex={-1}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 z-[59] cursor-default bg-nu-blue-950/25 backdrop-blur-[1px] print:hidden"
+            />
+
+            {/* Chat panel */}
+            <motion.div
+              role="dialog"
+              aria-label="Ipon Coach"
+              initial={{ opacity: 0, y: 16, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.97 }}
+              transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 26 }}
+              className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] right-4 z-[60] flex h-[28rem] max-h-[68vh] w-[min(22rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-surface-border/70 bg-surface shadow-float lg:bottom-6 lg:right-28 print:hidden"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between bg-nu-gradient px-4 py-3 text-white">
+                <div className="flex items-center gap-2.5">
+                  <CoachAvatar variant={variant} size={36} className="ring-2 ring-white/30" />
+                  <div className="leading-tight">
+                    <p className="text-sm font-bold">Ipon Coach</p>
+                    <p className="text-[11px] text-white/70">Your AI money buddy</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  {/* Avatar switcher (customization) */}
+                  {(['woman', 'man'] as CoachVariant[]).map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => setVariant(v)}
+                      aria-label={`Use ${v} avatar`}
+                      aria-pressed={variant === v}
+                      className={`grid place-items-center rounded-full p-0.5 transition ${
+                        variant === v ? 'ring-2 ring-nu-gold-300' : 'opacity-60 hover:opacity-100'
+                      }`}
+                    >
+                      <CoachAvatar variant={v} size={24} />
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setOpen(false)}
+                    aria-label="Close"
+                    className="ml-1 rounded-lg p-1 hover:bg-white/15"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+                {enabled === false ? (
+                  <div className="rounded-2xl bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-500/10 dark:text-amber-200">
+                    The AI Coach isn't set up yet. Add a free Gemini API key on the server
+                    (<code>AI_API_KEY</code>) to switch it on.
+                  </div>
+                ) : messages.length === 0 ? (
+                  <p className="text-sm text-ink-soft">
+                    Hi! 👋 I'm your money buddy. Ask me about your budget, saving tips, or anything money-related.
+                  </p>
+                ) : (
+                  messages.map((m, i) => (
+                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start gap-2'}`}>
+                      {m.role === 'ai' && <CoachAvatar variant={variant} size={28} className="mt-0.5" />}
+                      <div
+                        className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm ${
+                          m.role === 'user'
+                            ? 'bg-nu-blue-600 text-white'
+                            : 'bg-surface-soft text-ink'
+                        }`}
+                      >
+                        {m.text}
+                      </div>
+                    </div>
+                  ))
+                )}
+                {loading && (
+                  <div className="flex items-center gap-2">
+                    <CoachAvatar variant={variant} size={28} />
+                    <div className="flex items-center gap-2 rounded-2xl bg-surface-soft px-3.5 py-2 text-sm text-ink-soft">
+                      <Loader2 size={14} className="animate-spin" /> Thinking…
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Quick chips + input */}
+              {enabled !== false && (
+                <div className="border-t border-surface-border/60 p-3">
+                  {messages.length === 0 && (
+                    <div className="mb-2 flex flex-wrap gap-1.5">
+                      {QUICK.map((q) => (
+                        <button
+                          key={q.label}
+                          onClick={() => send(q.type, q.input)}
+                          disabled={loading}
+                          className="rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-ink-soft transition hover:text-ink disabled:opacity-50"
+                        >
+                          {q.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      send('tutor_question', input);
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      maxLength={1000}
+                      placeholder="Ask Ipon Coach…"
+                      className="flex-1 rounded-xl border border-surface-border bg-surface-soft px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-nu-blue-400 focus:bg-surface focus:outline-none"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading || !input.trim()}
+                      aria-label="Send"
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-nu-blue-600 text-white transition hover:bg-nu-blue-700 disabled:opacity-50"
+                    >
+                      <Send size={16} />
+                    </button>
+                  </form>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* The AI Coach FAB — avatar icon, stacked above the bulldog FAB */}
+      <motion.button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-label={open ? 'Close Ipon Coach' : 'Open Ipon Coach (AI money buddy)'}
+        whileHover={reduceMotion ? undefined : { y: -3, scale: 1.05 }}
+        whileTap={{ scale: 0.92 }}
+        className="fixed bottom-[calc(9.75rem+env(safe-area-inset-bottom))] right-[1.25rem] z-50 grid h-14 w-14 place-items-center rounded-full bg-surface shadow-float outline-none ring-nu-gold-300 focus-visible:ring-4 lg:bottom-[6.75rem] lg:right-[1.85rem] print:hidden"
+      >
+        <CoachAvatar variant={variant} size={56} />
+        {/* AI sparkle badge */}
+        <span className="absolute -right-0.5 -top-0.5 grid h-5 w-5 place-items-center rounded-full bg-nu-gradient-gold text-nu-blue-900 shadow-glow ring-2 ring-surface">
+          <Sparkles size={11} strokeWidth={2.5} />
+        </span>
+      </motion.button>
+    </>
+  );
+}
