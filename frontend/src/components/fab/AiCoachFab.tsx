@@ -142,12 +142,12 @@ export default function AiCoachFab() {
                 ) : (
                   messages.map((m, i) => (
                     <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start gap-2'}`}>
-                      {m.role === 'ai' && <CoachAvatar variant={variant} size={28} className="mt-0.5" />}
+                      {m.role === 'ai' && <CoachAvatar variant={variant} size={28} className="mt-0.5 shadow-sm" />}
                       <div
-                        className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm ${
+                        className={`max-w-[80%] whitespace-pre-wrap px-3.5 py-2 text-sm shadow-sm ${
                           m.role === 'user'
-                            ? 'bg-nu-blue-600 text-white'
-                            : 'bg-surface-soft text-ink'
+                            ? 'rounded-2xl rounded-br-md bg-nu-gradient text-white'
+                            : 'rounded-2xl rounded-bl-md bg-surface text-ink ring-1 ring-surface-border/60'
                         }`}
                       >
                         {m.text}
@@ -175,7 +175,7 @@ export default function AiCoachFab() {
                           key={q.label}
                           onClick={() => send(q.type, q.input)}
                           disabled={loading}
-                          className="rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-ink-soft transition hover:text-ink disabled:opacity-50"
+                          className="rounded-full bg-surface-soft px-3 py-1.5 text-xs font-medium text-ink-soft ring-1 ring-surface-border/60 transition hover:bg-surface hover:text-ink hover:shadow-sm disabled:opacity-50"
                         >
                           {q.label}
                         </button>
@@ -221,7 +221,7 @@ export default function AiCoachFab() {
         whileTap={{ scale: 0.92 }}
         className="fixed bottom-[calc(9.75rem+env(safe-area-inset-bottom))] right-[1.25rem] z-50 grid h-14 w-14 place-items-center rounded-full bg-surface shadow-float outline-none ring-nu-gold-300 focus-visible:ring-4 lg:bottom-[6.75rem] lg:right-[1.85rem] print:hidden"
       >
-        <CoachAvatar variant={variant} size={56} />
+        <CoachAvatar variant={variant} size={56} className="ring-2 ring-white/70 dark:ring-white/15" />
         {/* AI sparkle badge */}
         <span className="absolute -right-0.5 -top-0.5 grid h-5 w-5 place-items-center rounded-full bg-nu-gradient-gold text-nu-blue-900 shadow-glow ring-2 ring-surface">
           <Sparkles size={11} strokeWidth={2.5} />
