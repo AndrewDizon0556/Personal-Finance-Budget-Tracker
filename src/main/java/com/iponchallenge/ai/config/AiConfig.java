@@ -1,41 +1,38 @@
 package com.iponchallenge.ai.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * Reads AI provider credentials from environment variables.
  *
- * SECURITY: API keys must NEVER be hardcoded. They must be injected via
- * environment variables on the hosting platform (Railway → Variables tab).
+ * Default provider is Google Gemini (it has a free tier). The app calls Gemini's
+ * REST API directly from {@code GeminiClient} — no SDK needed.
+ *
+ * SECURITY: API keys must NEVER be hardcoded. Inject them via environment
+ * variables on the hosting platform (Railway -> Variables tab).
  *
  * Required env vars when AI features are enabled:
- *   AI_API_KEY   — API key for the AI provider (Anthropic / OpenAI)
- *   AI_MODEL     — Model identifier, e.g. "claude-sonnet-4-6" (optional, has default)
- *
- * TODO (Sprint 11+):
- *  - Add RestTemplate / HttpClient bean for calling the AI provider
- *  - Add retry + circuit breaker for AI call failures
- *  - Add token budget limit per user per day
+ *   AI_API_KEY  — Gemini API key (free from https://aistudio.google.com/app/apikey)
+ *   AI_MODEL    — Gemini model id (optional; defaults to "gemini-2.0-flash")
+ *   AI_BASE_URL — API base (optional; defaults to the Gemini v1beta endpoint)
  */
+@Getter
 @Configuration
 public class AiConfig {
 
     @Value("${AI_API_KEY:NOT_SET}")
     private String apiKey;
 
-    @Value("${AI_MODEL:claude-haiku-4-5-20251001}")
+    @Value("${AI_MODEL:gemini-2.0-flash}")
     private String model;
 
+    @Value("${AI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}")
+    private String baseUrl;
+
+    /** True only when a real API key has been supplied. */
     public boolean isEnabled() {
-        return !"NOT_SET".equals(apiKey) && !apiKey.isBlank();
-    }
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public String getModel() {
-        return model;
+        return !"NOT_SET".equals(apiKey) && apiKey != null && !apiKey.isBlank();
     }
 }

@@ -139,8 +139,9 @@ Create a database, then provide configuration via environment variables
 | `PGUSER` / `PGPASSWORD` | Postgres credentials | `postgres` / `postgres` |
 | `JWT_SECRET` | Signing key for JWTs — **required** (the app won't start without it) | _none — must be set_ |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins | `http://localhost:5173` |
-| `AI_API_KEY` | AI provider key — only needed when AI Coach is enabled (never hardcode) | unset (AI disabled) |
-| `AI_MODEL` | AI model identifier | `claude-haiku-4-5-20251001` |
+| `AI_API_KEY` | Google Gemini API key — enables the AI Coach (free key from [aistudio.google.com](https://aistudio.google.com/app/apikey); never hardcode) | unset (AI Coach off) |
+| `AI_MODEL` | Gemini model id | `gemini-2.0-flash` |
+| `AI_BASE_URL` | Gemini API base URL | Gemini v1beta endpoint |
 
 Run the API (defaults to `http://localhost:8080`):
 
@@ -191,8 +192,10 @@ Security is treated as a core feature, not an afterthought:
 
 ## Roadmap
 
-- **AI Coach** — budget advice, auto-categorization, and a student finance tutor
-  (backend scaffold is in place under `ai/`; provider integration is next)
+- **AI Coach (live)** — a chat assistant (Google Gemini) that gives budget advice
+  from your real spending data, answers finance questions, and can categorize
+  expenses; surfaced as a customizable-avatar floating button, with per-user daily
+  caps to stay within the free tier. Set `AI_API_KEY` to switch it on.
 - Refresh-token rotation with HTTP-only cookies (single-domain hosting)
 - Push notifications for budget alerts and upcoming school events
 - Richer analytics and multi-month report comparisons
