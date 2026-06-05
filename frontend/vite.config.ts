@@ -11,7 +11,7 @@ export default defineConfig({
       manifest: {
         name: 'Ipon Challenge',
         short_name: 'Ipon',
-        description: 'Student personal finance tracker for NU Laguna. Track your allowance, control your spending, survive the semester.',
+        description: 'A friendly personal finance tracker. Track your money, control your spending, and hit your savings goals.',
         theme_color: '#35408E',
         background_color: '#f8fafc',
         display: 'standalone',
@@ -66,5 +66,18 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split heavy third-party libraries into their own cacheable chunks so the
+        // main app bundle stays small and the browser can load vendors in parallel.
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'chart-vendor': ['recharts'],
+          'motion-vendor': ['framer-motion'],
+        },
+      },
+    },
   },
 });

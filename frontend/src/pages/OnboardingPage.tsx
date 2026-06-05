@@ -110,9 +110,9 @@ export default function OnboardingPage() {
                   <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-3xl bg-white/10 text-nu-gold-300 backdrop-blur animate-float-slow">
                     <GraduationCap size={38} />
                   </div>
-                  <h1 className="font-display text-3xl font-extrabold">Welcome, {(user?.fullName ?? 'Student').split(' ')[0]}! 🎉</h1>
+                  <h1 className="font-display text-3xl font-extrabold">Welcome, {(user?.fullName ?? 'there').split(' ')[0]}! 🎉</h1>
                   <p className="mx-auto mt-3 max-w-sm text-white/70">
-                    Let's set you up in under a minute so you can start tracking your allowance like a champion.
+                    Let's set you up in under a minute so you can start tracking your money like a champion.
                   </p>
                 </div>
               )}
@@ -122,7 +122,7 @@ export default function OnboardingPage() {
                   <div className="mb-5 grid h-14 w-14 place-items-center rounded-2xl bg-white/10 text-nu-gold-300">
                     <Wallet size={26} />
                   </div>
-                  <h2 className="font-display text-2xl font-extrabold">How much is your allowance?</h2>
+                  <h2 className="font-display text-2xl font-extrabold">How much is your allowance or income?</h2>
                   <p className="mt-2 text-white/70">We'll calculate your safe-to-spend amount for you.</p>
 
                   <div className="mt-6">

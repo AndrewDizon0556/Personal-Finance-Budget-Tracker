@@ -20,16 +20,16 @@ import { staggerContainer, fadeUpItem } from '../lib/motion';
 import { formatPeso } from '../lib/utils';
 
 const FEATURES = [
-  { icon: Wallet, title: 'Allowance Tracking', desc: 'Know exactly how much you can spend each day so your baon lasts the whole week.' },
-  { icon: Receipt, title: 'Smart Expenses', desc: 'Log food, transpo, load, and projects in seconds with student-built categories.' },
-  { icon: Target, title: 'Savings Goals', desc: 'Save for a new laptop, tuition, or barkada trip with animated progress rings.' },
+  { icon: Wallet, title: 'Allowance & Income Tracking', desc: 'Know exactly how much you can spend each day so your money lasts the whole week.' },
+  { icon: Receipt, title: 'Smart Expenses', desc: 'Log food, transport, bills, and more in seconds with ready-made categories.' },
+  { icon: Target, title: 'Savings Goals', desc: 'Save for a new laptop, a trip, or a rainy-day fund with animated progress rings.' },
   { icon: BarChart3, title: 'Insights & Reports', desc: 'See where your money goes with beautiful charts and weekly spending trends.' },
   { icon: Trophy, title: 'Achievements & XP', desc: 'Earn badges, build streaks, and level up for staying within your budget.' },
-  { icon: ShieldCheck, title: 'Stay In Control', desc: 'Get nudges before you overspend and finish every semester financially fit.' },
+  { icon: ShieldCheck, title: 'Stay In Control', desc: 'Get nudges before you overspend and stay financially fit all year round.' },
 ];
 
 const STEPS = [
-  { n: '01', title: 'Set your allowance', desc: 'Tell us your weekly or monthly baon and spending habits.' },
+  { n: '01', title: 'Set your budget', desc: 'Tell us your weekly or monthly allowance or income and spending habits.' },
   { n: '02', title: 'Log as you go', desc: 'Add expenses in a tap. We categorize and track everything for you.' },
   { n: '03', title: 'Level up', desc: 'Hit savings goals, earn badges, and watch your discipline grow.' },
 ];
@@ -37,7 +37,7 @@ const STEPS = [
 const BADGES = [
   { icon: PiggyBank, label: 'Tipid Master' },
   { icon: Flame, label: '7-Day Streak' },
-  { icon: GraduationCap, label: "Dean's Lister Saver" },
+  { icon: GraduationCap, label: 'Super Saver' },
   { icon: ShieldCheck, label: 'Budget Warrior' },
 ];
 
@@ -52,7 +52,7 @@ export default function LandingPage() {
           <motion.div variants={staggerContainer} initial="hidden" animate="show">
             <motion.div variants={fadeUpItem}>
               <span className="chip bg-accent-soft text-nu-blue-800 dark:text-nu-gold-300">
-                <Sparkles size={14} /> Built for National University Laguna students
+                <Sparkles size={14} /> Smart budgeting for students — and anyone on a budget
               </span>
             </motion.div>
 
@@ -61,13 +61,13 @@ export default function LandingPage() {
               className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl"
             >
               Budget smarter,{' '}
-              <span className="text-gradient-blue">NU student.</span>
+              <span className="text-gradient-blue">spend wiser.</span>
             </motion.h1>
 
             <motion.p variants={fadeUpItem} className="mt-5 max-w-md text-base text-ink-soft sm:text-lg">
-              A student budgeting companion designed to help you manage allowance, track expenses, and
-              hit savings goals with confidence. Track your allowance. Control your spending.
-              <span className="font-semibold text-ink"> Survive the semester.</span>
+              A friendly budgeting companion designed to help you manage your money, track expenses, and
+              hit savings goals with confidence. Track your income. Control your spending.
+              <span className="font-semibold text-ink"> Make it last.</span>
             </motion.p>
 
             <motion.div variants={fadeUpItem} className="mt-8 flex flex-wrap items-center gap-3">
@@ -87,7 +87,7 @@ export default function LandingPage() {
               <div className="h-8 w-px bg-surface-border" />
               <div>
                 <p className="font-display text-2xl font-bold text-ink">100%</p>
-                <p>Free for students</p>
+                <p>Free to use</p>
               </div>
               <div className="h-8 w-px bg-surface-border" />
               <div>
@@ -138,7 +138,7 @@ export default function LandingPage() {
         <SectionHeading
           eyebrow="How it works"
           title="Start in three quick steps"
-          subtitle="No finance degree required. Just your baon and two minutes."
+          subtitle="No finance degree required. Just two minutes and your budget."
         />
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {STEPS.map((s) => (
@@ -171,7 +171,7 @@ export default function LandingPage() {
               </h2>
               <p className="mt-4 max-w-md text-white/70">
                 Earn XP for logging expenses, build no-overspending streaks, and unlock badges that
-                prove your financial discipline all semester long.
+                prove your financial discipline all year long.
               </p>
               <Link to="/register" className="btn-gold mt-7">
                 Start your streak <Flame size={18} />
@@ -206,7 +206,7 @@ export default function LandingPage() {
             Track every peso like a champion.
           </h2>
           <p className="mx-auto mt-4 max-w-md text-ink-soft">
-            Join the students taking control of their allowance this semester.
+            Join everyone taking control of their money — one peso at a time.
           </p>
           <Link to="/register" className="btn-gold mx-auto mt-8 text-base">
             Get Started Free <ArrowRight size={18} />

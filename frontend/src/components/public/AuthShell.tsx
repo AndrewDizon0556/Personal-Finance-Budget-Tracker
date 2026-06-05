@@ -32,10 +32,10 @@ export default function AuthShell({ title, subtitle, children, footer }: AuthShe
 
         <div className="relative">
           <h1 className="font-display text-4xl font-extrabold leading-tight text-white">
-            Survive the semester, financially.
+            Take control of your money.
           </h1>
           <p className="mt-4 max-w-sm text-white/70">
-            The student budgeting companion built for National University Laguna.
+            A friendly budgeting companion for students and anyone who wants their money to last.
           </p>
 
           <div className="mt-10 space-y-4">
