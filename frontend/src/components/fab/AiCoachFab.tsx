@@ -8,8 +8,8 @@ type Msg = { role: 'user' | 'ai'; text: string };
 
 const QUICK: { label: string; type: AiCoachType; input: string }[] = [
   { label: "How's my budget?", type: 'budget_advice', input: 'How am I doing with my budget this month?' },
-  { label: 'How can I save more?', type: 'tutor_question', input: 'Give me practical ways to save more money each week.' },
-  { label: 'Tip of the day', type: 'tutor_question', input: 'Give me one simple money-saving tip.' },
+  { label: 'Can I afford ₱1,000?', type: 'tutor_question', input: 'Can I afford to spend ₱1,000 right now without hurting my budget or savings goals?' },
+  { label: 'How can I save more?', type: 'tutor_question', input: 'Based on my spending, how can I save more money each week?' },
 ];
 
 const AVATAR_KEY = 'ipon-coach-avatar';
@@ -137,7 +137,9 @@ export default function AiCoachFab() {
                   </div>
                 ) : messages.length === 0 ? (
                   <p className="text-sm text-ink-soft">
-                    Hi! 👋 I'm your money buddy. Ask me about your budget, saving tips, or anything money-related.
+                    Hi! 👋 I can see your balance, spending, budgets, and goals — so ask me anything,
+                    like <span className="font-medium text-ink">"Can I afford ₱2,000 this week?"</span> or
+                    <span className="font-medium text-ink"> "How am I doing this month?"</span>
                   </p>
                 ) : (
                   messages.map((m, i) => (

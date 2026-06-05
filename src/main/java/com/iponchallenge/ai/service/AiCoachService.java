@@ -4,17 +4,16 @@ import com.iponchallenge.ai.client.GeminiClient;
 import com.iponchallenge.ai.config.AiConfig;
 import com.iponchallenge.ai.dto.AiCoachRequest;
 import com.iponchallenge.ai.dto.AiCoachResponse;
-import com.iponchallenge.dto.DashboardResponse;
-import com.iponchallenge.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * AI Coach — turns the user's budget data + question into friendly, practical
- * advice via {@link GeminiClient}. Three modes, picked by request type:
- *   budget_advice      — personalised advice using the current-month snapshot
- *   categorize_expense — classify a description into one category
- *   tutor_question     — answer a general personal-finance question (default)
+ * AI Coach — an intelligent financial assistant. It reads the signed-in user's
+ * real financial snapshot (via {@link FinancialContextService}) and answers
+ * questions grounded in those numbers (e.g. "Can I afford this?"). Three modes:
+ *   budget_advice      — personalised advice from the snapshot
+ *   categorize_expense — classify a description into one category (no data)
+ *   tutor_question     — general finance Q&A, also grounded in the snapshot
  */
 @Service
 @RequiredArgsConstructor
@@ -22,25 +21,37 @@ public class AiCoachService {
 
     private final AiConfig aiConfig;
     private final GeminiClient gemini;
-    private final DashboardService dashboardService;
+    private final FinancialContextService contextService;
 
     private static final String SYSTEM_PROMPT = """
-            You are "Ipon Coach", a friendly, practical personal-finance assistant inside the
-            Ipon Challenge budgeting app. Your users are in the Philippines and budget in pesos (₱)
-            — students, workers, and families.
-            Style: warm, encouraging, and concrete. Answer in 3–5 short sentences using simple
-            language and Filipino-friendly examples. Avoid jargon.
-            Rules: give safe, general budgeting and saving guidance only. Never give specific
-            investment, tax, legal, or medical advice. Do not invent numbers — only reason from the
-            data you are given.
+            You are "Ipon Coach", a friendly, practical AI financial assistant inside the Ipon
+            Challenge budgeting app. Users are in the Philippines and budget in pesos (₱).
+
+            You are given a SNAPSHOT of the user's real finances (balance, income, expenses by
+            category, budgets, savings goals, allowance schedule, runway). Always reason from
+            these actual numbers — never invent figures.
+
+            When asked "can I afford X?", weigh the price against the remaining balance, the
+            safe-to-spend-per-day, upcoming allowance, and any savings goals; give a clear
+            yes/no/maybe with a short reason and the trade-off.
+
+            Style: warm, encouraging, concrete. Answer in 3–6 short sentences with simple,
+            Filipino-friendly language. Give safe, general budgeting guidance only — never
+            specific investment, tax, legal, or medical advice.
+
+            You can READ the user's data but cannot YET make changes. If they ask you to add,
+            edit, or create something (income, expense, goal), briefly tell them you can guide
+            them and that they can record it with the + button for now.
             """;
 
     public AiCoachResponse coach(String email, AiCoachRequest request) {
         String type = request.getType() == null ? "" : request.getType().trim().toLowerCase();
         String reply = switch (type) {
-            case "budget_advice" -> budgetAdvice(email, request.getInput());
             case "categorize_expense" -> categorize(request.getInput());
-            default -> tutor(request.getInput()); // tutor_question and anything else
+            case "budget_advice" -> answerWithContext(email, request.getInput(),
+                    "How am I doing with my budget this month?");
+            default -> answerWithContext(email, request.getInput(),
+                    "Give me one simple money-saving tip based on my data.");
         };
         return AiCoachResponse.builder()
                 .reply(reply)
@@ -49,31 +60,13 @@ public class AiCoachService {
                 .build();
     }
 
-    private String budgetAdvice(String email, String question) {
-        DashboardResponse d = dashboardService.getDashboard(email);
-        String snapshot = """
-                The user's current-month snapshot (Philippine pesos):
-                - Allowance/income this period: ₱%s
-                - Spent so far this month: ₱%s
-                - Remaining balance: ₱%s
-                - Safe-to-spend per day: ₱%s
-                - Days left in the month: %d
-                - Runway status: %s
-                """.formatted(
-                nz(d.getMonthlyAllowance()), nz(d.getTotalSpentThisMonth()), nz(d.getRemainingBalance()),
-                nz(d.getDailySafeSpend()), d.getDaysLeftInMonth(),
-                d.getRunwayStatus() == null ? "unknown" : d.getRunwayStatus().name());
-
-        String prompt = snapshot
-                + "\nThe user asks: " + orDefault(question, "How am I doing with my budget this month?")
-                + "\nGive personalised, encouraging budgeting advice based on the snapshot above.";
-        return gemini.generate(SYSTEM_PROMPT, prompt, 600);
-    }
-
-    private String tutor(String question) {
-        String prompt = "Answer this personal-finance question for a beginner: "
-                + orDefault(question, "Give me one simple tip to save money.");
-        return gemini.generate(SYSTEM_PROMPT, prompt, 600);
+    /** Answers a question grounded in the user's live financial snapshot. */
+    private String answerWithContext(String email, String question, String fallbackQuestion) {
+        String context = contextService.buildContext(email);
+        String prompt = context
+                + "\n\nThe user asks: " + orDefault(question, fallbackQuestion)
+                + "\nAnswer using the snapshot above — reason from the real numbers.";
+        return gemini.generate(SYSTEM_PROMPT, prompt, 700);
     }
 
     private String categorize(String description) {
@@ -83,10 +76,6 @@ public class AiCoachService {
                 Reply with only the category name — nothing else.
                 Expense: %s""".formatted(orDefault(description, ""));
         return gemini.generate("You are an expense classifier. Reply with only the category name.", prompt, 20);
-    }
-
-    private static String nz(Object value) {
-        return value == null ? "0" : value.toString();
     }
 
     private static String orDefault(String value, String fallback) {
