@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +51,7 @@ class FinancialHealthScoreServiceTest {
     @Test
     void score_isPoor_whenNoDataAtAll() {
         when(goalRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(Collections.emptyList());
-        when(budgetRepository.findByUserAndMonthAndYear(any(), any(), any())).thenReturn(Collections.emptyList());
+        when(budgetRepository.findByUserAndMonthAndYear(any(), anyInt(), anyInt())).thenReturn(Collections.emptyList());
         when(emergencyFundRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(Collections.emptyList());
         when(challengeProgressRepository.countByUserAndCompleted(user, true)).thenReturn(0L);
         when(challengeProgressRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(Collections.emptyList());
@@ -58,7 +59,9 @@ class FinancialHealthScoreServiceTest {
 
         FinancialHealthScoreResponse response = healthScoreService.getScore(EMAIL);
 
-        assertThat(response.getScore()).isEqualTo(0);
+        // Spending Rate gives the benefit of the doubt (full 20 pts) when there is no
+        // allowance data yet, so a brand-new user scores 20 — still POOR overall.
+        assertThat(response.getScore()).isEqualTo(20);
         assertThat(response.getLevel()).isEqualTo("POOR");
     }
 
@@ -91,7 +94,7 @@ class FinancialHealthScoreServiceTest {
                 .build();
 
         when(goalRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(List.of(completedGoal));
-        when(budgetRepository.findByUserAndMonthAndYear(any(), any(), any())).thenReturn(List.of(budget));
+        when(budgetRepository.findByUserAndMonthAndYear(any(), anyInt(), anyInt())).thenReturn(List.of(budget));
         when(emergencyFundRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(List.of(fund));
         when(challengeProgressRepository.countByUserAndCompleted(user, true)).thenReturn(3L);
         when(challengeProgressRepository.findByUserOrderByCreatedAtDesc(user))
@@ -108,7 +111,7 @@ class FinancialHealthScoreServiceTest {
     @Test
     void factorNames_areCorrect() {
         when(goalRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(Collections.emptyList());
-        when(budgetRepository.findByUserAndMonthAndYear(any(), any(), any())).thenReturn(Collections.emptyList());
+        when(budgetRepository.findByUserAndMonthAndYear(any(), anyInt(), anyInt())).thenReturn(Collections.emptyList());
         when(emergencyFundRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(Collections.emptyList());
         when(challengeProgressRepository.countByUserAndCompleted(user, true)).thenReturn(0L);
         when(challengeProgressRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(Collections.emptyList());

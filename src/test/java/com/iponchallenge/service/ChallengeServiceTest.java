@@ -62,7 +62,6 @@ class ChallengeServiceTest {
     void joinChallenge_createsProgressRecord() {
         when(challengeRepository.findById(challenge.getId())).thenReturn(Optional.of(challenge));
         when(progressRepository.findByUserAndChallenge(user, challenge)).thenReturn(Optional.empty());
-        when(progressRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(Collections.emptyList());
         when(progressRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(expenseRepository.sumByUserAndDateBetweenAndType(any(), any(), any(), eq(TransactionType.EXPENSE)))
                 .thenReturn(BigDecimal.ZERO);

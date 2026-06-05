@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +39,9 @@ class EmergencyFundServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder().email(EMAIL).build();
-        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        // Shared stub: only the service-level tests (e.g. contribute) consult the
+        // user repo; the mapper-only tests don't, so keep it lenient under strict mocks.
+        lenient().when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
     }
 
     @Test
