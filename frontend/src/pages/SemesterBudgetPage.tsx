@@ -138,11 +138,16 @@ function SemesterDetailPage() {
   );
 }
 
-// ─── List view ────────────────────────────────────────────────────────────────
+// ─── Page router: detail vs list ───────────────────────────────────────────────
+// Kept hook-free (beyond useParams) so the early branch never sits in front of
+// hooks — that would violate the Rules of Hooks. Each view owns its own hooks.
 export default function SemesterBudgetPage() {
   const { id } = useParams<{ id?: string }>();
-  if (id) return <SemesterDetailPage />;
+  return id ? <SemesterDetailPage /> : <SemesterListPage />;
+}
 
+// ─── List view ────────────────────────────────────────────────────────────────
+function SemesterListPage() {
   const { semesters, isLoading, error, fetchSemesters, addSemester, editSemester, removeSemester } =
     useSemesterBudgetStore();
   const [showForm, setShowForm] = useState(false);
