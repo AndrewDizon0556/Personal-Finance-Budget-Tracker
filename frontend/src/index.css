@@ -40,6 +40,29 @@
     @apply overflow-x-clip bg-[rgb(var(--page-bg))] text-ink font-sans transition-colors duration-300;
   }
 
+  /* Accessibility: a clear, consistent focus ring for keyboard users only.
+     Mouse/touch interactions are unaffected (no outline on :focus). */
+  :focus-visible {
+    outline: 2px solid #4d5db4; /* nu-blue-500 */
+    outline-offset: 2px;
+  }
+  .dark :focus-visible {
+    outline-color: #97a4da; /* nu-blue-300, higher contrast on dark */
+  }
+
+  /* Accessibility: respect users who prefer reduced motion — neutralize
+     animations and transitions instead of removing features. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -70,6 +93,12 @@
   /* Standard rounded card */
   .card {
     @apply bg-surface rounded-3xl border border-surface-border/70 shadow-soft;
+  }
+
+  /* Opt-in: add to clickable cards for a subtle, premium hover lift. */
+  .card-interactive {
+    @apply cursor-pointer transition-all duration-200 hover:-translate-y-1
+           hover:border-nu-blue-200 hover:shadow-card dark:hover:border-nu-blue-700;
   }
 
   /* Buttons */
