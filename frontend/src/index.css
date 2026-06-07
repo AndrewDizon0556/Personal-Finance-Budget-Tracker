@@ -17,6 +17,18 @@
     --accent: 245 179 0;
     --accent-soft: 255 244 198;
     --page-bg: 247 248 252;
+
+    /* Brand scales + shadow — themeable defaults (Ocean Blue). The theme store
+       overrides these inline per selected palette (Minimal / Ocean / Pink). */
+    --c-blue-50: 240 242 250;  --c-blue-100: 221 226 244; --c-blue-200: 192 201 234;
+    --c-blue-300: 151 164 218; --c-blue-400: 107 124 198; --c-blue-500: 77 93 180;
+    --c-blue-600: 61 74 156;   --c-blue-700: 53 64 142;   --c-blue-800: 43 52 112;
+    --c-blue-900: 35 42 87;    --c-blue-950: 22 26 56;
+    --c-gold-50: 255 251 235;  --c-gold-100: 255 244 198; --c-gold-200: 255 232 136;
+    --c-gold-300: 255 214 51;  --c-gold-400: 255 201 26;  --c-gold-500: 245 179 0;
+    --c-gold-600: 217 144 0;   --c-gold-700: 179 107 0;   --c-gold-800: 146 84 6;
+    --c-gold-900: 124 69 9;
+    --sh: 53 64 142;
   }
 
   .dark {

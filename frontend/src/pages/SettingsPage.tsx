@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Moon, Sun, Palette, Bell, Check, ShieldCheck, LogOut, AlertCircle, CheckCircle2, LifeBuoy, PlayCircle, RotateCcw } from 'lucide-react';
-import { useThemeStore, ACCENT_PRESETS, type AccentKey } from '../store/themeStore';
+import { useThemeStore, ACCENT_PRESETS, PALETTE_PRESETS, type AccentKey, type Palette as PaletteKey } from '../store/themeStore';
 import { usePrefsStore } from '../store/prefsStore';
 import { useAuthStore } from '../store/authStore';
 import { useHelpStore } from '../store/helpStore';
@@ -10,7 +10,7 @@ import PageHeader from '../components/ui/PageHeader';
 import TextField from '../components/ui/TextField';
 
 export default function SettingsPage() {
-  const { mode, setMode, accent, setAccent } = useThemeStore();
+  const { mode, setMode, accent, setAccent, palette, setPalette } = useThemeStore();
   const prefs = usePrefsStore();
 
   const notifItems: { key: 'budgetAlerts' | 'renewalReminders' | 'streakNudges' | 'weeklyDigest'; label: string; desc: string }[] = [
@@ -31,7 +31,39 @@ export default function SettingsPage() {
           <p className="text-sm font-semibold text-ink">Appearance</p>
         </div>
 
-        <p className="mb-2 text-sm font-medium text-ink">Theme</p>
+        <p className="mb-2 text-sm font-medium text-ink">Color theme</p>
+        <div className="mb-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+          {(Object.keys(PALETTE_PRESETS) as PaletteKey[]).map((key) => {
+            const t = PALETTE_PRESETS[key];
+            const selected = palette === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setPalette(key)}
+                className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition-all sm:flex-col sm:items-start sm:gap-2 ${
+                  selected
+                    ? 'border-nu-blue-400 bg-nu-blue-50 dark:bg-nu-blue-500/10'
+                    : 'border-surface-border hover:border-nu-blue-300'
+                }`}
+              >
+                <span className="flex gap-1">
+                  {t.swatches.map((c) => (
+                    <span key={c} className="h-6 w-6 rounded-lg ring-1 ring-black/5" style={{ backgroundColor: c }} />
+                  ))}
+                </span>
+                <span className="min-w-0">
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                    {t.label}
+                    {selected && <Check size={14} className="text-nu-blue-700" />}
+                  </span>
+                  <span className="block text-[11px] text-ink-faint">{t.desc}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="mb-2 text-sm font-medium text-ink">Mode</p>
         <div className="mb-6 grid grid-cols-2 gap-3">
           {(['light', 'dark'] as const).map((m) => (
             <button

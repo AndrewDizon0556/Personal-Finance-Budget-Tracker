@@ -8,32 +8,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        // NU Laguna royal blue
+        // Primary brand scale — themeable via CSS vars (Ocean / Minimal / Pink).
+        // Kept named "nu-blue" so every existing usage recolors with the theme.
         'nu-blue': {
-          50: '#f0f2fa',
-          100: '#dde2f4',
-          200: '#c0c9ea',
-          300: '#97a4da',
-          400: '#6b7cc6',
-          500: '#4d5db4',
-          600: '#3d4a9c',
-          700: '#35408e', // brand primary
-          800: '#2b3470',
-          900: '#232a57',
-          950: '#161a38',
+          50: 'rgb(var(--c-blue-50) / <alpha-value>)',
+          100: 'rgb(var(--c-blue-100) / <alpha-value>)',
+          200: 'rgb(var(--c-blue-200) / <alpha-value>)',
+          300: 'rgb(var(--c-blue-300) / <alpha-value>)',
+          400: 'rgb(var(--c-blue-400) / <alpha-value>)',
+          500: 'rgb(var(--c-blue-500) / <alpha-value>)',
+          600: 'rgb(var(--c-blue-600) / <alpha-value>)',
+          700: 'rgb(var(--c-blue-700) / <alpha-value>)',
+          800: 'rgb(var(--c-blue-800) / <alpha-value>)',
+          900: 'rgb(var(--c-blue-900) / <alpha-value>)',
+          950: 'rgb(var(--c-blue-950) / <alpha-value>)',
         },
-        // NU Laguna gold
+        // Accent / "gold" scale — themeable (warm gold, amber, or rose-gold).
         'nu-gold': {
-          50: '#fffbeb',
-          100: '#fff4c6',
-          200: '#ffe888',
-          300: '#ffd633',
-          400: '#ffc91a',
-          500: '#f5b300', // brand gold
-          600: '#d99000',
-          700: '#b36b00',
-          800: '#925406',
-          900: '#7c4509',
+          50: 'rgb(var(--c-gold-50) / <alpha-value>)',
+          100: 'rgb(var(--c-gold-100) / <alpha-value>)',
+          200: 'rgb(var(--c-gold-200) / <alpha-value>)',
+          300: 'rgb(var(--c-gold-300) / <alpha-value>)',
+          400: 'rgb(var(--c-gold-400) / <alpha-value>)',
+          500: 'rgb(var(--c-gold-500) / <alpha-value>)',
+          600: 'rgb(var(--c-gold-600) / <alpha-value>)',
+          700: 'rgb(var(--c-gold-700) / <alpha-value>)',
+          800: 'rgb(var(--c-gold-800) / <alpha-value>)',
+          900: 'rgb(var(--c-gold-900) / <alpha-value>)',
         },
         // Themeable surface tokens (driven by CSS vars for dark/light)
         surface: 'rgb(var(--surface) / <alpha-value>)',
@@ -53,17 +54,17 @@ export default {
         '4xl': '2rem',
       },
       boxShadow: {
-        soft: '0 2px 8px -2px rgb(53 64 142 / 0.08), 0 4px 24px -8px rgb(53 64 142 / 0.12)',
-        glow: '0 0 0 1px rgb(255 201 26 / 0.3), 0 8px 32px -8px rgb(245 179 0 / 0.4)',
-        'glow-blue': '0 8px 32px -8px rgb(53 64 142 / 0.45)',
-        card: '0 1px 2px rgb(16 24 40 / 0.04), 0 12px 32px -12px rgb(53 64 142 / 0.18)',
-        float: '0 18px 50px -12px rgb(53 64 142 / 0.35)',
+        soft: '0 2px 8px -2px rgb(var(--sh) / 0.08), 0 4px 24px -8px rgb(var(--sh) / 0.12)',
+        glow: '0 0 0 1px rgb(var(--c-gold-300) / 0.3), 0 8px 32px -8px rgb(var(--c-gold-500) / 0.4)',
+        'glow-blue': '0 8px 32px -8px rgb(var(--sh) / 0.45)',
+        card: '0 1px 2px rgb(16 24 40 / 0.04), 0 12px 32px -12px rgb(var(--sh) / 0.18)',
+        float: '0 18px 50px -12px rgb(var(--sh) / 0.35)',
       },
       backgroundImage: {
-        'nu-gradient': 'linear-gradient(135deg, #35408e 0%, #4d5db4 50%, #232a57 100%)',
-        'nu-gradient-gold': 'linear-gradient(135deg, #ffc91a 0%, #f5b300 100%)',
+        'nu-gradient': 'linear-gradient(135deg, rgb(var(--c-blue-700)) 0%, rgb(var(--c-blue-500)) 50%, rgb(var(--c-blue-900)) 100%)',
+        'nu-gradient-gold': 'linear-gradient(135deg, rgb(var(--c-gold-400)) 0%, rgb(var(--c-gold-500)) 100%)',
         'nu-mesh':
-          'radial-gradient(at 0% 0%, rgb(53 64 142 / 0.18) 0px, transparent 50%), radial-gradient(at 98% 10%, rgb(255 201 26 / 0.15) 0px, transparent 50%), radial-gradient(at 50% 100%, rgb(77 93 180 / 0.12) 0px, transparent 50%)',
+          'radial-gradient(at 0% 0%, rgb(var(--c-blue-500) / 0.18) 0px, transparent 50%), radial-gradient(at 98% 10%, rgb(var(--c-gold-400) / 0.15) 0px, transparent 50%), radial-gradient(at 50% 100%, rgb(var(--c-blue-400) / 0.12) 0px, transparent 50%)',
       },
       keyframes: {
         'fade-in-up': {
