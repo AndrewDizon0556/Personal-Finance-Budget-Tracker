@@ -99,6 +99,20 @@ function hexToRgb(hex: string): string {
   return `${(num >> 16) & 255} ${(num >> 8) & 255} ${num & 255}`;
 }
 
+/** Applies a palette + mode + accent to the document root (inline vars). */
+function applyVars(palette: Palette, mode: ThemeMode, accent: AccentKey) {
+  const root = document.documentElement;
+  root.classList.toggle('dark', mode === 'dark');
+  const def = PALETTES[palette] ?? PALETTES.minimal;
+  const vars = mode === 'dark' ? { ...def.light, ...def.dark } : def.light;
+  for (const [name, hex] of Object.entries(vars)) {
+    root.style.setProperty(name, hexToRgb(hex));
+  }
+  const preset = ACCENT_PRESETS[accent];
+  root.style.setProperty('--accent', preset.rgb);
+  root.style.setProperty('--accent-soft', preset.soft);
+}
+
 interface ThemeState {
   mode: ThemeMode;
   accent: AccentKey;
@@ -108,6 +122,8 @@ interface ThemeState {
   setAccent: (accent: AccentKey) => void;
   setPalette: (palette: Palette) => void;
   applyToDocument: () => void;
+  /** Temporarily apply a specific theme without persisting (e.g. public pages). */
+  previewTheme: (palette: Palette, mode: ThemeMode) => void;
 }
 
 export const useThemeStore = create<ThemeState>()(
@@ -134,19 +150,10 @@ export const useThemeStore = create<ThemeState>()(
       },
       applyToDocument: () => {
         const { mode, accent, palette } = get();
-        const root = document.documentElement;
-        root.classList.toggle('dark', mode === 'dark');
-
-        const def = PALETTES[palette] ?? PALETTES.minimal;
-        const vars = mode === 'dark' ? { ...def.light, ...def.dark } : def.light;
-        for (const [name, hex] of Object.entries(vars)) {
-          root.style.setProperty(name, hexToRgb(hex));
-        }
-
-        // Accent stays independently customizable on top of the palette.
-        const preset = ACCENT_PRESETS[accent];
-        root.style.setProperty('--accent', preset.rgb);
-        root.style.setProperty('--accent-soft', preset.soft);
+        applyVars(palette, mode, accent);
+      },
+      previewTheme: (palette, mode) => {
+        applyVars(palette, mode, get().accent);
       },
     }),
     { name: 'ipon-theme' },

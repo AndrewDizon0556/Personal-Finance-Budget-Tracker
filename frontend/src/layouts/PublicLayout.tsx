@@ -1,6 +1,18 @@
+import { useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
+import { useThemeStore } from '../store/themeStore';
 
 export default function PublicLayout() {
+  const previewTheme = useThemeStore((s) => s.previewTheme);
+  const applyToDocument = useThemeStore((s) => s.applyToDocument);
+
+  // Marketing / auth pages always use the vibrant Ocean Blue brand look, no
+  // matter the user's in-app theme. Restore their real theme on the way out.
+  useEffect(() => {
+    previewTheme('ocean', 'light');
+    return () => applyToDocument();
+  }, [previewTheme, applyToDocument]);
+
   return (
     <div className="flex min-h-screen flex-col bg-[rgb(var(--page-bg))] bg-nu-mesh">
       <div className="flex-1">
