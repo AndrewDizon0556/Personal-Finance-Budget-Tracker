@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils';
+import LogoMark from './LogoMark';
 
 interface LogoProps {
   className?: string;
@@ -12,13 +13,7 @@ interface LogoProps {
 export default function Logo({ className, markOnly = false, light = false }: LogoProps) {
   return (
     <div className={cn('flex items-center gap-2.5', className)}>
-      <img
-        src="/logo-icon.svg"
-        alt="Ipon Challenge"
-        className="h-9 w-9 rounded-xl shadow-glow-blue"
-        width={36}
-        height={36}
-      />
+      <LogoMark size={36} />
       {!markOnly && (
         <div className="leading-none">
           <span
