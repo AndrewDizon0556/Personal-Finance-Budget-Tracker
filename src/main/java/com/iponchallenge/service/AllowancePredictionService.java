@@ -3,11 +3,6 @@ package com.iponchallenge.service;
 import com.iponchallenge.dto.AllowancePredictionResponse;
 import com.iponchallenge.dto.AllowancePredictionResponse.WeeklyProjection;
 import com.iponchallenge.dto.RunwayResponse;
-import com.iponchallenge.entity.TransactionType;
-import com.iponchallenge.entity.User;
-import com.iponchallenge.exception.BadRequestException;
-import com.iponchallenge.repository.ExpenseRepository;
-import com.iponchallenge.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,45 +12,41 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Enriches the single-source {@link RunwayService} data with a recommended daily
+ * spend, an exhaustion date, a budget-health "spending trend", a smart tip, and a
+ * 4-week projection. Everything derives from the same runway status, so the card,
+ * Smart Insights, and Financial Health Score never disagree.
+ */
 @Service
 @RequiredArgsConstructor
 public class AllowancePredictionService {
 
     private final RunwayService runwayService;
-    private final UserRepository userRepository;
-    private final ExpenseRepository expenseRepository;
 
     public AllowancePredictionResponse getPrediction(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BadRequestException("User not found"));
-
+        // getRunway is the single source of truth (and validates the user).
         RunwayResponse runway = runwayService.getRunway(email);
-
         LocalDate today = LocalDate.now();
 
-        // Recommended daily spend to last until next allowance
+        // Recommended daily spend to last until the next allowance.
         BigDecimal dailyRecommended = runway.getDaysUntilNextAllowance() > 0
                 ? runway.getRemainingBalance()
                         .divide(BigDecimal.valueOf(runway.getDaysUntilNextAllowance()), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
         dailyRecommended = dailyRecommended.max(BigDecimal.ZERO);
 
-        // Exhaustion date
         LocalDate exhaustionDate = runway.getEstimatedDaysRemaining() < 999
                 ? today.plusDays(runway.getEstimatedDaysRemaining())
                 : null;
 
-        // Spending trend: compare last-7 avg vs previous-7 avg
-        String trend = computeSpendingTrend(user, today);
-
-        // Risk level mapped from RunwayStatus
+        String trend = budgetTrend(runway);
         String riskLevel = switch (runway.getRunwayStatus()) {
             case SAFE     -> "GREEN";
             case WARNING  -> "YELLOW";
             case CRITICAL -> "RED";
         };
-
-        String smartTip = buildSmartTip(runway, riskLevel, trend, dailyRecommended);
+        String smartTip = buildSmartTip(runway, riskLevel, dailyRecommended);
 
         List<WeeklyProjection> projections = buildWeeklyProjections(
                 runway.getRemainingBalance(), runway.getAvgDailySpending(), today, 4);
@@ -76,37 +67,32 @@ public class AllowancePredictionService {
                 .build();
     }
 
-    private String computeSpendingTrend(User user, LocalDate today) {
-        BigDecimal last7 = expenseRepository.sumByUserAndDateBetweenAndType(
-                user, today.minusDays(7), today, TransactionType.EXPENSE);
-        BigDecimal prev7 = expenseRepository.sumByUserAndDateBetweenAndType(
-                user, today.minusDays(14), today.minusDays(7), TransactionType.EXPENSE);
-
-        if (prev7.compareTo(BigDecimal.ZERO) == 0) return "STABLE";
-
-        BigDecimal diff = last7.subtract(prev7);
-        BigDecimal threshold = prev7.multiply(new BigDecimal("0.10")); // 10% change threshold
-
-        if (diff.compareTo(threshold) > 0)       return "INCREASING";
-        if (diff.negate().compareTo(threshold) > 0) return "DECREASING";
-        return "STABLE";
+    /**
+     * Budget-health trend (CRITICAL | HIGH_RISK | STABLE), derived from the same
+     * runway status so it can never say "Stable" while the wallet is in the red.
+     */
+    private String budgetTrend(RunwayResponse runway) {
+        if (runway.getRemainingBalance().compareTo(BigDecimal.ZERO) < 0) return "CRITICAL";
+        return switch (runway.getRunwayStatus()) {
+            case SAFE     -> "STABLE";
+            case WARNING  -> "HIGH_RISK";
+            case CRITICAL -> "CRITICAL";
+        };
     }
 
-    private String buildSmartTip(RunwayResponse runway, String risk, String trend, BigDecimal daily) {
+    private String buildSmartTip(RunwayResponse runway, String risk, BigDecimal daily) {
+        if (runway.getRemainingBalance().compareTo(BigDecimal.ZERO) < 0) {
+            return "Your spending has exceeded your allowance. Reduce expenses or add income to recover your budget.";
+        }
         if ("RED".equals(risk)) {
-            return "Your allowance may run out early. Try to keep spending under ₱"
-                    + daily.toPlainString() + " per day.";
+            return "At your current spending rate, your funds may run out before your next allowance. "
+                    + "Keep spending under ₱" + daily.toPlainString() + "/day.";
         }
-        if ("YELLOW".equals(risk) && "INCREASING".equals(trend)) {
-            return "Your spending is increasing. Cut back now to avoid running short before your next allowance.";
+        if ("YELLOW".equals(risk)) {
+            return "Your spending pace is a bit high. Aim for about ₱" + daily.toPlainString()
+                    + "/day to stay on track.";
         }
-        if ("GREEN".equals(risk) && "DECREASING".equals(trend)) {
-            return "Great job! Your spending is decreasing. Consider moving some savings to your emergency fund.";
-        }
-        if ("GREEN".equals(risk)) {
-            return "You're on track! Recommended spend: ₱" + daily.toPlainString() + "/day.";
-        }
-        return runway.getMessage();
+        return "You're on track! Recommended spend: ₱" + daily.toPlainString() + "/day.";
     }
 
     private List<WeeklyProjection> buildWeeklyProjections(

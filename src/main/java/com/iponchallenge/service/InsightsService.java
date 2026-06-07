@@ -80,10 +80,14 @@ public class InsightsService {
                     analytics.getHighestSpendingCategory() + " is your biggest spending category this month."));
         }
 
-        // 4. Runway outlook
-        if (runway.getRunwayStatus() == RunwayStatus.CRITICAL) {
+        // 4. Runway outlook — same source of truth as the Allowance Runway card.
+        if (runway.getRemainingBalance().compareTo(BigDecimal.ZERO) < 0) {
+            // Highest priority: already overspent. Surface it first.
+            insights.add(0, new InsightDto("warning",
+                    "Your allowance has already been exceeded. Reduce spending or add income to recover your budget."));
+        } else if (runway.getRunwayStatus() == RunwayStatus.CRITICAL) {
             insights.add(new InsightDto("warning",
-                    "Your funds may run out before your next allowance. Spend carefully."));
+                    "At your current spending rate, your funds may run out before your next allowance."));
         } else if (runway.getRunwayStatus() == RunwayStatus.SAFE
                 && runway.getEstimatedDaysRemaining() >= runway.getDaysUntilNextAllowance()) {
             insights.add(new InsightDto("celebrate",

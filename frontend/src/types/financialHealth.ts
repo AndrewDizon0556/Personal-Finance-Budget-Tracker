@@ -26,7 +26,8 @@ export interface AllowancePrediction {
   dailyRecommendedSpending: number;
   estimatedExhaustionDate: string | null;
   riskLevel: 'GREEN' | 'YELLOW' | 'RED';
-  spendingTrend: 'INCREASING' | 'DECREASING' | 'STABLE';
+  /** Budget-health trend — derived from the same runway status, never "Stable" while overspent. */
+  spendingTrend: 'CRITICAL' | 'HIGH_RISK' | 'STABLE';
   smartTip: string;
   weeklyProjections: WeeklyProjection[];
 }

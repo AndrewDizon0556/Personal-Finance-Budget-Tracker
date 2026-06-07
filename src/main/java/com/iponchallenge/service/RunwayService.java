@@ -62,8 +62,8 @@ public class RunwayService {
         LocalDate anchor = user.getCreatedAt() != null ? user.getCreatedAt().toLocalDate() : today;
         int daysUntilNextAllowance = calculateDaysUntilNextAllowance(user.getAllowanceSchedule(), today, anchor);
 
-        RunwayStatus status = determineStatus(estimatedDaysRemaining, daysUntilNextAllowance);
-        String message = buildMessage(status, estimatedDaysRemaining);
+        RunwayStatus status = determineStatus(remainingBalance, estimatedDaysRemaining, daysUntilNextAllowance);
+        String message = buildMessage(status, estimatedDaysRemaining, remainingBalance);
 
         return RunwayResponse.builder()
                 .remainingBalance(remainingBalance)
@@ -157,13 +157,18 @@ public class RunwayService {
         return (int) ChronoUnit.DAYS.between(today, next);
     }
 
-    private RunwayStatus determineStatus(int estimated, int daysUntilNext) {
+    private RunwayStatus determineStatus(BigDecimal remaining, int estimated, int daysUntilNext) {
+        // Overspent: the wallet is already in the red, regardless of schedule.
+        if (remaining.compareTo(BigDecimal.ZERO) < 0) return RunwayStatus.CRITICAL;
         if (estimated >= daysUntilNext) return RunwayStatus.SAFE;
         if (estimated >= daysUntilNext / 2) return RunwayStatus.WARNING;
         return RunwayStatus.CRITICAL;
     }
 
-    private String buildMessage(RunwayStatus status, int estimatedDays) {
+    private String buildMessage(RunwayStatus status, int estimatedDays, BigDecimal remaining) {
+        if (remaining.compareTo(BigDecimal.ZERO) < 0) {
+            return "Your spending has exceeded your allowance. Reduce expenses to recover your budget.";
+        }
         return switch (status) {
             case SAFE -> "You're on track! Your allowance should last until the next payout.";
             case WARNING -> "Heads up! Your allowance may run out in " + estimatedDays + " days.";

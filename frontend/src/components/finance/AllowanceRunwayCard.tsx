@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Minus, ShieldCheck, AlertTriangle, Siren } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, Siren } from 'lucide-react';
 import financialHealthService from '../../services/financialHealthService';
 import type { AllowancePrediction } from '../../types/financialHealth';
 import { formatPeso } from '../../lib/utils';
@@ -19,13 +19,13 @@ const STATUS_BAR: Record<string, string> = {
   SAFE: '#22c55e', WARNING: '#f59e0b', CRITICAL: '#ef4444',
 };
 
-function TrendIcon({ trend }: { trend: string }) {
-  if (trend === 'INCREASING')
-    return <TrendingUp size={13} className="text-rose-500" />;
-  if (trend === 'DECREASING')
-    return <TrendingDown size={13} className="text-emerald-500" />;
-  return <Minus size={13} className="text-ink-faint" />;
-}
+// Budget-health trend — mirrors the backend's single-source runway status, so this
+// can never read "Stable" while the balance is negative.
+const TREND: Record<string, { label: string; cls: string; icon: typeof ShieldCheck }> = {
+  STABLE:    { label: 'Stable',    cls: 'text-emerald-500', icon: ShieldCheck },
+  HIGH_RISK: { label: 'High Risk', cls: 'text-amber-500',   icon: AlertTriangle },
+  CRITICAL:  { label: 'Critical',  cls: 'text-rose-500',    icon: Siren },
+};
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: { payload: { weekStart: string; projectedSpend: number; projectedBalance: number; status: string } }[] }) {
   if (!active || !payload?.length) return null;
@@ -82,10 +82,15 @@ export default function AllowanceRunwayCard() {
         </div>
         <div>
           <p className="text-[10px] text-ink-faint">Spending trend</p>
-          <span className="flex items-center gap-1 text-xs font-semibold text-ink">
-            <TrendIcon trend={data.spendingTrend} />
-            {data.spendingTrend.charAt(0) + data.spendingTrend.slice(1).toLowerCase()}
-          </span>
+          {(() => {
+            const t = TREND[data.spendingTrend] ?? TREND.STABLE;
+            const TIcon = t.icon;
+            return (
+              <span className={`flex items-center gap-1 text-xs font-semibold ${t.cls}`}>
+                <TIcon size={13} /> {t.label}
+              </span>
+            );
+          })()}
         </div>
       </div>
 
