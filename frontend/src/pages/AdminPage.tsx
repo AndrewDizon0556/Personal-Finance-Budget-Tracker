@@ -45,10 +45,10 @@ export default function AdminPage() {
   useEffect(() => { load(); }, []);
 
   const metrics: Metric[] = data ? [
-    { label: 'Total registered users', value: fmt(data.totalUsers), icon: Users, fg: 'text-nu-blue-600', bg: 'bg-nu-blue-100 dark:bg-nu-blue-500/15' },
-    { label: 'Active users', sub: 'last 7 days', value: fmt(data.activeUsers7Days), icon: Activity, fg: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-500/15' },
-    { label: 'Total app usage', sub: 'logins all-time', value: fmt(data.totalAppUsage), icon: MousePointerClick, fg: 'text-violet-600', bg: 'bg-violet-100 dark:bg-violet-500/15' },
-    { label: 'New users', sub: 'last 30 days', value: fmt(data.newUsersThisMonth), icon: UserPlus, fg: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-500/15' },
+    { label: 'Total registered users', value: fmt(data.totalUsers), icon: Users, fg: 'text-nu-blue-600', bg: 'bg-nu-blue-100 dark:bg-nu-blue-500/25 dark:text-nu-blue-300' },
+    { label: 'Active users', sub: 'last 7 days', value: fmt(data.activeUsers7Days), icon: Activity, fg: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-500/25 dark:text-emerald-300' },
+    { label: 'Total app usage', sub: 'logins all-time', value: fmt(data.totalAppUsage), icon: MousePointerClick, fg: 'text-violet-600', bg: 'bg-violet-100 dark:bg-violet-500/25 dark:text-violet-300' },
+    { label: 'New users', sub: 'last 30 days', value: fmt(data.newUsersThisMonth), icon: UserPlus, fg: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-500/25 dark:text-orange-300' },
   ] : [];
 
   return (

@@ -10,9 +10,9 @@ import { formatPeso } from '../../lib/utils';
 import { fadeUpItem } from '../../lib/motion';
 
 const RISK = {
-  GREEN:  { label: 'On track',  chip: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15', bar: '#22c55e', icon: ShieldCheck },
-  YELLOW: { label: 'Slow down', chip: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15',       bar: '#f59e0b', icon: AlertTriangle },
-  RED:    { label: 'Critical',  chip: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15',           bar: '#ef4444', icon: Siren },
+  GREEN:  { label: 'On track',  chip: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-300', bar: '#22c55e', icon: ShieldCheck },
+  YELLOW: { label: 'Slow down', chip: 'bg-amber-100 text-amber-700 dark:bg-amber-500/25 dark:text-amber-300',       bar: '#f59e0b', icon: AlertTriangle },
+  RED:    { label: 'Critical',  chip: 'bg-rose-100 text-rose-700 dark:bg-rose-500/25 dark:text-rose-300',           bar: '#ef4444', icon: Siren },
 };
 
 const STATUS_BAR: Record<string, string> = {

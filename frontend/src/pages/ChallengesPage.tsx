@@ -16,9 +16,9 @@ const TYPE_LABELS: Record<string, string> = {
   NO_SPEND: 'No-Spend', SAVINGS_TARGET: 'Savings Target', STREAK: 'Streak',
 };
 const TYPE_COLORS: Record<string, string> = {
-  NO_SPEND: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15',
-  SAVINGS_TARGET: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15',
-  STREAK: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15',
+  NO_SPEND: 'bg-rose-100 text-rose-700 dark:bg-rose-500/25 dark:text-rose-300',
+  SAVINGS_TARGET: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-300',
+  STREAK: 'bg-amber-100 text-amber-700 dark:bg-amber-500/25 dark:text-amber-300',
 };
 
 export default function ChallengesPage() {

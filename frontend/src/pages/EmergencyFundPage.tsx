@@ -25,10 +25,10 @@ const CATEGORY_ICONS: Record<string, string> = {
   MEDICAL: '🏥', TRANSPORTATION: '🚌', SCHOOL: '🎓', GENERAL: '🛡️',
 };
 const CATEGORY_COLORS: Record<string, string> = {
-  MEDICAL: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15',
-  TRANSPORTATION: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15',
-  SCHOOL: 'bg-violet-100 text-violet-700 dark:bg-violet-500/15',
-  GENERAL: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15',
+  MEDICAL: 'bg-rose-100 text-rose-700 dark:bg-rose-500/25 dark:text-rose-300',
+  TRANSPORTATION: 'bg-sky-100 text-sky-700 dark:bg-sky-500/25 dark:text-sky-300',
+  SCHOOL: 'bg-violet-100 text-violet-700 dark:bg-violet-500/25 dark:text-violet-300',
+  GENERAL: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-300',
 };
 
 export default function EmergencyFundPage() {
@@ -96,7 +96,7 @@ export default function EmergencyFundPage() {
           <Stat label="Total Target" value={totalTarget} />
           <Stat label="Total Saved" value={totalSaved} />
           <div className="card flex items-center gap-3 p-4">
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-300">
               <Shield size={18} />
             </span>
             <div>

@@ -12,10 +12,10 @@ interface Props {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  ON_TRACK: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15',
-  WARNING: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15',
-  CRITICAL: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15',
-  COMPLETED: 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15',
+  ON_TRACK: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-300',
+  WARNING: 'bg-amber-100 text-amber-700 dark:bg-amber-500/25 dark:text-amber-300',
+  CRITICAL: 'bg-rose-100 text-rose-700 dark:bg-rose-500/25 dark:text-rose-300',
+  COMPLETED: 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300',
 };
 
 const STATUS_LABELS: Record<string, string> = {

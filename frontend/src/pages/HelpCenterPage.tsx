@@ -74,7 +74,7 @@ function AccordionSection({
   return (
     <motion.div variants={fadeUpItem} id={section.id} className="card scroll-mt-24 overflow-hidden">
       <button onClick={onToggle} className="flex w-full items-center gap-3 p-5 text-left">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300">
           <Icon size={18} />
         </span>
         <div className="min-w-0 flex-1">

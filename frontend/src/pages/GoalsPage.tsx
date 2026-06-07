@@ -75,7 +75,7 @@ export default function GoalsPage() {
           <SummaryStat icon={PiggyBank} label="Total saved" value={totalSaved} />
           <SummaryStat icon={Target} label="Total target" value={totalTarget} />
           <div className="card flex items-center gap-3 p-4">
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-300">
               <Flag size={18} />
             </span>
             <div>
@@ -131,7 +131,7 @@ export default function GoalsPage() {
 function SummaryStat({ icon: Icon, label, value }: { icon: typeof Target; label: string; value: number }) {
   return (
     <div className="card flex items-center gap-3 p-4">
-      <span className="grid h-10 w-10 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15">
+      <span className="grid h-10 w-10 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300">
         <Icon size={18} />
       </span>
       <div className="min-w-0">

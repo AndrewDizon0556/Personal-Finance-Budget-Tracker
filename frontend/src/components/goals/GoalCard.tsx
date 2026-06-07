@@ -53,7 +53,7 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
           <div className="flex items-center gap-2">
             <p className="truncate font-display text-base font-bold text-ink">{goal.goalName}</p>
             {goal.completed && (
-              <span className="chip bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15">
+              <span className="chip bg-emerald-100 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-300">
                 <Trophy size={12} /> Done
               </span>
             )}

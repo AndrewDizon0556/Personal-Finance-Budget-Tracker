@@ -139,16 +139,16 @@ export default function FloatingActionButton() {
   const exploreItems = useMemo<FabAction[]>(() => {
     const go = (to: string) => () => navigate(to);
     return [
-      { id: 'analytics', label: 'Analytics', icon: BarChart3, tone: 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15', onClick: go('/analytics') },
-      { id: 'reports', label: 'Reports', icon: FileText, tone: 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15', onClick: go('/report') },
-      { id: 'semester', label: 'Semester', icon: GraduationCap, tone: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15', onClick: go('/semester-budget') },
-      { id: 'learn', label: 'Learn', icon: BookOpen, tone: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15', onClick: go('/financial-literacy') },
-      { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard, tone: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15', onClick: go('/subscriptions') },
-      { id: 'split', label: 'Split Bills', icon: Users, tone: 'bg-violet-100 text-violet-700 dark:bg-violet-500/15', onClick: go('/split-bills') },
-      { id: 'emergency', label: 'Emergency', icon: Shield, tone: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15', onClick: go('/emergency-fund') },
-      { id: 'challenges', label: 'Challenges', icon: Trophy, tone: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15', onClick: go('/challenges') },
-      { id: 'calendar', label: 'Calendar', icon: CalendarDays, tone: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15', onClick: go('/school-calendar') },
-      { id: 'help', label: 'Help', icon: HelpCircle, tone: 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15', onClick: go('/help') },
+      { id: 'analytics', label: 'Analytics', icon: BarChart3, tone: 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300', onClick: go('/analytics') },
+      { id: 'reports', label: 'Reports', icon: FileText, tone: 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300', onClick: go('/report') },
+      { id: 'semester', label: 'Semester', icon: GraduationCap, tone: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/25 dark:text-indigo-300', onClick: go('/semester-budget') },
+      { id: 'learn', label: 'Learn', icon: BookOpen, tone: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-300', onClick: go('/financial-literacy') },
+      { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard, tone: 'bg-rose-100 text-rose-700 dark:bg-rose-500/25 dark:text-rose-300', onClick: go('/subscriptions') },
+      { id: 'split', label: 'Split Bills', icon: Users, tone: 'bg-violet-100 text-violet-700 dark:bg-violet-500/25 dark:text-violet-300', onClick: go('/split-bills') },
+      { id: 'emergency', label: 'Emergency', icon: Shield, tone: 'bg-rose-100 text-rose-700 dark:bg-rose-500/25 dark:text-rose-300', onClick: go('/emergency-fund') },
+      { id: 'challenges', label: 'Challenges', icon: Trophy, tone: 'bg-amber-100 text-amber-700 dark:bg-amber-500/25 dark:text-amber-300', onClick: go('/challenges') },
+      { id: 'calendar', label: 'Calendar', icon: CalendarDays, tone: 'bg-sky-100 text-sky-700 dark:bg-sky-500/25 dark:text-sky-300', onClick: go('/school-calendar') },
+      { id: 'help', label: 'Help', icon: HelpCircle, tone: 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300', onClick: go('/help') },
     ];
   }, [navigate]);
 

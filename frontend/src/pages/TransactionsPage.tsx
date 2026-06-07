@@ -81,7 +81,7 @@ export default function TransactionsPage() {
       {/* Period summary */}
       <div className="mb-5 grid grid-cols-2 gap-4">
         <div className="card flex items-center gap-3 p-4">
-          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-300">
             <ArrowUpCircle size={20} />
           </span>
           <div>
@@ -90,7 +90,7 @@ export default function TransactionsPage() {
           </div>
         </div>
         <div className="card flex items-center gap-3 p-4">
-          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/15">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/25 dark:text-nu-gold-300">
             <ArrowDownCircle size={20} />
           </span>
           <div>

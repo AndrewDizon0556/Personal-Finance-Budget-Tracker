@@ -13,9 +13,9 @@ const statusConfig: Record<
   RunwayStatus,
   { ring: string; badge: string; icon: typeof ShieldCheck; label: string }
 > = {
-  SAFE: { ring: 'text-emerald-500', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15', icon: ShieldCheck, label: 'On track' },
-  WARNING: { ring: 'text-nu-gold-500', badge: 'bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/15', icon: AlertTriangle, label: 'Slow down' },
-  CRITICAL: { ring: 'text-rose-500', badge: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15', icon: Siren, label: 'Critical' },
+  SAFE: { ring: 'text-emerald-500', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-300', icon: ShieldCheck, label: 'On track' },
+  WARNING: { ring: 'text-nu-gold-500', badge: 'bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/25 dark:text-nu-gold-300', icon: AlertTriangle, label: 'Slow down' },
+  CRITICAL: { ring: 'text-rose-500', badge: 'bg-rose-100 text-rose-700 dark:bg-rose-500/25 dark:text-rose-300', icon: Siren, label: 'Critical' },
 };
 
 export default function RunwayWidget({

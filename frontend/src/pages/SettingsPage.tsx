@@ -297,10 +297,12 @@ function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
       onClick={onClick}
       role="switch"
       aria-checked={on}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${on ? 'bg-nu-blue-700' : 'bg-surface-border'}`}
+      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+        on ? 'bg-accent' : 'bg-surface-border'
+      }`}
     >
       <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
           on ? 'translate-x-[22px]' : 'translate-x-0.5'
         }`}
       />

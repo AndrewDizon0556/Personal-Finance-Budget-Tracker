@@ -53,7 +53,7 @@ export default function AnalyticsPage() {
 
       <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card flex items-center gap-4 p-5">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300">
             <TrendingUp size={22} />
           </span>
           <div>
@@ -64,7 +64,7 @@ export default function AnalyticsPage() {
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card flex items-center gap-4 p-5">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/15">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/25 dark:text-nu-gold-300">
             <Crown size={22} />
           </span>
           <div className="min-w-0">

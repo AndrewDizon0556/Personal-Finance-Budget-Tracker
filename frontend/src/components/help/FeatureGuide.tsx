@@ -55,7 +55,7 @@ export default function FeatureGuide({ guideName, title, steps }: FeatureGuidePr
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15">
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300">
             <Lightbulb size={16} />
           </span>
           <div>

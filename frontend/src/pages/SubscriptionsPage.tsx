@@ -12,11 +12,11 @@ import { staggerContainer, fadeUpItem } from '../lib/motion';
 
 function renewalBadge(days: number, active: boolean) {
   if (!active) return { label: 'Inactive', cls: 'bg-surface-soft text-ink-faint' };
-  if (days < 0) return { label: 'Overdue', cls: 'bg-rose-100 text-rose-600 dark:bg-rose-500/15' };
-  if (days === 0) return { label: 'Due today', cls: 'bg-rose-100 text-rose-600 dark:bg-rose-500/15' };
-  if (days <= 3) return { label: `${days}d left`, cls: 'bg-orange-100 text-orange-600 dark:bg-orange-500/15' };
-  if (days <= 7) return { label: `${days}d left`, cls: 'bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/15' };
-  return { label: `${days}d left`, cls: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15' };
+  if (days < 0) return { label: 'Overdue', cls: 'bg-rose-100 text-rose-600 dark:bg-rose-500/25 dark:text-rose-300' };
+  if (days === 0) return { label: 'Due today', cls: 'bg-rose-100 text-rose-600 dark:bg-rose-500/25 dark:text-rose-300' };
+  if (days <= 3) return { label: `${days}d left`, cls: 'bg-orange-100 text-orange-600 dark:bg-orange-500/25 dark:text-orange-300' };
+  if (days <= 7) return { label: `${days}d left`, cls: 'bg-nu-gold-100 text-nu-gold-700 dark:bg-nu-gold-500/25 dark:text-nu-gold-300' };
+  return { label: `${days}d left`, cls: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-300' };
 }
 
 export default function SubscriptionsPage() {
@@ -103,7 +103,7 @@ export default function SubscriptionsPage() {
                 variants={fadeUpItem}
                 className={`card group flex items-center gap-3 p-4 ${!sub.active ? 'opacity-60' : ''}`}
               >
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300">
                   <CalendarClock size={20} />
                 </span>
                 <div className="min-w-0 flex-1">

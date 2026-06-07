@@ -19,7 +19,7 @@ function TipsBlock({ title, items }: { title: string; items: string[] }) {
       <ol className="space-y-2">
         {items.map((item, i) => (
           <li key={i} className="flex gap-2 text-sm text-ink-soft">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-nu-blue-100 text-[10px] font-bold text-nu-blue-700 dark:bg-nu-blue-500/15">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-nu-blue-100 text-[10px] font-bold text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-300">
               {i + 1}
             </span>
             {item}

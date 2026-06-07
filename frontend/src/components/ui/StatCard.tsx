@@ -44,7 +44,9 @@ export default function StatCard({
         <p className={`text-xs font-medium ${highlight ? 'text-white/70' : 'text-ink-faint'}`}>{label}</p>
         <div
           className={`grid h-9 w-9 place-items-center rounded-xl ${
-            highlight ? 'bg-white/10 text-nu-gold-300' : 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/15'
+            highlight
+              ? 'bg-white/10 text-nu-gold-300'
+              : 'bg-nu-blue-100 text-nu-blue-700 dark:bg-nu-blue-500/25 dark:text-nu-blue-200'
           }`}
         >
           <Icon size={18} />

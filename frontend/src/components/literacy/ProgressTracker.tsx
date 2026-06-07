@@ -6,9 +6,9 @@ interface Props {
 }
 
 const LEVEL_COLORS = {
-  BEGINNER: 'text-sky-600 bg-sky-100 dark:bg-sky-500/15',
-  INTERMEDIATE: 'text-amber-600 bg-amber-100 dark:bg-amber-500/15',
-  ADVANCED: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-500/15',
+  BEGINNER: 'text-sky-600 bg-sky-100 dark:bg-sky-500/25 dark:text-sky-300',
+  INTERMEDIATE: 'text-amber-600 bg-amber-100 dark:bg-amber-500/25 dark:text-amber-300',
+  ADVANCED: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-500/25 dark:text-emerald-300',
 };
 
 export default function ProgressTracker({ progress }: Props) {
