@@ -5,6 +5,7 @@ import { z } from 'zod';
 import type { Subscription } from '../../types/subscription';
 import Modal from '../ui/Modal';
 import TextField from '../ui/TextField';
+import Toggle from '../ui/Toggle';
 
 const subscriptionSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -28,8 +29,12 @@ export default function SubscriptionModal({ isOpen, onClose, onSubmit, editingSu
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<SubscriptionFormData>({ resolver: zodResolver(subscriptionSchema) });
+
+  const active = watch('active');
 
   useEffect(() => {
     if (editingSub) {
@@ -76,10 +81,17 @@ export default function SubscriptionModal({ isOpen, onClose, onSubmit, editingSu
           {...register('category')}
         />
 
-        <label className="flex cursor-pointer items-center gap-2.5 rounded-2xl bg-surface-soft/60 px-4 py-3 text-sm font-medium text-ink">
-          <input type="checkbox" {...register('active')} className="h-4 w-4 accent-nu-blue-700" />
-          Active subscription
-        </label>
+        <div className="flex items-center justify-between gap-4 rounded-2xl bg-surface-soft/60 px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-ink">Active subscription</p>
+            <p className="text-xs text-ink-soft">Inactive subscriptions are kept but skipped in your monthly total.</p>
+          </div>
+          <Toggle
+            checked={active ?? true}
+            onChange={(v) => setValue('active', v, { shouldDirty: true })}
+            aria-label="Active subscription"
+          />
+        </div>
 
         <div className="flex gap-2 pt-1">
           <button type="button" onClick={onClose} className="btn-ghost flex-1">

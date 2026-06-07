@@ -8,6 +8,7 @@ import { useHelpStore } from '../store/helpStore';
 import authService from '../services/authService';
 import PageHeader from '../components/ui/PageHeader';
 import TextField from '../components/ui/TextField';
+import Toggle from '../components/ui/Toggle';
 
 export default function SettingsPage() {
   const { mode, setMode, accent, setAccent, palette, setPalette } = useThemeStore();
@@ -124,7 +125,7 @@ export default function SettingsPage() {
                 <p className="text-sm font-semibold text-ink">{item.label}</p>
                 <p className="text-xs text-ink-soft">{item.desc}</p>
               </div>
-              <Toggle on={prefs[item.key]} onClick={() => prefs.toggle(item.key)} />
+              <Toggle checked={prefs[item.key]} onChange={() => prefs.toggle(item.key)} aria-label={item.label} />
             </div>
           ))}
         </div>
@@ -169,7 +170,7 @@ function HelpPreferencesSection() {
           <p className="text-sm font-semibold text-ink">Show tips</p>
           <p className="text-xs text-ink-soft">Display the small (?) help icons and coach-marks around the app.</p>
         </div>
-        <Toggle on={tipsEnabled} onClick={() => setTipsEnabled(!tipsEnabled)} />
+        <Toggle checked={tipsEnabled} onChange={setTipsEnabled} aria-label="Show tips" />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -288,24 +289,5 @@ function SecuritySection() {
         </button>
       </div>
     </div>
-  );
-}
-
-function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      role="switch"
-      aria-checked={on}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-        on ? 'bg-accent' : 'bg-surface-border'
-      }`}
-    >
-      <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-          on ? 'translate-x-[22px]' : 'translate-x-0.5'
-        }`}
-      />
-    </button>
   );
 }
