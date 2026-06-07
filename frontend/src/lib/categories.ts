@@ -9,6 +9,7 @@ import {
   Siren,
   Wallet,
   TrendingUp,
+  Home,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -24,6 +25,7 @@ interface CategoryStyle {
 const STYLES: Record<string, CategoryStyle> = {
   food: { icon: Utensils, fg: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-500/15', hex: '#f97316' },
   transport: { icon: Bus, fg: 'text-sky-600', bg: 'bg-sky-100 dark:bg-sky-500/15', hex: '#0ea5e9' },
+  rent: { icon: Home, fg: 'text-amber-600 dark:text-amber-300', bg: 'bg-amber-100 dark:bg-amber-500/20', hex: '#d97706' },
   tuition: { icon: GraduationCap, fg: 'text-nu-blue-700', bg: 'bg-nu-blue-100 dark:bg-nu-blue-500/20', hex: '#35408e' },
   supplies: { icon: BookOpen, fg: 'text-violet-600', bg: 'bg-violet-100 dark:bg-violet-500/15', hex: '#8b5cf6' },
   project: { icon: FolderKanban, fg: 'text-teal-600', bg: 'bg-teal-100 dark:bg-teal-500/15', hex: '#14b8a6' },
@@ -40,6 +42,7 @@ export function categoryStyle(name?: string | null): CategoryStyle {
   const n = name.toLowerCase();
   if (n.includes('food') || n.includes('baon') || n.includes('meal')) return STYLES.food;
   if (n.includes('transp') || n.includes('fare') || n.includes('jeep')) return STYLES.transport;
+  if (n.includes('rent') || n.includes('house') || n.includes('boarding') || n.includes('dorm')) return STYLES.rent;
   if (n.includes('tuition') || n.includes('school fee')) return STYLES.tuition;
   if (n.includes('suppl') || n.includes('book')) return STYLES.supplies;
   if (n.includes('project')) return STYLES.project;

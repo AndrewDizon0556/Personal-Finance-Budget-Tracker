@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ExpenseCategoryService {
 
-    // Student-focused spending categories (match the dashboard icons/colors).
+    // Everyday spending categories (match the dashboard icons/colors).
     private static final List<String> DEFAULT_EXPENSE_CATEGORIES = List.of(
-            "Tuition", "Food", "Transportation", "School Supplies",
+            "Tuition", "Rent", "Food", "Transportation", "School Supplies",
             "Projects", "Load/Data", "Leisure", "Emergency"
     );
 
@@ -55,6 +55,8 @@ public class ExpenseCategoryService {
         User user = getUser(email);
         // Backfill income categories for accounts created before income categories existed.
         ensureIncomeCategories(user);
+        // Backfill the "Rent" category for accounts created before it was a default.
+        ensureCategory(user, "Rent", CategoryType.EXPENSE);
         return categoryRepository.findByUserOrderByNameAsc(user).stream()
                 .map(cat -> ExpenseCategoryResponse.builder()
                         .id(cat.getId())
@@ -103,6 +105,16 @@ public class ExpenseCategoryService {
             DEFAULT_INCOME_CATEGORIES.forEach(name -> categoryRepository.save(
                     ExpenseCategory.builder().user(user).name(name).type(CategoryType.INCOME).build()
             ));
+        }
+    }
+
+    /** Adds a single category for the user if they don't already have it (by name + type). */
+    private void ensureCategory(User user, String name, CategoryType type) {
+        boolean exists = categoryRepository.findByUserOrderByNameAsc(user).stream()
+                .anyMatch(c -> c.getType() == type && c.getName().equalsIgnoreCase(name));
+        if (!exists) {
+            categoryRepository.save(
+                    ExpenseCategory.builder().user(user).name(name).type(type).build());
         }
     }
 

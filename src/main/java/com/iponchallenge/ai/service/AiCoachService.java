@@ -82,7 +82,7 @@ public class AiCoachService {
     private String categorize(String description) {
         String prompt = """
                 Classify this expense into exactly ONE category from this list:
-                Food, Transportation, Tuition, School Supplies, Projects, Load/Data, Leisure, Emergency, Income, Other.
+                Food, Transportation, Rent, Tuition, School Supplies, Projects, Load/Data, Leisure, Emergency, Income, Other.
                 Reply with only the category name — nothing else.
                 Expense: %s""".formatted(orDefault(description, ""));
         return gemini.generate("You are an expense classifier. Reply with only the category name.", prompt, 20);
