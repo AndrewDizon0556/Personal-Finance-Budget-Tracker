@@ -1,5 +1,5 @@
 import axiosClient from '../api/axiosClient';
-import type { Subscription, SubscriptionPayload } from '../types/subscription';
+import type { Subscription, SubscriptionPayload, PaymentStatus } from '../types/subscription';
 
 const subscriptionService = {
   getSubscriptions: async (): Promise<Subscription[]> => {
@@ -14,6 +14,11 @@ const subscriptionService = {
 
   updateSubscription: async (id: string, payload: SubscriptionPayload): Promise<Subscription> => {
     const response = await axiosClient.put<Subscription>(`/api/subscriptions/${id}`, payload);
+    return response.data;
+  },
+
+  updateStatus: async (id: string, paymentStatus: PaymentStatus): Promise<Subscription> => {
+    const response = await axiosClient.patch<Subscription>(`/api/subscriptions/${id}/status`, { paymentStatus });
     return response.data;
   },
 

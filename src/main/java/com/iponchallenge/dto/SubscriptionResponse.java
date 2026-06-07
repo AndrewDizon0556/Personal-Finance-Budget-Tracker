@@ -1,6 +1,7 @@
 package com.iponchallenge.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.iponchallenge.entity.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,4 +29,6 @@ public class SubscriptionResponse {
     private boolean active;
     private int daysUntilRenewal;
     private boolean dueSoon;
+    private PaymentStatus paymentStatus;
+    private String category;
 }

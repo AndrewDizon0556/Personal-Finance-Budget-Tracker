@@ -1,3 +1,5 @@
+export type PaymentStatus = 'PAID' | 'PENDING';
+
 export interface Subscription {
   id: string;
   name: string;
@@ -6,6 +8,8 @@ export interface Subscription {
   active: boolean;
   daysUntilRenewal: number;
   dueSoon: boolean;
+  paymentStatus: PaymentStatus;
+  category?: string | null;
 }
 
 export interface SubscriptionPayload {
@@ -13,4 +17,5 @@ export interface SubscriptionPayload {
   amount: number;
   renewalDate: string;
   active?: boolean;
+  category?: string;
 }

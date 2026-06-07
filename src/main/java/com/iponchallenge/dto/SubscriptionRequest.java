@@ -30,4 +30,7 @@ public class SubscriptionRequest {
     private LocalDate renewalDate;
 
     private boolean active = true;
+
+    /** Optional category used for the expense recorded when this is paid. */
+    private String category;
 }

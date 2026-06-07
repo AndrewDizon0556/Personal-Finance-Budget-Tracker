@@ -36,4 +36,19 @@ public class Subscription {
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private boolean active = true;
+
+    /** Optional category for the expense created when this subscription is paid. */
+    @Column(name = "category")
+    private String category;
+
+    // DB default keeps Hibernate auto-update safe on a populated table.
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false, columnDefinition = "varchar(20) default 'PENDING'")
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    /** The expense transaction created when marked paid — used to prevent
+     *  duplicate deductions and to reverse the deduction if set back to pending. */
+    @Column(name = "paid_expense_id")
+    private UUID paidExpenseId;
 }

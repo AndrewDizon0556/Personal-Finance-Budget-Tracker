@@ -2,6 +2,7 @@ package com.iponchallenge.controller;
 
 import com.iponchallenge.dto.SubscriptionRequest;
 import com.iponchallenge.dto.SubscriptionResponse;
+import com.iponchallenge.dto.SubscriptionStatusRequest;
 import com.iponchallenge.service.SubscriptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,15 @@ public class SubscriptionController {
             @Valid @RequestBody SubscriptionRequest request,
             Authentication auth) {
         return ResponseEntity.ok(subscriptionService.updateSubscription(auth.getName(), id, request));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<SubscriptionResponse> updateStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody SubscriptionStatusRequest request,
+            Authentication auth) {
+        return ResponseEntity.ok(
+                subscriptionService.updateStatus(auth.getName(), id, request.getPaymentStatus()));
     }
 
     @DeleteMapping("/{id}")

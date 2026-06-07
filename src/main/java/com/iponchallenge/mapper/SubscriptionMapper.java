@@ -28,6 +28,8 @@ public class SubscriptionMapper {
                 .active(subscription.isActive())
                 .daysUntilRenewal(daysUntilRenewal)
                 .dueSoon(dueSoon)
+                .paymentStatus(subscription.getPaymentStatus())
+                .category(subscription.getCategory())
                 .build();
     }
 }

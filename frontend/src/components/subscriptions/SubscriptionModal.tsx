@@ -11,6 +11,7 @@ const subscriptionSchema = z.object({
   amount: z.coerce.number().positive('Amount must be greater than zero'),
   renewalDate: z.string().min(1, 'Renewal date is required'),
   active: z.boolean().default(true),
+  category: z.string().optional(),
 });
 
 type SubscriptionFormData = z.infer<typeof subscriptionSchema>;
@@ -37,9 +38,10 @@ export default function SubscriptionModal({ isOpen, onClose, onSubmit, editingSu
         amount: editingSub.amount,
         renewalDate: editingSub.renewalDate,
         active: editingSub.active,
+        category: editingSub.category ?? '',
       });
     } else {
-      reset({ name: '', amount: undefined, renewalDate: '', active: true });
+      reset({ name: '', amount: undefined, renewalDate: '', active: true, category: '' });
     }
   }, [editingSub, reset, isOpen]);
 
@@ -66,6 +68,12 @@ export default function SubscriptionModal({ isOpen, onClose, onSubmit, editingSu
           type="date"
           error={errors.renewalDate?.message}
           {...register('renewalDate')}
+        />
+        <TextField
+          label="Category (optional)"
+          placeholder="e.g. Entertainment, Leisure"
+          error={errors.category?.message}
+          {...register('category')}
         />
 
         <label className="flex cursor-pointer items-center gap-2.5 rounded-2xl bg-surface-soft/60 px-4 py-3 text-sm font-medium text-ink">
