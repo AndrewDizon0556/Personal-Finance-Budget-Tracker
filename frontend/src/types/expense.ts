@@ -1,4 +1,4 @@
-export type TransactionType = 'EXPENSE' | 'INCOME';
+export type TransactionType = 'EXPENSE' | 'INCOME' | 'GOAL_CONTRIBUTION';
 export type CategoryType = 'EXPENSE' | 'INCOME';
 
 export interface ExpenseCategory {

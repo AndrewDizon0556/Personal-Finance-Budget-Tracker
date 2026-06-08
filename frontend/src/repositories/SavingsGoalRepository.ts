@@ -79,6 +79,17 @@ export const SavingsGoalRepository = {
     return updated;
   },
 
+  // Adding money moves funds out of the spendable balance and writes a ledger
+  // entry server-side, so it must happen online — we don't queue it offline.
+  async contribute(id: string, amount: number): Promise<SavingsGoal> {
+    if (!isOnline()) {
+      throw new Error("You're offline. Connect to the internet to add money to a goal.");
+    }
+    const goal = await goalService.contribute(id, amount);
+    await db.goals.put(goal);
+    return goal;
+  },
+
   async remove(id: string): Promise<void> {
     if (isOnline()) {
       await goalService.deleteGoal(id);

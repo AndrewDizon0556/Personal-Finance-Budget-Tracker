@@ -17,6 +17,11 @@ const goalService = {
     return response.data;
   },
 
+  contribute: async (id: string, amount: number): Promise<SavingsGoal> => {
+    const response = await axiosClient.post<SavingsGoal>(`/api/goals/${id}/contribute`, { amount });
+    return response.data;
+  },
+
   deleteGoal: async (id: string): Promise<void> => {
     await axiosClient.delete(`/api/goals/${id}`);
   },

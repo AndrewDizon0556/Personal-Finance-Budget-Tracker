@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Pencil, Trash2, Trophy, CalendarClock } from 'lucide-react';
+import { Pencil, Trash2, Trophy, CalendarClock, PiggyBank } from 'lucide-react';
 import type { SavingsGoal } from '../../types/goal';
 import ProgressRing from '../ui/ProgressRing';
 import Confetti from '../ui/Confetti';
@@ -8,6 +8,7 @@ import { fadeUpItem } from '../../lib/motion';
 
 interface GoalCardProps {
   goal: SavingsGoal;
+  onAddMoney: (goal: SavingsGoal) => void;
   onEdit: (goal: SavingsGoal) => void;
   onDelete: (id: string) => void;
 }
@@ -28,7 +29,7 @@ function estimateDate(targetDate: string | null): string | null {
   });
 }
 
-export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
+export default function GoalCard({ goal, onAddMoney, onEdit, onDelete }: GoalCardProps) {
   const pct = clamp(goal.progressPercentage, 0, 100);
   const quote = QUOTES[goal.goalName.length % QUOTES.length];
   const remaining = Math.max(0, goal.targetAmount - goal.currentAmount);
@@ -76,19 +77,24 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
         </p>
       </div>
 
-      <div className="mt-3 flex gap-2 border-t border-surface-border/60 pt-3">
-        <button
-          onClick={() => onEdit(goal)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-1.5 text-xs font-semibold text-ink-soft hover:bg-surface-soft hover:text-nu-blue-600"
-        >
-          <Pencil size={13} /> Edit
+      <div className="mt-3 space-y-2 border-t border-surface-border/60 pt-3">
+        <button onClick={() => onAddMoney(goal)} className="btn-gold w-full py-2 text-sm">
+          <PiggyBank size={16} /> Add Money
         </button>
-        <button
-          onClick={() => onDelete(goal.id)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-1.5 text-xs font-semibold text-ink-soft hover:bg-surface-soft hover:text-rose-500"
-        >
-          <Trash2 size={13} /> Delete
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => onEdit(goal)}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-1.5 text-xs font-semibold text-ink-soft hover:bg-surface-soft hover:text-nu-blue-600"
+          >
+            <Pencil size={13} /> Edit
+          </button>
+          <button
+            onClick={() => onDelete(goal.id)}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-1.5 text-xs font-semibold text-ink-soft hover:bg-surface-soft hover:text-rose-500"
+          >
+            <Trash2 size={13} /> Delete
+          </button>
+        </div>
       </div>
     </motion.div>
   );

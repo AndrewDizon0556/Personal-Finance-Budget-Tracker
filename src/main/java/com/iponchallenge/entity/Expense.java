@@ -38,6 +38,10 @@ public class Expense {
     @Column(name = "expense_date", nullable = false)
     private LocalDate expenseDate;
 
+    /** Set only on GOAL_CONTRIBUTION rows — links the contribution to its savings goal. */
+    @Column(name = "goal_id")
+    private UUID goalId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
     @Builder.Default

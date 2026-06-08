@@ -55,7 +55,7 @@ export default function ExpenseModal({
 
   // Switching type refreshes the category list and auto-selects a valid default,
   // so income and expense categories can never be mixed.
-  const selectType = (next: TransactionType) => {
+  const selectType = (next: 'EXPENSE' | 'INCOME') => {
     if (next === type) return;
     setValue('transactionType', next);
     const firstOfType = categories.find((c) => c.type === next);
@@ -69,10 +69,11 @@ export default function ExpenseModal({
         amount: editingExpense.amount,
         notes: editingExpense.notes ?? '',
         expenseDate: editingExpense.expenseDate,
-        transactionType: editingExpense.transactionType,
+        // The form only handles EXPENSE/INCOME; goal contributions aren't edited here.
+        transactionType: editingExpense.transactionType === 'INCOME' ? 'INCOME' : 'EXPENSE',
       });
     } else {
-      const presetType = preset?.transactionType ?? 'EXPENSE';
+      const presetType = preset?.transactionType === 'INCOME' ? 'INCOME' : 'EXPENSE';
       const firstOfType = categories.find((c) => c.type === presetType);
       reset({
         categoryId: firstOfType?.id ?? '',

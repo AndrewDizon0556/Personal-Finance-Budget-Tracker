@@ -1,28 +1,55 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Plus, Target, PiggyBank, Flag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Target, PiggyBank, Flag, Wallet, CheckCircle2, X } from 'lucide-react';
 import { useGoalStore } from '../store/goalStore';
+import { useUiStore } from '../store/uiStore';
 import type { SavingsGoal, SavingsGoalPayload } from '../types/goal';
 import GoalCard from '../components/goals/GoalCard';
 import GoalModal from '../components/goals/GoalModal';
+import AddMoneyModal from '../components/goals/AddMoneyModal';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
 import EmptyStateGuide from '../components/help/EmptyStateGuide';
 import AnimatedNumber from '../components/ui/AnimatedNumber';
+import dashboardService from '../services/dashboardService';
 import { formatPeso } from '../lib/utils';
 import { staggerContainer } from '../lib/motion';
 import { TOOLTIPS } from '../lib/helpContent';
 
 export default function GoalsPage() {
-  const { goals, isLoading, error, fetchGoals, addGoal, editGoal, removeGoal } = useGoalStore();
+  const { goals, isLoading, error, fetchGoals, addGoal, editGoal, contributeToGoal, removeGoal } = useGoalStore();
+  const mutationTick = useUiStore((s) => s.mutationTick);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
+  const [addMoneyGoal, setAddMoneyGoal] = useState<SavingsGoal | null>(null);
+  const [remainingBalance, setRemainingBalance] = useState(0);
+  const [toast, setToast] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     fetchGoals();
   }, []);
+
+  // Keep the spendable balance fresh — it's the cap for contributions and it
+  // changes whenever the user spends, earns, or saves elsewhere in the app.
+  useEffect(() => {
+    let active = true;
+    dashboardService
+      .getDashboard()
+      .then((d) => active && setRemainingBalance(d.remainingBalance))
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [mutationTick]);
+
+  // Auto-dismiss the success toast.
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3500);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   // Deep-link from the quick-action FAB ("Create Goal") opens the form straight away.
   useEffect(() => {
@@ -56,6 +83,15 @@ export default function GoalsPage() {
     setEditingGoal(null);
     setIsModalOpen(true);
   };
+  const openAddMoney = (goal: SavingsGoal) => setAddMoneyGoal(goal);
+
+  // Rejections bubble up so the modal can show the error and stay open.
+  const handleContribute = async (amount: number) => {
+    if (!addMoneyGoal) return;
+    const name = addMoneyGoal.goalName;
+    await contributeToGoal(addMoneyGoal.id, amount);
+    setToast(`Added ${formatPeso(amount)} to ${name}.`);
+  };
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
@@ -70,8 +106,26 @@ export default function GoalsPage() {
         }
       />
 
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="mb-4 flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+          >
+            <CheckCircle2 size={16} className="shrink-0" />
+            <span className="flex-1">{toast}</span>
+            <button onClick={() => setToast(null)} aria-label="Dismiss" className="text-emerald-600/70 hover:text-emerald-700 dark:text-emerald-300/70">
+              <X size={15} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {goals.length > 0 && (
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <SummaryStat icon={Wallet} label="Available to save" value={remainingBalance} />
           <SummaryStat icon={PiggyBank} label="Total saved" value={totalSaved} />
           <SummaryStat icon={Target} label="Total target" value={totalTarget} />
           <div className="card flex items-center gap-3 p-4">
@@ -113,7 +167,13 @@ export default function GoalsPage() {
           className="grid grid-cols-1 gap-4 sm:grid-cols-2"
         >
           {goals.map((goal) => (
-            <GoalCard key={goal.id} goal={goal} onEdit={openEdit} onDelete={handleDelete} />
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onAddMoney={openAddMoney}
+              onEdit={openEdit}
+              onDelete={handleDelete}
+            />
           ))}
         </motion.div>
       )}
@@ -123,6 +183,14 @@ export default function GoalsPage() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         editingGoal={editingGoal}
+      />
+
+      <AddMoneyModal
+        isOpen={addMoneyGoal !== null}
+        onClose={() => setAddMoneyGoal(null)}
+        goal={addMoneyGoal}
+        remainingBalance={remainingBalance}
+        onConfirm={handleContribute}
       />
     </div>
   );

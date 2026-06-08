@@ -27,6 +27,9 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
 
     Optional<Expense> findByIdAndUser(UUID id, User user);
 
+    /** All ledger rows tied to a savings goal (its contributions) — used to reverse them on delete. */
+    List<Expense> findByUserAndGoalId(User user, UUID goalId);
+
     @Query("SELECT COALESCE(SUM(e.amount), 0) FROM Expense e " +
            "WHERE e.user = :user " +
            "AND e.expenseDate BETWEEN :start AND :end " +

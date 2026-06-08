@@ -28,7 +28,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
- * Verifies the wallet/remaining-balance formula: allowance + income − expenses.
+ * The remaining-balance formula now lives in {@link RunwayService} (and is covered
+ * by its test). The dashboard simply surfaces that single source, so here we verify
+ * it passes the runway balance through and still reports its own spent-this-month total.
  */
 @ExtendWith(MockitoExtension.class)
 class DashboardServiceTest {
@@ -53,7 +55,7 @@ class DashboardServiceTest {
         when(expenseRepository.findTop5ByUserOrderByExpenseDateDescCreatedAtDesc(any()))
                 .thenReturn(Collections.emptyList());
         when(runwayService.getRunway(EMAIL)).thenReturn(RunwayResponse.builder()
-                .remainingBalance(BigDecimal.ZERO)
+                .remainingBalance(new BigDecimal("4200"))
                 .avgDailySpending(BigDecimal.ZERO)
                 .estimatedDaysRemaining(100)
                 .daysUntilNextAllowance(10)
@@ -62,39 +64,22 @@ class DashboardServiceTest {
                 .build());
     }
 
-    private void stubTotals(String income, String expense) {
-        when(expenseRepository.sumByUserAndDateBetweenAndType(
-                any(), any(LocalDate.class), any(LocalDate.class), eq(TransactionType.INCOME)))
-                .thenReturn(new BigDecimal(income));
+    private void stubExpenseTotal(String expense) {
         when(expenseRepository.sumByUserAndDateBetweenAndType(
                 any(), any(LocalDate.class), any(LocalDate.class), eq(TransactionType.EXPENSE)))
                 .thenReturn(new BigDecimal(expense));
     }
 
     @Test
-    void income_increasesRemainingBalance() {
-        stubTotals("1000", "0"); // allowance 5000 + income 1000
+    void remainingBalance_isTakenFromRunway() {
+        // The runway already applied allowance + income − expenses − goalContributions.
         assertThat(dashboardService.getDashboard(EMAIL).getRemainingBalance())
-                .isEqualByComparingTo("6000");
-    }
-
-    @Test
-    void expense_decreasesRemainingBalance() {
-        stubTotals("0", "1000"); // allowance 5000 − expense 1000
-        assertThat(dashboardService.getDashboard(EMAIL).getRemainingBalance())
-                .isEqualByComparingTo("4000");
-    }
-
-    @Test
-    void incomeAndExpense_netCorrectly() {
-        stubTotals("2000", "1500"); // 5000 + 2000 − 1500
-        assertThat(dashboardService.getDashboard(EMAIL).getRemainingBalance())
-                .isEqualByComparingTo("5500");
+                .isEqualByComparingTo("4200");
     }
 
     @Test
     void spentFieldReflectsExpensesOnly() {
-        stubTotals("2000", "1500");
+        stubExpenseTotal("1500");
         assertThat(dashboardService.getDashboard(EMAIL).getTotalSpentThisMonth())
                 .isEqualByComparingTo("1500");
     }

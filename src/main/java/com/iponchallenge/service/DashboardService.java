@@ -45,18 +45,14 @@ public class DashboardService {
         BigDecimal totalSpent = expenseRepository.sumByUserAndDateBetweenAndType(
                 user, startOfMonth, endOfMonth, TransactionType.EXPENSE
         );
-        BigDecimal totalIncome = expenseRepository.sumByUserAndDateBetweenAndType(
-                user, startOfMonth, endOfMonth, TransactionType.INCOME
-        );
 
-        // Remaining balance = allowance + income − expenses.
-        // Income transactions increase the wallet; expenses decrease it.
-        BigDecimal allowance = user.getMonthlyAllowance() != null
-                ? user.getMonthlyAllowance() : BigDecimal.ZERO;
         BigDecimal monthlyAllowance = user.getMonthlyAllowance();
-        BigDecimal remainingBalance = allowance.add(totalIncome).subtract(totalSpent);
 
+        // Single source of truth for the wallet: the runway already applies
+        // allowance + income − expenses − goalContributions, so reuse it here
+        // instead of recomputing (which previously ignored goal contributions).
         RunwayResponse runway = runwayService.getRunway(email);
+        BigDecimal remainingBalance = runway.getRemainingBalance();
 
         // "Days left" follows the user's allowance cycle (weekly / bi-weekly / monthly),
         // i.e. the days until their next allowance — not just the calendar month end.

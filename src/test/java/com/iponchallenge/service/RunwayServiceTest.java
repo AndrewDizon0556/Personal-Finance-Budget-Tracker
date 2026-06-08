@@ -59,6 +59,10 @@ class RunwayServiceTest {
         lenient().when(expenseRepository.sumByUserAndDateBetweenAndType(
                 any(), any(LocalDate.class), any(LocalDate.class), eq(TransactionType.INCOME)))
                 .thenReturn(new BigDecimal(income));
+        // Default: no money moved into savings goals. Individual tests can override.
+        lenient().when(expenseRepository.sumByUserAndDateBetweenAndType(
+                any(), any(LocalDate.class), any(LocalDate.class), eq(TransactionType.GOAL_CONTRIBUTION)))
+                .thenReturn(BigDecimal.ZERO);
     }
 
     @Test
@@ -104,6 +108,21 @@ class RunwayServiceTest {
         assertThat(r.getRemainingBalance()).isLessThanOrEqualTo(BigDecimal.ZERO);
         assertThat(r.getEstimatedDaysRemaining()).isZero();
         assertThat(r.getRunwayStatus()).isEqualTo(RunwayStatus.CRITICAL);
+    }
+
+    @Test
+    void goalContributions_reduceRemainingBalance() {
+        stubUser(new BigDecimal("5000"), AllowanceSchedule.MONTHLY);
+        stubSums("0", "0"); // no spending, no income
+        // ₱1,200 moved into savings goals this month.
+        lenient().when(expenseRepository.sumByUserAndDateBetweenAndType(
+                any(), any(LocalDate.class), any(LocalDate.class), eq(TransactionType.GOAL_CONTRIBUTION)))
+                .thenReturn(new BigDecimal("1200"));
+
+        RunwayResponse r = runwayService.getRunway(EMAIL);
+
+        // 5000 allowance − 1200 saved into goals = 3800 still spendable.
+        assertThat(r.getRemainingBalance()).isEqualByComparingTo("3800");
     }
 
     @Test

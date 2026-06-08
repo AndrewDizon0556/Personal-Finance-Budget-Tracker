@@ -10,6 +10,7 @@ import {
   Wallet,
   TrendingUp,
   Home,
+  PiggyBank,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -22,7 +23,7 @@ interface CategoryStyle {
   hex: string;
 }
 
-const STYLES: Record<string, CategoryStyle> = {
+export const STYLES: Record<string, CategoryStyle> = {
   food: { icon: Utensils, fg: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-500/15', hex: '#f97316' },
   transport: { icon: Bus, fg: 'text-sky-600', bg: 'bg-sky-100 dark:bg-sky-500/15', hex: '#0ea5e9' },
   rent: { icon: Home, fg: 'text-amber-600 dark:text-amber-300', bg: 'bg-amber-100 dark:bg-amber-500/20', hex: '#d97706' },
@@ -33,6 +34,7 @@ const STYLES: Record<string, CategoryStyle> = {
   leisure: { icon: Gamepad2, fg: 'text-pink-600', bg: 'bg-pink-100 dark:bg-pink-500/15', hex: '#ec4899' },
   emergency: { icon: Siren, fg: 'text-rose-600', bg: 'bg-rose-100 dark:bg-rose-500/15', hex: '#f43f5e' },
   income: { icon: TrendingUp, fg: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-500/15', hex: '#10b981' },
+  savings: { icon: PiggyBank, fg: 'text-nu-gold-700 dark:text-nu-gold-300', bg: 'bg-nu-gold-100 dark:bg-nu-gold-500/20', hex: '#f5b300' },
   default: { icon: Wallet, fg: 'text-nu-blue-600', bg: 'bg-nu-blue-100 dark:bg-nu-blue-500/15', hex: '#4d5db4' },
 };
 

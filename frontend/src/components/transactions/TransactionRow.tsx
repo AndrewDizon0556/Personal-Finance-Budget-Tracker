@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { Expense } from '../../types/expense';
-import { categoryStyle } from '../../lib/categories';
+import { categoryStyle, STYLES } from '../../lib/categories';
 import { formatPeso, formatShortDate } from '../../lib/utils';
 import { useUiStore } from '../../store/uiStore';
 import { useExpenseStore } from '../../store/expenseStore';
@@ -21,9 +21,17 @@ export default function TransactionRow({ expense, stagger = true }: TransactionR
   const [deleting, setDeleting] = useState(false);
 
   const isIncome = expense.transactionType === 'INCOME';
-  const style = isIncome ? categoryStyle('income') : categoryStyle(expense.categoryName);
+  const isContribution = expense.transactionType === 'GOAL_CONTRIBUTION';
+  const style = isContribution
+    ? STYLES.savings
+    : isIncome
+      ? categoryStyle('income')
+      : categoryStyle(expense.categoryName);
   const Icon = style.icon;
-  const label = expense.notes?.trim() || expense.categoryName || 'Transaction';
+  const label = expense.notes?.trim() || (isContribution ? 'Savings goal' : expense.categoryName) || 'Transaction';
+  const subLabel = isContribution ? 'Savings goal' : expense.categoryName;
+  // A contribution isn't editable as a normal transaction — manage it from the Goals page.
+  const canEdit = !isContribution;
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -49,34 +57,38 @@ export default function TransactionRow({ expense, stagger = true }: TransactionR
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-ink">{label}</p>
         <p className="text-xs text-ink-faint">
-          {expense.categoryName} · {formatShortDate(expense.expenseDate)}
+          {subLabel} · {formatShortDate(expense.expenseDate)}
         </p>
       </div>
 
       <div className="flex items-center gap-1">
         <span
-          className={`font-display text-sm font-bold ${isIncome ? 'text-emerald-600' : 'text-ink'}`}
+          className={`font-display text-sm font-bold ${
+            isIncome ? 'text-emerald-600' : isContribution ? 'text-nu-gold-700 dark:text-nu-gold-300' : 'text-ink'
+          }`}
         >
           {isIncome ? '+' : '−'}
-          {formatPeso(expense.amount).replace('₱', '₱')}
+          {formatPeso(expense.amount)}
         </span>
 
-        <div className="ml-1 flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-          <button
-            onClick={() => openExpenseModal(expense)}
-            className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface hover:text-nu-blue-600"
-            aria-label="Edit"
-          >
-            <Pencil size={14} />
-          </button>
-          <button
-            onClick={handleDelete}
-            className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface hover:text-rose-500"
-            aria-label="Delete"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
+        {canEdit && (
+          <div className="ml-1 flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+            <button
+              onClick={() => openExpenseModal(expense)}
+              className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface hover:text-nu-blue-600"
+              aria-label="Edit"
+            >
+              <Pencil size={14} />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="grid h-7 w-7 place-items-center rounded-lg text-ink-faint hover:bg-surface hover:text-rose-500"
+              aria-label="Delete"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )}
       </div>
     </motion.div>
   );

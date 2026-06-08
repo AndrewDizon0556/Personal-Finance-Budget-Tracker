@@ -50,10 +50,16 @@ public class RunwayService {
         BigDecimal totalIncome = expenseRepository.sumByUserAndDateBetweenAndType(
                 user, startOfMonth, endOfMonth, TransactionType.INCOME
         );
+        // Money moved into savings goals is no longer spendable, so it leaves the wallet
+        // just like an expense: remaining = allowance + income − expenses − goalContributions.
+        BigDecimal totalGoalContributions = expenseRepository.sumByUserAndDateBetweenAndType(
+                user, startOfMonth, endOfMonth, TransactionType.GOAL_CONTRIBUTION
+        );
 
         BigDecimal allowance = user.getMonthlyAllowance() != null
                 ? user.getMonthlyAllowance() : BigDecimal.ZERO;
-        BigDecimal remainingBalance = allowance.add(totalIncome).subtract(totalSpent);
+        BigDecimal remainingBalance = allowance.add(totalIncome)
+                .subtract(totalSpent).subtract(totalGoalContributions);
 
         BigDecimal avgDailySpending = calculateAvgDailySpending(user, today);
         int estimatedDaysRemaining = calculateEstimatedDays(remainingBalance, avgDailySpending);
