@@ -1,155 +1,253 @@
-# Ipon Challenge
+<p align="center">
+  <a href="https://personal-finance-budget-tracker-seven.vercel.app">
+    <img src="frontend/public/logo-icon.svg" width="80" alt="Ipon Challenge logo" />
+  </a>
+</p>
 
-**Track your money. Control your spending. Build the saving habit.**
+<h1 align="center">Ipon Challenge</h1>
 
-Ipon Challenge is a personal finance and budget tracker for **students and anyone
-on a budget**. It helps you manage your allowance or income, log everyday expenses,
-set savings goals, and build healthy money habits — wrapped in a modern, gamified
-experience that makes budgeting feel less like a chore. It began with student life
-in mind, and works just as well for professionals, families, and first-time savers.
+<p align="center">
+  <strong>Track your money. Control your spending. Build the saving habit.</strong>
+</p>
+
+<p align="center">
+  A full-stack personal finance and budget tracker built for students and anyone on a budget.<br/>
+  Manage your allowance, log everyday expenses, set savings goals, and build healthy money habits —<br/>
+  with an AI coach that knows your numbers and helps your money last.
+</p>
+
+<p align="center">
+  <a href="https://personal-finance-budget-tracker-seven.vercel.app"><strong>Live App →</strong></a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="#-features">Features</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="#-architecture">Architecture</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="#-getting-started">Getting Started</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white" alt="React 18" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Spring_Boot-3.2-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot" />
+  <img src="https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white" alt="Java 17" />
+  <img src="https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/PWA-Offline_First-5A0FC8?logo=pwa&logoColor=white" alt="PWA" />
+  <img src="https://img.shields.io/badge/AI_Coach-Gemini-886FBF?logo=googlegemini&logoColor=white" alt="AI Coach" />
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License" />
+</p>
 
 > *Ipon* is the Filipino word for "saving up."
 
-🔗 **Live app:** https://personal-finance-budget-tracker-seven.vercel.app
+---
+
+## Product Showcase
+
+<p align="center">
+  <img src="showcase/product-showcase.png" alt="Ipon Challenge — Product Showcase" width="100%" />
+</p>
+
+<details>
+<summary><strong>How to generate the showcase image</strong></summary>
+
+Open `showcase/showcase.html` in Chrome, then use DevTools → **⋮** → **Capture full size screenshot** (set device pixel ratio to 2× for sharper output). Alternatively, use the AI image-generation prompt in `showcase/image-prompt.md` with Midjourney, DALL·E, or Imagen.
+
+</details>
 
 ---
 
-## Install the app (PWA)
+## Screenshots
 
-Ipon Challenge is a Progressive Web App, so you can install it like a native app —
-no app store needed. Open the live link above, then:
+| Dashboard | AI Coach | Savings Goals |
+|:-:|:-:|:-:|
+| ![Dashboard](showcase/screenshots/dashboard.png) | ![AI Coach](showcase/screenshots/ai-coach.png) | ![Goals](showcase/screenshots/goals.png) |
 
-- **Android (Chrome):** tap the **⋮** menu → **Add to Home screen** → **Install**.
-- **iPhone/iPad (Safari):** tap **Share** → **Add to Home Screen**.
-- **Desktop (Chrome/Edge):** click the **install icon** (⊕) in the address bar, or
-  the **⋮** menu → **Install Ipon Challenge**.
-
-Once installed it opens full-screen, keeps you logged in, and works offline — any
-expenses you add without internet are saved locally and synced automatically when
-you reconnect.
+| Analytics | Mobile View | Dark Mode |
+|:-:|:-:|:-:|
+| ![Analytics](showcase/screenshots/analytics.png) | ![Mobile](showcase/screenshots/mobile.png) | ![Dark Mode](showcase/screenshots/dark-mode.png) |
 
 ---
-
-## Overview
-
-Ipon Challenge works for everyone — students living on a weekly *baon*, professionals
-managing a salary, or anyone who just wants their money to last. It started with
-student life in mind (allowance scheduling, school-friendly categories, and a
-"safe-to-spend per day" figure that keeps you on track until your next payout) and
-broadened from there. It pairs a clean React dashboard with a secure Spring Boot API
-and a PostgreSQL database.
 
 ## Features
 
-**Money management**
-- **Smart Allowance Runway 2.0** — daily safe-to-spend, risk level (green / yellow / red),
-  spending trend, estimated exhaustion date, and a 4-week projection chart
-- **Recurring allowance automation** — allowance is auto-credited on your schedule
-  (daily / weekly / bi-weekly / monthly)
-- Fast expense and income logging with ready-made categories
-  (Food, Transportation, Bills, Leisure, Emergency, plus student-friendly ones like Tuition, School Supplies, Projects, Load/Data)
+### 💰 Smart Budget Tracking
+
+- **Allowance Runway 2.0** — daily safe-to-spend, risk level (green / yellow / red), spending trend, estimated exhaustion date, and a 4-week projection chart
+- **Recurring allowance automation** — allowance auto-credited on your schedule (daily / weekly / bi-weekly / monthly)
+- Fast expense and income logging with ready-made categories (Food, Transportation, Bills, Leisure, Emergency, Tuition, School Supplies, Projects, Load/Data)
 - **Semester Budget Mode** — plan a whole semester and get a weekly spending breakdown
-- Savings goals with animated progress rings and milestone tracking
+- **Before You Buy** — spending-impact check before each expense is saved
+
+### 🎯 Savings Goals
+
+- Create financial goals with target amounts and deadlines
+- Animated progress rings and milestone tracking
+- Add money from your available balance — automatically deducted
 - **Emergency Fund** — dedicated safety-net savings by category (Medical, Transport, School, General)
-- Subscription tracker and a quick bill-splitter for group expenses
-- **Before You Buy** — a spending-impact check before each expense is saved
 
-**Insight & motivation**
-- Analytics with spending-by-category and weekly trend charts
-- **Financial Health Score** — a 0–100 score across savings, budget, spending,
-  challenges, and emergency-fund habits
-- Smart financial insights generated from your real spending
+### 🤖 AI Finance Coach
+
+- Personalized financial insights — the AI sees your real balance, budgets, spending, and goals
+- Natural language interaction: *"Can I afford ₱1,000 right now?"*
+- Can log income, expenses, and goals on your behalf (you confirm first)
+- Choose your coach avatar — female or male assistant
+- Powered by Google Gemini with per-user daily caps
+
+### 📊 Analytics & Reports
+
+- Spending breakdown by category with visual charts
+- Weekly and monthly spending trends
+- **Financial Health Score** — 0–100 score across savings, budget, spending, challenges, and emergency-fund habits
+- **Monthly Reports** — exportable as PDF (print) or CSV
+
+### 🏆 Gamification
+
+- XP, levels, no-overspend streaks, and unlockable achievements
 - **No-Spend Challenges** — gamified challenges (No Milk Tea, Save ₱50/day, …) that award XP
-- Gamification: XP, levels, no-overspend streaks, and unlockable achievements
 - **Financial Literacy** — practical lessons with quizzes and a compound-interest calculator
-
-**Admin**
-- **App Growth Dashboard (admin-only)** — aggregated usage and engagement analytics:
-  total / new / active users, total app usage, a signup-growth chart, and an activity
-  summary. Locked behind role-based access (server-side `ADMIN` check) and hidden from
-  regular users; exposes aggregated stats only, never individual user data.
-
-**Planning & reports**
 - **School Calendar** — track exams, projects, and tuition deadlines with budget suggestions
-- **Reports** — monthly report with charts, exportable as **PDF** (print) or **CSV**
 
-**Experience**
-- **Offline-first PWA** — installable on phone/desktop; works without internet and
-  auto-syncs when the connection returns
+### 📱 Progressive Web App
+
+- Install on any device — Android, iOS, desktop — no app store needed
+- **Offline-first** — works without internet and auto-syncs when the connection returns
 - Light/dark mode with customizable accent colors
-- First-time onboarding flow and friendly empty states
-- Responsive layout with a mobile bottom nav, "More" menu, and quick-add button
+- Responsive layout with mobile bottom nav, "More" menu, and quick-add button
+
+### 🐶 Quick Actions (Coachy)
+
+A friendly bulldog mascot FAB floats on every screen — tap to instantly add an expense, income, savings, create a goal, or record your allowance.
+
+---
 
 ## Tech Stack
 
-| Layer | Technologies |
-| --- | --- |
-| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, Recharts, Zustand, React Hook Form + Zod, Axios |
-| **Offline / PWA** | vite-plugin-pwa (Workbox service worker), Dexie (IndexedDB) |
-| **Backend** | Java 17, Spring Boot 3.2, Spring Security, Spring Data JPA (Hibernate), Bean Validation, JJWT, Spring Scheduling |
-| **Database** | PostgreSQL |
-| **Hosting** | Vercel (frontend) · Railway (backend + PostgreSQL) |
+<table>
+  <tr>
+    <td><strong>Frontend</strong></td>
+    <td>React 18 · TypeScript · Vite · Tailwind CSS · Framer Motion · Recharts · Zustand · React Hook Form + Zod · Axios</td>
+  </tr>
+  <tr>
+    <td><strong>Offline / PWA</strong></td>
+    <td>vite-plugin-pwa (Workbox) · Dexie (IndexedDB) · Background Sync</td>
+  </tr>
+  <tr>
+    <td><strong>Backend</strong></td>
+    <td>Java 17 · Spring Boot 3.2 · Spring Security · Spring Data JPA (Hibernate) · Bean Validation · JJWT · Spring Scheduling</td>
+  </tr>
+  <tr>
+    <td><strong>AI</strong></td>
+    <td>Google Gemini API · Context-aware financial assistant</td>
+  </tr>
+  <tr>
+    <td><strong>Database</strong></td>
+    <td>PostgreSQL 14+</td>
+  </tr>
+  <tr>
+    <td><strong>Hosting</strong></td>
+    <td>Vercel (frontend) · Railway (backend + PostgreSQL)</td>
+  </tr>
+</table>
+
+---
 
 ## Architecture
 
-The project is a clean two-tier application:
+A clean two-tier application: a **React SPA** communicating over HTTPS with a **stateless Spring Boot REST API**, backed by **PostgreSQL**.
 
-- A **React single-page app** that talks to the API over HTTPS and stores its
-  session as a JWT bearer token.
-- A **stateless Spring Boot REST API** organized into controllers → services →
-  repositories, with DTOs and mappers separating the API contract from entities.
-  Authentication is JWT-based; every data query is scoped to the authenticated user.
+```
+┌─────────────────────────────────────────────────┐
+│  React + TypeScript SPA  (Vercel)                │
+│  Pages · Components · Zustand stores             │
+│  Services (Axios) · Offline layer (Dexie)        │
+└──────────────────┬──────────────────────────────┘
+                   │  HTTPS · JWT Bearer
+                   ▼
+┌─────────────────────────────────────────────────┐
+│  Spring Boot REST API  (Railway)                  │
+│                                                   │
+│  Controller → Service → Repository → Entity       │
+│       (DTO + Mapper)       (Spring Data JPA)      │
+│                                                   │
+│  Security: JWT filter · Rate limiting · Lockout   │
+│  AI Coach: Gemini integration · Daily caps        │
+│  Scheduling: Recurring allowance automation       │
+└──────────────────┬──────────────────────────────┘
+                   │  JDBC (Hibernate)
+                   ▼
+┌─────────────────────────────────────────────────┐
+│  PostgreSQL  (Railway)                            │
+└─────────────────────────────────────────────────┘
+```
+
+### Project Structure
 
 ```
 Personal-Finance-Budget-Tracker/
 ├── src/main/java/com/iponchallenge/   # Spring Boot API
 │   ├── controller/                    # REST endpoints
-│   ├── service/                       # Business logic (incl. allowance scheduler)
+│   ├── service/                       # Business logic
 │   ├── repository/                    # Spring Data JPA repositories
-│   ├── entity/  dto/  mapper/         # Domain, API contracts, mapping
-│   ├── security/  config/             # JWT filter, rate limiting, seeders
-│   ├── ai/                            # AI Coach scaffold (controller/service/dto/config)
+│   ├── entity/  dto/  mapper/         # Domain model, API contracts, mapping
+│   ├── security/  config/             # JWT, rate limiting, CORS, headers
+│   ├── ai/                            # AI Coach (Gemini integration)
 │   └── exception/                     # Centralized error handling
-├── src/main/resources/                # application.properties
-└── frontend/                          # React + TypeScript PWA
-    └── src/
-        ├── pages/  components/        # Screens and UI building blocks
-        ├── store/                     # Zustand state (auth, theme, offline, …)
-        ├── services/  api/            # API clients
-        ├── repositories/              # Online/offline data layer
-        ├── db/  sync/                 # Dexie (IndexedDB) + SyncManager
-        └── lib/                       # Helpers, motion variants, theme
+├── frontend/                          # React + TypeScript PWA
+│   └── src/
+│       ├── pages/  components/        # Screens and UI building blocks
+│       ├── store/                     # Zustand state management
+│       ├── services/  api/            # Typed API clients
+│       ├── db/  sync/                 # IndexedDB + SyncManager
+│       └── lib/                       # Helpers, animations, theming
+├── showcase/                          # Product images and showcase assets
+├── docs/                              # Technical documentation
+├── ARCHITECTURE.md                    # Detailed architecture reference
+└── CHANGELOG.md                       # Sprint-by-sprint feature log
 ```
+
+For a detailed breakdown of packages, data models, request lifecycle, and technology decisions, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+---
+
+## Security
+
+- **Authentication** — JWT bearer tokens with BCrypt password hashing and token-versioning for full session revocation (logout all devices, password change invalidation)
+- **Password policy** — minimum 12 characters with upper, lower, number, and symbol — enforced on both client and server
+- **Brute-force protection** — account lockout after repeated failures plus per-IP rate limiting on auth endpoints
+- **Authorization** — role-based access control (`STUDENT` / `ADMIN`) enforced server-side; all data access scoped to the authenticated user
+- **Hardening** — CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy, strict input validation, request-size limits, generic error responses
+
+---
 
 ## Getting Started
 
 ### Prerequisites
+
 - Java 17+ and Maven
 - Node.js 18+ and npm
 - PostgreSQL 14+
 
-### 1. Backend
+### Backend
 
-Create a database, then provide configuration via environment variables
-(sensible local defaults are built in):
+Create a database, then configure via environment variables:
 
-| Variable | Description | Local default |
-| --- | --- | --- |
+| Variable | Description | Default |
+|---|---|---|
 | `PGHOST` / `PGPORT` / `PGDATABASE` | Postgres connection | `localhost` / `5432` / `ipon_challenge` |
 | `PGUSER` / `PGPASSWORD` | Postgres credentials | `postgres` / `postgres` |
-| `JWT_SECRET` | Signing key for JWTs — **required** (the app won't start without it) | _none — must be set_ |
+| `JWT_SECRET` | JWT signing key (**required**) | — |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins | `http://localhost:5173` |
-| `AI_API_KEY` | Google Gemini API key — enables the AI Coach (free key from [aistudio.google.com](https://aistudio.google.com/app/apikey); never hardcode) | unset (AI Coach off) |
+| `AI_API_KEY` | Google Gemini API key (enables AI Coach) | unset |
 | `AI_MODEL` | Gemini model id | `gemini-2.5-flash-lite` |
-| `AI_BASE_URL` | Gemini API base URL | Gemini v1beta endpoint |
-
-Run the API (defaults to `http://localhost:8080`):
 
 ```bash
 mvn spring-boot:run
 ```
 
-### 2. Frontend
+The API starts at `http://localhost:8080`.
+
+### Frontend
 
 ```bash
 cd frontend
@@ -157,59 +255,53 @@ npm install
 npm run dev
 ```
 
-The app runs at `http://localhost:5173`. To point it at a non-default API, set
-`VITE_API_URL` in a `frontend/.env` file:
+The app runs at `http://localhost:5173`. To point at a non-default API, set `VITE_API_URL` in `frontend/.env`:
 
 ```
 VITE_API_URL=http://localhost:8080
 ```
 
-## Security
+### Install as PWA
 
-Security is treated as a core feature, not an afterthought:
+Open the live app, then:
 
-- **Authentication** — JWT bearer tokens with BCrypt password hashing and a
-  token-versioning scheme that supports "log out of all devices" and full
-  revocation on password change.
-- **Password policy** — minimum 12 characters with upper, lower, number, and
-  symbol, enforced on both client and server.
-- **Brute-force protection** — account lockout after repeated failures plus
-  per-IP rate limiting on auth endpoints.
-- **Authorization** — every endpoint requires authentication (except login and
-  register); all data access is scoped to the current user. **Role-based access
-  control** (`STUDENT` / `ADMIN`) is enforced server-side — admin-only endpoints
-  (`/api/admin/**`) reject non-admins with `403`, and admin UI is hidden from
-  regular users.
-- **Hardening** — security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy,
-  Permissions-Policy), strict input validation, request-size limits, and generic
-  error responses that never leak stack traces or internals.
+- **Android (Chrome):** ⋮ menu → Add to Home screen → Install
+- **iPhone/iPad (Safari):** Share → Add to Home Screen
+- **Desktop (Chrome/Edge):** click the install icon (⊕) in the address bar
+
+Once installed, the app opens full-screen, keeps you logged in, and works offline.
+
+---
 
 ## Deployment
 
-- **Frontend** is deployed on **Vercel** from the `frontend/` directory.
-- **Backend** and **PostgreSQL** run on **Railway**; the API auto-deploys on
-  pushes to `main`.
+| Service | Platform | Trigger |
+|---|---|---|
+| Frontend | Vercel | Auto-deploy on push to `main` |
+| Backend + DB | Railway | Auto-deploy on push to `main` |
+
+Security headers are configured via `vercel.json` (CSP, HSTS, X-Frame-Options). The backend reads all configuration from environment variables.
+
+---
 
 ## Roadmap
 
-- **AI Coach (live)** — a chat assistant (Google Gemini) that gives budget advice
-  from your real spending data, answers finance questions, and can categorize
-  expenses; surfaced as a customizable-avatar floating button, with per-user daily
-  caps to stay within the free tier. Set `AI_API_KEY` to switch it on.
-- Refresh-token rotation with HTTP-only cookies (single-domain hosting)
-- Push notifications for budget alerts and upcoming school events
-- Richer analytics and multi-month report comparisons
+- Advanced AI financial insights and spending predictions
+- Refresh-token rotation with HTTP-only cookies
+- Push notifications for budget alerts and school events
+- Multi-month report comparisons and trend analysis
+- Enhanced customization and theming options
+
+---
 
 ## License
 
 Released under the **MIT License** — see [LICENSE](LICENSE) for details.
-NU Laguna branding elements are used for an educational, non-commercial project
-and remain the property of National University Laguna. See also the in-app
-[Terms of Service](https://personal-finance-budget-tracker-seven.vercel.app/terms)
-and [Privacy Policy](https://personal-finance-budget-tracker-seven.vercel.app/privacy).
 
-## Acknowledgements
+NU Laguna branding elements are used for an educational, non-commercial project and remain the property of National University Laguna. See also the in-app [Terms of Service](https://personal-finance-budget-tracker-seven.vercel.app/terms) and [Privacy Policy](https://personal-finance-budget-tracker-seven.vercel.app/privacy).
 
-Built as a full-stack portfolio project for **National University
-Laguna** by Vic Andrew A. Dizon. Branding and theming are inspired by NU Laguna and are used for an
-educational, non-commercial project.
+---
+
+<p align="center">
+  Built as a full-stack portfolio project for <strong>National University Laguna</strong> by <a href="https://github.com/AndrewDizon0556">Vic Andrew A. Dizon</a>.
+</p>
