@@ -37,7 +37,12 @@ export default function LoginPage() {
       navigate('/dashboard');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      setServerError(error.response?.data?.message ?? 'Login failed. Please try again.');
+      if (!error.response) {
+        // No response at all — the API is unreachable, not a credential problem.
+        setServerError("Can't reach the server. Make sure the backend is running, then try again.");
+        return;
+      }
+      setServerError(error.response.data?.message ?? 'Login failed. Please try again.');
     }
   };
 
